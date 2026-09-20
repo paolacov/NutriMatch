@@ -11,7 +11,7 @@
 help: ## Lista los targets disponibles
 	@echo "Targets de NutriMatch:"
 	@echo "  setup        Crea .venv con uv e instala el paquete en modo editable (extra dev)"
-	@echo "  ingest-off   Descarga y procesa el export de Open Food Facts  [pendiente]"
+	@echo "  ingest-off   Descarga y procesa el export de Open Food Facts (1,28 GB)"
 	@echo "  ingest-qqp   Descarga y procesa los precios de PROFECO QQP    [pendiente]"
 	@echo "  eda          Análisis exploratorio del universo México        [pendiente]"
 	@echo "  ui           Lanza la interfaz Streamlit"
@@ -25,8 +25,10 @@ setup: ## Crea .venv con uv e instala el paquete en modo editable con el extra d
 	uv venv
 	uv pip install -e ".[dev]"
 
-ingest-off: ## Pendiente: ejecutará scripts/ingesta_off.py para construir el snapshot México
-	@echo "pendiente de implementar: scripts/ingesta_off.py"
+# Descarga el export diario de OFF (~1,28 GB), inspecciona su esquema real, filtra México
+# con DuckDB y reconcilia el conteo contra el count medido en la API.
+ingest-off: ## Construye el snapshot México desde el export de Open Food Facts
+	uv run python scripts/ingesta_off.py
 
 ingest-qqp: ## Pendiente: ingesta de los precios de referencia de PROFECO QQP
 	@echo "pendiente de implementar: ingesta de PROFECO QQP"

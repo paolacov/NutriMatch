@@ -31,11 +31,23 @@ nutrimatch.db*
 datos/snapshots/*
 datos/precios_qqp/*
 
-# Derivados del snapshot. Excluidos POR AHORA.
-# PENDIENTE: decidir si se versiona el Parquet derivado del universo México una
-# vez se mida su tamaño real; si resulta pequeño, conviene versionarlo para
-# hacer el análisis reproducible sin repetir la descarga de 1,28 GB.
+# Excepción para los metadatos: git no desciende en un directorio excluido, así
+# que hay que reabrir primero las carpetas de snapshot y excluir su contenido
+# archivo a archivo.
+!datos/snapshots/*/
+datos/snapshots/*/*
+
+# Derivados del snapshot: SÍ se versionan.
+# Resuelto el 2026-09-19: el Parquet del universo México pesa 4,9 MB para
+# 16.851 productos, así que versionarlo hace el análisis reproducible sin
+# repetir la descarga de 1,19 GB.
 datos/procesados/*
+!datos/procesados/*.parquet
+
+# Los metadatos de procedencia del snapshot (URL, Last-Modified, ETag, SHA-256,
+# esquema y reconciliación) son la trazabilidad del dato: pesan poco y se
+# versionan aunque el archivo crudo que describen no esté en el repo.
+!datos/snapshots/*/_metadata.json
 
 # Se conservan los marcadores de carpeta para que el árbol exista al clonar.
 !**/.gitkeep
