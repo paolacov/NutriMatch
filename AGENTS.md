@@ -247,6 +247,66 @@ core7 (49,6 % vs 52,7 %), un impacto mucho menor al que sugería la muestra sesg
 - Se revisa si conviene una excepción por categoría cuando exista `category_stats` con el desglose
   real por categoría (esta decisión se tomó sobre el agregado del universo, no por categoría).
 
+### A21. Corrección de escala de sal cuando la razón con sodio es ≈2,5
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/03_transformacion_score.ipynb` (sección 1). Al
+sanear `salt_100g` (A18), 56 productos quedaron fuera de rango; 55 de ellos mantienen exactamente la
+razón sal ≈ 2,5 × sodio del producto (fórmula química estándar, no un ajuste del dataset) y, al
+dividir entre 1000, caen en un rango de sal perfectamente normal para su tipo de producto (compatible
+con una captura en miligramos donde se esperaban gramos). El caso restante (razón ≈2500) es un error
+de otra naturaleza.
+
+- Se corrige automáticamente `salt_100g` cuando, estando fuera de rango, su razón con `sodium_100g`
+  es ≈2,5 (tolerancia ±0,02) **y** el valor reescalado (÷1000) cae dentro del rango válido.
+- La corrección se deriva siempre del propio dato del producto (su `sodium_100g`), nunca de un valor
+  externo o supuesto: no es "inventar" un dato, es reconciliar dos campos del mismo producto con una
+  fórmula universal.
+- Queda trazable vía `salt_100g_flag_correccion_escala_aplicada`: se puede distinguir siempre un dato
+  "tal cual vino" de uno "corregido por esta regla".
+- El caso que no cumple la razón se queda fuera de la regla y sigue marcado como fuera de rango sin
+  corregir (A18 sin excepción).
+- Implementado en `nutrimatch.engine.sanitize.corregir_escala_sal_por_sodio`.
+
+### A22. Umbral del universo puntuable: ≥4 de 8 percentiles válidos + D2 calculable
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/03_transformacion_score.ipynb` (sección 6),
+afinando A19. La estimación naive de A19 (34,8 %) no exigía categoría de referencia resuelta ni
+mínimo de pares por percentil; recalculado con precisión, ese mismo 34,8 % se reproduce casi exacto
+exigiendo **al menos 4 de los 8 percentiles de D1 sean válidos** (la mitad del núcleo nutricional) y
+D2 sea calculable (el producto tiene NOVA): 5.864 productos (34,8 %). Exigir los 8 completos baja el
+universo a 31,7 % (5.341); exigir solo 1 lo sube apenas a 34,9 % (5.888) — la diferencia entre los
+tres umbrales es pequeña, y se elige el intermedio.
+
+- Columna `universo_puntuable` (booleana) guardada en `matriz_nut_100g`, calculada con este umbral.
+- No sustituye a `cov` (A2): `cov` sigue siendo la regla fina que pondera cada dimensión según los
+  pesos de la usuaria; este umbral es un filtro previo, agnóstico del usuario, sobre qué productos
+  tienen *suficiente dato crudo* para intentar puntuarse en absoluto.
+
+### A23. Fórmula de D2 confirmada: bandas de 25 puntos por grupo NOVA, ajustadas por `additives_n`
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/03_transformacion_score.ipynb` (sección 4),
+cerrando el "cómo" que A17 dejó abierto (A17 solo cerró el "qué": combinar NOVA con `additives_n`).
+
+- Cada grupo NOVA ocupa una banda fija de 25 puntos en la escala 0-100 (NOVA=1 → 75-100, NOVA=2 →
+  50-75, NOVA=3 → 25-50, NOVA=4 → 0-25), preservando que ningún producto de mejor NOVA puede puntuar
+  por debajo de uno de peor NOVA.
+- Dentro de su banda, `additives_n` empuja el subpuntaje hacia el piso, hasta un tope calibrado como
+  el **percentil 95 de `additives_n` entre los productos NOVA=4 del propio snapshot** (recalculado en
+  cada snapshot, no una constante fija; da 9,0 en `off_csv_20260919`).
+- `additives_n` ausente se trata como 0 aditivos (la posición más favorable dentro de la banda), no
+  como dato faltante que anule D2.
+- D2 solo es calculable si el producto tiene NOVA; sin NOVA, D2 es NULL (A2).
+- Implementado en `nutrimatch.engine.processing_score`.
+
+### A24. Mínimo de pares para un percentil confiable: 5
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/03_transformacion_score.ipynb` (sección 3). Que
+una categoría de referencia alcance el mínimo de A16 (30 productos con la etiqueta) no garantiza que
+haya suficientes productos con dato válido para un nutriente concreto en particular. Se exige un
+mínimo de **5 productos con dato saneado válido** en la categoría de referencia para calcular el
+percentil de ese nutriente; si no se alcanza, el percentil es NULL para ese producto y ese nutriente,
+aunque la categoría nominal cumpla A16. Implementado en `nutrimatch.engine.constants.MINIMO_PEERS_PERCENTIL`.
+
 ---
 
 ## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
