@@ -153,12 +153,108 @@ El motor vive en el paquete `nutrimatch`, **reutilizado tal cual** por notebooks
 es la interfaz del MVP. **FastAPI y Angular quedan documentados como línea futura** en
 [`docs/linea_futura.md`](docs/linea_futura.md), fuera del alcance.
 
+### A15. Filtro de alergias: tres estados, no un binario fail-safe
+
+**Decisión revisada el 2026-09-20**, sobre datos reales de `notebooks/02_eda_universo_mexico.ipynb`
+(sección 4). El fail-safe binario de A1 ("no verificado = no apto") se definió antes de medir la
+cobertura real de `allergens`: es **16,6 %** sobre el universo México (2.793 de 16.851), muy por
+debajo del 61,7 % que sugería la muestra sesgada de la sección 7.2 del documento maestro original.
+Aplicado tal cual, el binario marcaría **83,4 % del catálogo como "no apto"** para cualquier usuaria
+con una alergia declarada, y en la inmensa mayoría de esos casos sería por ausencia de dato, no por
+presencia real del alérgeno.
+
+- **Alergias: tres estados**, igual que dieta (A1): **apto / no apto / no verificable**.
+- "No verificable" se muestra en su **propia banda**, con advertencia visible de que el dato de
+  alérgenos del producto está incompleto. Nunca se mezcla con "apto".
+- Fuentes: `allergens` (positivo confirmado) y `traces` ("puede contener", igual de relevante para
+  el fail-safe). `allergens_en` existe en el export pero llega **vacía en el 100 % de las filas**
+  (ver B11): no es una fuente utilizable.
+
+### A16. Categoría de referencia para D1: retroceso ascendente con umbral mínimo
+
+**Decisión cerrada el 2026-09-20**, resuelve el bloqueante B10. Verificado sobre
+`notebooks/02_eda_universo_mexico.ipynb` (sección 5): ni la etiqueta más específica de
+`categories_tags` (mediana de 14 miembros; 40,8 % de los productos con categoría cae en una
+categoría específica de menos de 10 miembros) ni la más genérica (`en:plant-based-foods-and-beverages`
+agrupa sola 3.048 productos heterogéneos) sirven por sí solas para calcular un percentil confiable.
+
+- La categoría de referencia de un producto es su **etiqueta más específica** de `categories_tags`
+  (última posición: OFF ordena la lista de lo genérico a lo específico).
+- Si esa categoría tiene **menos de 30 productos** en el universo puntuable, se **sube un nivel** (la
+  etiqueta inmediatamente anterior) y se repite la comprobación.
+- Si se agota la jerarquía del producto sin alcanzar el umbral, el producto **no tiene categoría de
+  referencia válida**: D1 queda "sin dato" para él (nunca se fuerza una categoría demasiado pequeña
+  ni una demasiado genérica). Consistente con A2: sin dato es NULL + bandera, no una aproximación.
+- El umbral de 30 se fijó porque cubre el 64,0 % de los productos con categoría específica sin
+  necesitar retroceso; es un valor inicial, no una constante inamovible, y se revisa al construir
+  `category_stats`.
+
+### A17. D2 combina NOVA con `additives_n`, no NOVA en solitario
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/02_eda_universo_mexico.ipynb` (sección 3). NOVA
+solo discrimina poco en el universo México: **69,5 %** de los 6.781 productos con NOVA son grupo 4,
+que recibirían subpuntaje 0 sin distinción entre sí. `additives_n` tiene una relación **monótona y
+clara** con NOVA (aditivos promedio: 0,09 en N1, 0,13 en N2, 0,49 en N3, 3,71 en N4) y una cobertura
+ligeramente mayor (45,4 % vs 40,2 %).
+
+- **D2 = NOVA como base + ajuste continuo por `additives_n` dentro de cada grupo.** No es un
+  constructo nuevo: `additives_n` refina la medida de procesamiento *dentro* de los cuatro niveles de
+  NOVA, de forma análoga a como D1 combina varios nutrientes dentro de una sola dimensión (A4). No
+  duplica NOVA como dimensión aparte.
+- La fórmula exacta de combinación se define en el paso de transformación (`src/nutrimatch/engine`),
+  no aquí.
+
+### A18. Saneamiento de valores físicamente imposibles antes de puntuar
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/02_eda_universo_mexico.ipynb` (sección 6). Se
+detectaron errores de captura reales en OFF México: **58 productos** con `energy-kcal_100g > 900`
+(máximo teórico, grasa pura), incluyendo un caso de **277.183 kcal/100 g**. La desviación
+kJ↔kcal >5 % afecta al **20,1 %** de los productos con ambos campos (más del doble que la baselina
+sesgada de 7.2, que reportaba 9,9 %).
+
+- Los valores fuera de rango físico plausible se marcan con **flag de calidad** explícito.
+- Un producto con flag de calidad se **excluye del cálculo de percentiles y de `category_stats`**
+  para esa dimensión (no puede aportar una comparación válida).
+- El dato crudo **permanece visible** en la ficha del producto: no se oculta ni se corrige en
+  silencio. Es coherente con A2 (nunca imputar) y con no perder trazabilidad.
+- Los umbrales exactos de saneamiento (qué cuenta como "fuera de rango" para cada nutriente) se
+  definen en el paso de transformación.
+
+### A19. Universo híbrido: buscar sobre todo, rankear solo sobre lo puntuable
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/02_eda_universo_mexico.ipynb` (sección 8). Solo
+el **34,8 %** del universo México (5.856 de 16.851) cumple a la vez los requisitos de D1 (core5 +
+categoría de referencia) y D2 (NOVA). Restringir todo el MVP a ese subconjunto dejaría fuera dos
+tercios del catálogo, incluida búsqueda y escaneo.
+
+- Los **16.851 productos** del snapshot son **buscables y consultables** en todo momento, mostrando
+  la información disponible con sus banderas de dato faltante.
+- Solo entran al **ranking comparativo** los productos que cumplen D1 + D2 **y** `cov ≥ 0.5` (A2)
+  según las prioridades activas de la usuaria (el universo puntuable exacto varía por usuaria, porque
+  D3 depende de qué etiquetas valoradas eligió).
+- Los que no cumplen van a la banda "información insuficiente" de A2, que ya contemplaba este caso.
+
+### A20. Fibra incluida en el núcleo nutricional global (core8)
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/02_eda_universo_mexico.ipynb` (sección 2). La
+sección 7.7 del documento maestro original marcaba la fibra como candidata a "opcional o por
+categoría" porque en la muestra sesgada de 7.2 derribaba mucho la cobertura de core7 en lácteos y
+bebidas. Verificado sobre el universo real: `fiber_100g` resta solo **3,1 puntos porcentuales** sobre
+core7 (49,6 % vs 52,7 %), un impacto mucho menor al que sugería la muestra sesgada.
+
+- La fibra se incluye en el **núcleo nutricional global** (core8: los 7 nutrientes de core7 más
+  fibra) desde ahora, sin excepción por categoría.
+- Se revisa si conviene una excepción por categoría cuando exista `category_stats` con el desglose
+  real por categoría (esta decisión se tomó sobre el agregado del universo, no por categoría).
+
 ---
 
-## Sección B. Trampas verificadas en vivo el 2026-09-19
+## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
 
-Todo lo de esta sección son **mediciones reales hechas el 2026-09-19**, no supuestos. Se citan con
-su fecha porque los datos de OFF se regeneran a diario y los counts cambian.
+Todo lo de esta sección son **mediciones reales**, no supuestos. Cada entrada cita su propia fecha
+porque los datos de OFF se regeneran a diario y los counts cambian; la mayoría es del 2026-09-19
+(verificación de la API y descarga del export), y B10-B12 son del 2026-09-20 (EDA sobre el snapshot
+ya construido).
 
 ### B1. Staging vs producción: la confusión que invalidó las primeras cifras
 
@@ -218,28 +314,45 @@ OFF **exige un `User-Agent` identificable en todas las peticiones**. Se configur
 
 La **API v2 es la única con búsqueda estructurada**. **v3 no tiene búsqueda.**
 
-### B9. PENDIENTE de confirmar al leer el esquema del export
+### B9. RESUELTO el 2026-09-19 — esquema real del export CSV
 
-Falta confirmar, leyendo la cabecera real del export, si existen las columnas:
+Confirmado leyendo la cabecera real del export (211 columnas, separador de tabulación):
+`main_category`, `main_category_en`, `image_nutrition_url` e `image_ingredients_url` **sí existen**.
+La prueba anterior con solo 2 productos por la API no había sido concluyente porque OFF omite los
+campos vacíos en la respuesta.
 
-- `main_category`
-- `allergens_en`
-- Las **imágenes de nutrición e ingredientes**.
+Con una salvedad importante encontrada en el mismo momento: **`allergens_en` existe pero llega vacía
+en el 100 % de las filas** de México. No es una fuente utilizable pese a existir la columna (ver
+también B11 y A15) — ejemplo directo de por qué la regla del proyecto es no asumir que una variable
+está completa por el hecho de existir.
 
-Una prueba con **solo 2 productos no fue concluyente**, porque **OFF omite los campos vacíos** en la
-respuesta: la ausencia de una columna en una muestra pequeña no prueba que la columna no exista.
+### B10. RESUELTO el 2026-09-20 — política de "categoría de referencia" para D1
 
-### B10. BLOQUEANTE para D1: política de "categoría de referencia"
+Bloqueante cerrado con datos reales del universo México. Ver **A16** para la decisión completa
+(retroceso ascendente, umbral mínimo de 30 productos) y `notebooks/02_eda_universo_mexico.ipynb`
+(sección 5) para la evidencia.
 
-Falta definir **la política de categoría de referencia para los percentiles**. El problema:
-`categories_tags` de OFF es **multietiqueta y jerárquica**, y un producto pertenece a **varias
-categorías a la vez**. Sin una regla que elija una sola categoría de comparación, el percentil de D1
-no está definido.
+### B11. Hallazgos del esquema real del export CSV, al construir el snapshot (2026-09-19)
 
-También falta fijar un **tamaño mínimo de categoría**: un percentil calculado sobre 3 productos no
-es informativo.
+Verificado en `scripts/ingesta_off.py`, que se detiene si falta una columna crítica en vez de generar
+un snapshot mutilado — y en efecto se detuvo en la primera ejecución por el motivo de abajo:
 
-**Esto bloquea D1.** Es la decisión más urgente del proyecto.
+- **`allergens_tags` NO existe en el export CSV** (solo existe en la API). La única fuente de
+  alérgenos taxonomizados del export es **`allergens`** (ya viene con prefijo de idioma, por ejemplo
+  `en:milk,en:gluten`).
+- **`traces`** y **`traces_tags`** (menciones "puede contener") sí existen y no estaban contemplados
+  en el inventario original de campos: son necesarios para el fail-safe de alergias (A15).
+- **`ingredients_analysis_tags`** sí existe: es la fuente del filtro de dieta vegana/vegetariana (A1)
+  y su tercer estado "no verificable".
+- Candidatas descubiertas, útiles para el EDA aunque no eran críticas: `food_groups_tags`,
+  `nutrient_levels_tags`, `data_quality_errors_tags`, `popularity_tags`.
+
+### B12. Universo México real: 16.851 productos, snapshot `off_csv_20260919`
+
+El export CSV filtrado por `countries_tags` conteniendo `en:mexico` da **16.851 productos**, 0
+duplicados de `code`, 0 filas rechazadas por malformación. Reconciliado contra los 17.741 medidos en
+la API (B2): diferencia de **-890 (5,0 %)**, dentro de la tolerancia del 10 % fijada en el script de
+ingesta. Snapshot y Parquet derivado (4,9 MB) versionados; el export crudo de 1,19 GB, no.
 
 ---
 
