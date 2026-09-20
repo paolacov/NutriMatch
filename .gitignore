@@ -1,0 +1,41 @@
+# Entornos virtuales
+.venv/
+venv/
+
+# Caché y artefactos de Python
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+
+# Secretos locales: solo se versiona .env.example
+.env
+
+# Base SQLite de estado mutable (incluye los ficheros -wal y -shm del modo WAL).
+# Es regenerable, no es fuente de verdad.
+nutrimatch.db*
+
+# Notebooks y sistema operativo
+.ipynb_checkpoints/
+.DS_Store
+
+# ---------------------------------------------------------------------------
+# Insumos externos grandes: NO se versionan.
+# El export CSV comprimido de Open Food Facts pesa 1,28 GB y el ZIP de PROFECO
+# "Quién es Quién en los Precios" unos 186 MB. Ambos se descargan con los
+# scripts de ingesta y se citan por fecha de snapshot, no por copia en el repo.
+# ---------------------------------------------------------------------------
+datos/snapshots/*
+datos/precios_qqp/*
+
+# Derivados del snapshot. Excluidos POR AHORA.
+# PENDIENTE: decidir si se versiona el Parquet derivado del universo México una
+# vez se mida su tamaño real; si resulta pequeño, conviene versionarlo para
+# hacer el análisis reproducible sin repetir la descarga de 1,28 GB.
+datos/procesados/*
+
+# Se conservan los marcadores de carpeta para que el árbol exista al clonar.
+!**/.gitkeep

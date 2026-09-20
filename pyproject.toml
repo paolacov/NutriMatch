@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nutrimatch"
+version = "0.1.0"
+description = "Motor determinista y explicable de compatibilidad alimentaria para apoyo a la decisión de compra en México."
+readme = "README.md"
+requires-python = ">=3.11"
+# La licencia del código está PENDIENTE de decidir: ver LICENSE.
+dependencies = [
+    "httpx",
+    "pandas",
+    "pyarrow",
+    "duckdb",
+    "streamlit",
+    "pydantic>=2",
+    "pydantic-settings",
+    "sqlalchemy>=2",
+    "rapidfuzz",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+# Capa LLM OPCIONAL: el sistema funciona sin ella con plantillas deterministas.
+llm = ["openai"]
+dev = ["pytest", "ruff"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nutrimatch"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
