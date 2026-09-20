@@ -360,6 +360,29 @@ acota A7 para esta versión del motor.
   percentiles de core8, no solo los 5 con signo de esta versión.
 - Implementado en `nutrimatch.engine.nutrition_score`.
 
+### A28. Resolución del nombre de un producto para mostrar: fallback entre columnas del propio OFF
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/04_modelo_recomendacion.ipynb` (Sección 1).
+Detectado al revisar el ranking del paso 7: `product_name` viene vacío para 1.740 de los 16.851
+productos del universo México (10,3 %); de esos, 68 (0,4 %) sí tienen `generic_name` (y en algunos
+casos también `abbreviated_product_name`) con el nombre real del producto — por ejemplo el code
+`5060323907641`, sin `product_name` pero con `generic_name = "Organic Smooth Almond Butter"`, que
+sí aparece con ese nombre en `openfoodfacts.org`. No es un dato ausente en OFF: son campos del
+propio registro que un contribuidor llenó sin sincronizar entre sí.
+
+- El nombre a mostrar se resuelve por fallback en este orden: `product_name` → `generic_name` →
+  `abbreviated_product_name`, usando siempre columnas del **mismo producto** (nunca un valor
+  externo ni inventado, mismo principio que la corrección de sal de A21).
+- El snapshot crudo (`off_mexico_20260919.parquet`) **no se modifica**: `product_name` sigue vacío
+  ahí tal cual lo entrega OFF (A2 — el dato crudo se conserva). La resolución se aplica solo al
+  construir el nombre para mostrar, guardando el original en `product_name_bruto`.
+- Queda trazable vía `product_name_flag_respaldo_usado`: distingue un nombre "tal cual vino en
+  `product_name`" de uno "resuelto por esta regla" — mismo patrón que
+  `salt_100g_flag_correccion_escala_aplicada` (A21).
+- Si ninguno de los tres campos tiene dato, el nombre resuelto es `None`: sigue siendo un NULL
+  genuino, no se inventa un nombre placeholder.
+- Implementado en `nutrimatch.engine.product_naming.resolver_nombre_producto`.
+
 ---
 
 ## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
