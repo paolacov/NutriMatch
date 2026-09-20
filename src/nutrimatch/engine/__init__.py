@@ -13,7 +13,16 @@ Módulos del paso de transformación (paso 6 del plan), ya implementados:
 - ``nutrition_percentile``: percentiles de D1 dentro de la categoría y ``category_stats``.
 - ``processing_score``: subpuntaje D2, NOVA combinado con ``additives_n`` (decisión A17).
 
-Pendientes del paso de modelo de recomendación (paso 7): aplicar el signo de D1 según el
-objetivo del usuario, D3 (preferencias), la regla de cobertura ``cov`` con pesos del usuario,
-los filtros duros (alergias, dieta) y el ensamblado del score final.
+Módulos del paso de modelo de recomendación (paso 7), ya implementados:
+
+- ``user_weights``: convierte el orden de 3 prioridades del usuario en pesos normalizados (A6).
+- ``hard_filters``: filtros de alergia y dieta, tres estados, fuera del score (A1, A15).
+- ``nutrition_score``: subpuntaje D1 con signo, sobre 5 nutrientes de dirección fija (A7).
+- ``preference_score``: subpuntaje D3, porcentaje de etiquetas valoradas presentes (A7).
+- ``coverage``: regla de cobertura ``cov`` y banda de "información insuficiente" (A2).
+- ``compatibility_score``: ensamblado del score final ponderado y explicación (A7, A10).
+
+Pendiente para una siguiente pasada (fuera del alcance del paso 7): extender D1 a
+``energy-kcal_100g``, ``fat_100g`` y ``carbohydrates_100g`` cuando se defina una taxonomía de
+objetivos nutricionales del usuario (el documento maestro los deja "según meta" sin especificarla).
 """

@@ -307,14 +307,67 @@ mínimo de **5 productos con dato saneado válido** en la categoría de referenc
 percentil de ese nutriente; si no se alcanza, el percentil es NULL para ese producto y ese nutriente,
 aunque la categoría nominal cumpla A16. Implementado en `nutrimatch.engine.constants.MINIMO_PEERS_PERCENTIL`.
 
+### A25. Fórmula de pesos del usuario: secuencia 3/2/1 normalizada según el orden de prioridades
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/04_modelo_recomendacion.ipynb` (sección 2),
+cierra el "cómo" que A6 dejó abierto (A6 solo cerró el "qué": ordenar 3 prioridades, sin controles
+numéricos directos).
+
+- El orden de las 3 prioridades declaradas (D1, D2, D3) se convierte en pesos proporcionales a la
+  secuencia fija 3/2/1 según la posición (1º lugar = 3 puntos, 2º = 2, 3º = 1), normalizada para
+  sumar 1: 0,50 / 0,33 / 0,17 para 1º/2º/3º lugar.
+- Con exactamente 3 dimensiones hay solo 6 permutaciones posibles; los tres valores resultantes son
+  siempre los mismos, solo cambia a qué dimensión se asigna cada uno. Es un reparto transparente y
+  fácil de explicar en la interfaz, no una medición calibrada sobre datos.
+- Implementado en `nutrimatch.engine.user_weights.convertir_prioridades_a_pesos`.
+
+### A26. Renormalización del score cuando falta una dimensión: promedio ponderado sobre las disponibles
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/04_modelo_recomendacion.ipynb` (sección 6),
+cierra el "cómo" que A7 dejó abierto para el caso de datos parciales (A7 solo fija que el score es
+"la suma ponderada por los pesos de A6" para el caso completo).
+
+- Cuando una dimensión no tiene subpuntaje calculable para un producto, el score final se calcula
+  como `Σ wᵢ·Dᵢ / Σ wᵢ`, sumando solo sobre las dimensiones con dato disponible — no se trata la
+  dimensión faltante como 0.
+- Es coherente con la regla de cobertura `cov` (A2): `cov` ya mide exactamente esa fracción de peso
+  disponible, así que cuando `cov ≥ 0,5` el score usa esa misma fracción como denominador. Si
+  `cov < 0,5` (banda "información insuficiente"), el score final es NULL, nunca un número calculado
+  sobre datos insuficientes.
+- Verificado con el perfil "Caro" del notebook (no declaró ninguna etiqueta valorada): D3 es NULL
+  para el 100 % del catálogo, y su score se calcula solo con D1 y D2 renormalizados sobre la suma de
+  sus dos pesos — su `cov` máxima posible queda acotada exactamente en ese peso conjunto.
+- Implementado en `nutrimatch.engine.compatibility_score.calcular_score_compatibilidad`.
+
+### A27. Alcance de D1 v1: 5 nutrientes de signo fijo; energía, grasa total y carbohidratos quedan informativos
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/04_modelo_recomendacion.ipynb` (sección 4),
+acota A7 para esta versión del motor.
+
+- D1 puntúa únicamente los 5 nutrientes de core8 con dirección universal y sin ambigüedad:
+  azúcares, sal y grasa saturada (signo −1, menos es mejor); fibra y proteína (signo +1, más es
+  mejor).
+- `energy-kcal_100g`, `fat_100g` (grasa total) y `carbohydrates_100g` siguen calculándose (tienen
+  percentil en `matriz_nut_100g`, paso 6) y se muestran como información en la ficha del producto,
+  pero no puntúan en esta versión: el documento maestro los deja "según meta" sin definir en ningún
+  lugar del proyecto qué valores toma esa meta (el motor no modela una taxonomía de objetivos
+  nutricionales del usuario). Inventar esa taxonomía sin una decisión explícita habría sido asumir
+  un requisito que nadie cerró.
+- Añadir estos 3 nutrientes a D1 en una versión futura es un cambio aditivo: no rompe la firma de
+  `calcular_subpuntaje_d1` ni las llamadas existentes.
+- D1 tiene dato disponible en 7.040 de 16.851 productos del universo México (41,8 %) — más amplio
+  que `universo_puntuable` (A22, 34,8 %) porque ese umbral exige además D2 calculable y ≥4 de los 8
+  percentiles de core8, no solo los 5 con signo de esta versión.
+- Implementado en `nutrimatch.engine.nutrition_score`.
+
 ---
 
 ## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
 
 Todo lo de esta sección son **mediciones reales**, no supuestos. Cada entrada cita su propia fecha
 porque los datos de OFF se regeneran a diario y los counts cambian; la mayoría es del 2026-09-19
-(verificación de la API y descarga del export), y B10-B12 son del 2026-09-20 (EDA sobre el snapshot
-ya construido).
+(verificación de la API y descarga del export), y B10-B13 son del 2026-09-20 (EDA y transformación
+sobre el snapshot ya construido).
 
 ### B1. Staging vs producción: la confusión que invalidó las primeras cifras
 
@@ -413,6 +466,28 @@ El export CSV filtrado por `countries_tags` conteniendo `en:mexico` da **16.851 
 duplicados de `code`, 0 filas rechazadas por malformación. Reconciliado contra los 17.741 medidos en
 la API (B2): diferencia de **-890 (5,0 %)**, dentro de la tolerancia del 10 % fijada en el script de
 ingesta. Snapshot y Parquet derivado (4,9 MB) versionados; el export crudo de 1,19 GB, no.
+
+### B13. `NaN` de pandas, no `None`, para texto y subpuntajes ausentes al leer Parquet con DuckDB
+
+Verificado el 2026-09-20 al construir `notebooks/04_modelo_recomendacion.ipynb`: un campo de texto
+ausente (`labels_tags`, `allergens`, `traces`, `ingredients_analysis_tags`) leído de un Parquet vía
+`duckdb.execute(...).df()` llega como `float('nan')`, no como `None`. Causó un bug real de
+implementación en la primera versión de `hard_filters.py` y `preference_score.py`, corregido antes
+de cerrar el paso 7:
+
+- `bool(float('nan'))` es `True` en Python, así que un chequeo con `not valor` no detecta la
+  ausencia. Peor aún: `str(float('nan'))` produce el texto literal `"nan"`, que un split ingenuo por
+  comas trataría como si fuera un tag real.
+- Lo mismo aplica a un subpuntaje ausente (D1, D2 o D3): si llega como `NaN` en vez de `None`,
+  `NaN is not None` es `True`, así que un chequeo de disponibilidad con `is not None` marca la
+  dimensión como "disponible" e infla `cov` (A2) artificialmente — se detectó porque `cov` daba
+  1,0 en el 100 % de los productos pese a que D1 y D2 solo tenían dato en ~40 % del universo.
+- Corregido con una función `_es_texto_nulo`/`_es_nulo` (según el módulo) que cubre `None` y `NaN`
+  explícitamente, en `hard_filters.py`, `preference_score.py` y `compatibility_score.py`, con
+  pruebas de regresión en `tests/` que fijan el comportamiento con `math.nan` como entrada.
+- Relevante para cualquier módulo futuro que reciba datos ya cargados en un DataFrame de pandas
+  (a diferencia de `sanitize.py` del paso 6, que evita el problema al convertir explícitamente con
+  `.astype("string")`, que sí usa `pd.NA`).
 
 ---
 
