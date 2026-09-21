@@ -151,16 +151,17 @@ tests/                pruebas
 evaluacion/           golden set, parity-check y diagnóstico de cobertura
 ```
 
-## Notebooks previstos
+## Notebooks
 
-**Ninguno existe todavía.** El orden planeado es:
+Orden planeado, con el estado real a la fecha (ver `AGENTS.md` para el detalle de cada paso):
 
-1. `01_ingesta`
-2. `02_eda_universo_mexico`
-3. `03_transformacion_score`
-4. `04_evaluacion`
-5. `05_qqp_precios`
-6. `06_app_y_llm`
+1. `01_ingesta` — pendiente como notebook: hecho como script (`scripts/ingesta_off.py`).
+2. `02_eda_universo_mexico` — hecho.
+3. `03_transformacion_score` — hecho.
+4. `04_modelo_recomendacion` — hecho.
+5. `05_evaluacion` — hecho.
+6. `06_qqp_precios` — pendiente.
+7. `07_app_y_llm` — pendiente.
 
 ## Convenciones
 

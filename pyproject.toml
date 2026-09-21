@@ -32,7 +32,11 @@ llm = ["openai"]
 dev = ["pytest", "ruff"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/nutrimatch"]
+# `evaluacion/` vive fuera de `src/` a propósito (ver README, "Mapa de carpetas"): son
+# mecanismos de evaluación del motor (golden set, parity-check, diagnóstico de cobertura),
+# no lógica de producto reutilizada por la UI. Se instala en editable junto a `nutrimatch`
+# para que notebooks y pruebas puedan hacer `import evaluacion...` sin manipular sys.path.
+packages = ["src/nutrimatch", "evaluacion"]
 
 [tool.ruff]
 line-length = 100

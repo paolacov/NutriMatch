@@ -383,14 +383,77 @@ propio registro que un contribuidor llenó sin sincronizar entre sí.
   genuino, no se inventa un nombre placeholder.
 - Implementado en `nutrimatch.engine.product_naming.resolver_nombre_producto`.
 
+### A29. Golden set: 13 casos reales, revisados a mano, sobre productos del snapshot
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/05_evaluacion.ipynb` (Sección 1), cierra el
+primero de los tres mecanismos de evaluación que A8 dejó pendientes.
+
+- El golden set fija 13 `code` reales de `off_csv_20260919`, cada uno con una descripción de qué
+  se espera y por qué, verificada a mano contra los valores crudos del snapshot: D1 y D2 en los
+  dos extremos (muy malo / muy bueno), los tres estados del filtro de alergia (confirmado en
+  `allergens`, "puede contener" en `traces`, sin dato → no_verificable), los tres estados de dieta
+  vegana (compatible / incompatible / "tal vez" → no_verificable), independencia entre D1 y D2
+  cuando falta solo una de las dos fuentes (categoría de referencia vs. NOVA), el fallback de
+  nombre (A28), D3 con una etiqueta exacta, y un caso de regresión de score completo ya auditado
+  a mano en `04_modelo_recomendacion.ipynb` (Sección 8).
+- Si el snapshot se regenera y un producto cambia legítimamente en OFF, el caso correspondiente
+  puede empezar a fallar: es señal de revisar ese caso puntual (¿sigue siendo válido con el dato
+  nuevo? ¿hay que sustituir el `code`?), no necesariamente un bug del motor.
+- Implementado en `evaluacion/golden_set.py`, con pruebas de regresión en `tests/test_golden_set.py`
+  que leen directamente `datos/procesados/*.parquet` (versionado en el repo, ver Sección B12): no
+  hace falta descargar ni reconstruir nada para correrlas.
+
+### A30. Parity-check: correlación de Spearman D1 vs `nutriscore_score`, umbral −0,3
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/05_evaluacion.ipynb` (Sección 2), cierra el
+segundo mecanismo de A8.
+
+- D1 y Nutri-Score puntúan nutrientes parcialmente distintos y con metodologías distintas: D1 usa
+  percentil dentro de la categoría de referencia sobre 5 nutrientes de signo fijo (A27);
+  Nutri-Score usa puntos de penalización/bonificación calibrados por macrocategoría sobre un
+  conjunto más amplio (incluye energía, sodio y fruta/verdura/legumbres, que D1 v1 no puntúa). No
+  se espera una correlación fuerte, y exigirla sería incoherente con A4 (Nutri-Score no puntúa en
+  NutriMatch justamente para no contar dos veces los mismos nutrientes que D1).
+- Umbral fijado en **correlación de Spearman ≤ −0,3** (negativa porque D1 alto = mejor y
+  `nutriscore_score` alto = peor). Deliberadamente laxo ("moderada" en la convención habitual de
+  0,3-0,5): es un chequeo de sanidad ("¿va, a grandes rasgos, en la misma dirección?"), no una
+  validación de que D1 deba replicar a Nutri-Score.
+- Verificado sobre 6.041 productos con ambos datos disponibles: correlación real ≈ **−0,4747**,
+  por encima del umbral en magnitud, y el promedio de D1 por `nutriscore_grade` decrece de forma
+  estrictamente monótona de grado 'a' (≈59,6) a 'e' (≈41,6).
+- La correlación se calcula como Pearson sobre rangos (`Series.rank().corr()`) en vez de
+  `.corr(method="spearman")` para no añadir `scipy` como dependencia nueva solo por esta función.
+- Implementado en `evaluacion/parity_check.py`.
+
+### A31. Diagnóstico de cobertura: desglose por combinación de dimensiones faltantes
+
+**Decisión cerrada el 2026-09-20**, sobre `notebooks/05_evaluacion.ipynb` (Sección 3), cierra el
+tercer mecanismo de A8.
+
+- Para un perfil de usuaria dado, se calcula `cov` producto a producto (reutilizando
+  `nutrimatch.engine.coverage`, A2, sin recalcularla) y se desglosan los productos en la banda
+  "información insuficiente" por la combinación exacta de dimensiones que les falta (p. ej.
+  `"D1+D2"`, `"D1+D2+D3"`), no solo el conteo total.
+- Verificado con los 3 perfiles de ejemplo de `04_modelo_recomendacion.ipynb` (Ana, Beto, Caro)
+  sobre el universo completo: la banda va de 56,5 % a 65,1 % (idéntico al paso 7, es el mismo
+  cálculo). La causa dominante en los tres perfiles es la combinación `"D1+D2+D3"` (81-82 % de los
+  insuficientes de cada uno): productos sin dato nutricional ni NOVA a la vez, no una debilidad de
+  una sola dimensión.
+- Con la fórmula de pesos de A25 (0,50/0,33/0,17), cualquier par de dos dimensiones suma ≥ 0,5
+  exacto, así que perder una sola dimensión nunca es suficiente por sí sola para cruzar el umbral
+  de A2 — de ahí que ninguna combinación de una sola dimensión faltante aparezca en el desglose
+  con esta fórmula de pesos concreta. Si A25 cambiara en el futuro (más de 3 dimensiones, u otra
+  secuencia de puntos), esta conclusión habría que revisarla.
+- Implementado en `evaluacion/coverage_diagnostic.py`.
+
 ---
 
 ## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
 
 Todo lo de esta sección son **mediciones reales**, no supuestos. Cada entrada cita su propia fecha
 porque los datos de OFF se regeneran a diario y los counts cambian; la mayoría es del 2026-09-19
-(verificación de la API y descarga del export), y B10-B13 son del 2026-09-20 (EDA y transformación
-sobre el snapshot ya construido).
+(verificación de la API y descarga del export), B10-B13 son del 2026-09-20 (EDA y transformación
+sobre el snapshot ya construido) y B14 es del mismo día (evaluación, paso 8).
 
 ### B1. Staging vs producción: la confusión que invalidó las primeras cifras
 
@@ -511,6 +574,28 @@ de cerrar el paso 7:
 - Relevante para cualquier módulo futuro que reciba datos ya cargados en un DataFrame de pandas
   (a diferencia de `sanitize.py` del paso 6, que evita el problema al convertir explícitamente con
   `.astype("string")`, que sí usa `pd.NA`).
+
+### B14. `nutriscore_score` llega como VARCHAR en el snapshot crudo, no como número
+
+Verificado el 2026-09-20 al construir `notebooks/05_evaluacion.ipynb` (Sección de setup, para el
+parity-check de A30): `scripts/ingesta_off.py` usa `all_varchar=true` a propósito al leer el CSV
+de OFF ("la conversión de tipos se hace después, de forma auditada"). `nutriscore_score` no es
+parte de CORE8, así que el paso 6 (`sanitize.py`) nunca lo tipó: sigue siendo texto en
+`off_mexico_20260919.parquet`.
+
+- Sin una conversión explícita con `pd.to_numeric`, cualquier comparación u ordenamiento de esta
+  columna se hace por orden **lexicográfico** (`"9" > "51"`) en vez de numérico, en silencio.
+- Costó un bug real de esta misma sesión: la primera versión del notebook calculó la correlación
+  de Spearman de A30 sin convertir la columna y obtuvo **−0,2727** en vez de **−0,4747** — una
+  diferencia de casi el doble, suficiente para haber quedado por debajo del umbral de A30 (−0,3) y
+  producir un falso negativo ("D1 no correlaciona razonablemente con Nutri-Score") sobre un motor
+  que en realidad sí pasa el chequeo.
+- Todos los valores de `nutriscore_score` en el universo México parsean limpio a entero
+  (0 valores no parseables sobre 6.431 no nulos): no es un problema de calidad del dato en sí,
+  solo de tipo declarado.
+- Cualquier módulo futuro que use `nutriscore_score`, o cualquier otra columna del snapshot crudo
+  que no pase por `sanitize.py` (paso 6), debe convertirla explícitamente antes de compararla
+  numéricamente — el mismo tipo de trampa que B13, pero de tipo declarado en vez de valor nulo.
 
 ---
 
