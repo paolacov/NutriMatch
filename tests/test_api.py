@@ -149,6 +149,38 @@ def test_from_referencia_frame_usa_nombre_homologado() -> None:
     assert cat.df.iloc[0]["d1"] is not None
 
 
+def test_detalle_conserva_nombre_literal_nan() -> None:
+    """El dataset guarda el nombre real ``NAN``; no es el NaN de pandas (B13)."""
+    detalle = detalle_desde_fila(
+        pd.Series(
+            {
+                "code": "7501058623201",
+                "product_name_homologated": "NAN",
+                "product_name": "NAN",
+                "product_name_status": "DERIVED",
+                "price": None,
+                "price_status": "UNAVAILABLE",
+            }
+        )
+    )
+    assert detalle.name.value == "NAN"
+    assert detalle.name.status == "DERIVED"
+
+    ausente = detalle_desde_fila(
+        pd.Series(
+            {
+                "code": "2",
+                "product_name_homologated": float("nan"),
+                "product_name": None,
+                "price": None,
+                "price_status": "UNAVAILABLE",
+            }
+        )
+    )
+    assert ausente.name.value is None
+    assert ausente.name.status == "UNAVAILABLE"
+
+
 def test_detalle_precio_texto_b14_y_ausencia() -> None:
     fila = pd.Series(
         {

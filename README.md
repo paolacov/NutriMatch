@@ -154,7 +154,7 @@ datos/
   cache/              caché en disco de las APIs externas (OFF, Open Prices, QQP; no se versiona)
   procesados/         Parquet derivado del universo México, identidad homologada, piloto de
                       precios Open Prices (A40), candidatos QQP por texto (A41) y CSV del re-EDA
-docs/                 atribución, línea futura y diagnóstico de calidad
+docs/                 atribución, línea futura, diagnóstico y auditoría de cierre MVP (2026-09-27)
 notebooks/            notebooks de análisis
 frontend/             aplicación Angular (única interfaz)
 scripts/              scripts de ingesta y mantenimiento

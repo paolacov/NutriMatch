@@ -20,21 +20,36 @@ NUTRIENTES_FICHA: tuple[tuple[str, str, str, str], ...] = (
 )
 
 _STATUS_VALIDOS = {"REAL", "DERIVED", "IMPUTED", "SYNTHETIC", "UNAVAILABLE"}
+_SENTINELAS_TEXTO_AUSENTE = frozenset({"", "none", "<na>"})
+_SENTINELAS_TEXTO_AUSENTE_O_NAN = _SENTINELAS_TEXTO_AUSENTE | {"nan"}
 
 
-def _es_nulo(valor: Any) -> bool:
+def _es_nulo(valor: Any, *, literal_nan_es_nulo: bool = True) -> bool:
     if valor is None:
         return True
     if isinstance(valor, float) and math.isnan(valor):
         return True
-    return isinstance(valor, str) and valor.strip().lower() in {"", "nan", "none", "<na>"}
+    if isinstance(valor, str):
+        sentinelas = _SENTINELAS_TEXTO_AUSENTE_O_NAN if literal_nan_es_nulo else _SENTINELAS_TEXTO_AUSENTE
+        return valor.strip().lower() in sentinelas
+    return False
 
 
-def _texto(valor: Any) -> str | None:
-    if _es_nulo(valor):
+def _texto(valor: Any, *, literal_nan_es_nulo: bool = True) -> str | None:
+    if _es_nulo(valor, literal_nan_es_nulo=literal_nan_es_nulo):
         return None
     texto = str(valor).strip()
     return texto or None
+
+
+def _texto_nombre(valor: Any) -> str | None:
+    """Nombre para mostrar: conserva el literal ``NAN`` del dataset.
+
+    ``_texto`` trata la cadena ``nan`` como nulo porque es el residuo de B13
+    (``str(float("nan"))``). Ese sentinel no debe borrar un ``product_name``
+    real. El float NaN de pandas sigue siendo nulo.
+    """
+    return _texto(valor, literal_nan_es_nulo=False)
 
 
 def _float_or_none(valor: Any) -> float | None:
@@ -84,7 +99,7 @@ def _precio(fila: pd.Series) -> ProvenanceValue:
 
 
 def detalle_desde_fila(fila: pd.Series) -> ProductDetail:
-    nombre = _texto(fila.get("product_name_homologated")) or _texto(fila.get("product_name"))
+    nombre = _texto_nombre(fila.get("product_name_homologated")) or _texto_nombre(fila.get("product_name"))
     nombre_status = _status(fila.get("product_name_status"), "DERIVED" if nombre else "UNAVAILABLE")
     if nombre is None:
         nombre_status = "UNAVAILABLE"
