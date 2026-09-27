@@ -7,6 +7,10 @@ Pruebas: `tests/test_cierre_mvp.py` + regresión existente. Suite completa: **24
 No se modificó el Parquet. No se cambiaron fórmulas de D1/D2/D3/`cov`/`score_final`.  
 No se imputó. No se generaron sintéticos. No se entrenó ML. No se integró LLM.
 
+**NutriMatch no utiliza aprendizaje supervisado en el MVP porque el catálogo no contiene un target observado que permita entrenar y evaluar de manera científicamente válida un modelo de recomendación.**
+
+Esa ausencia no es un bug ni una tarea pendiente. Es una decisión metodológica (ver `docs/auditoria_preparacion_ml_20260927.md`). El ranking es un motor determinístico de reglas, evidencia disponible y cobertura; no es machine learning.
+
 ---
 
 ## 1. Objetivo
@@ -149,14 +153,15 @@ No se exige cobertura completa del catálogo.
 
 ---
 
-## 11. Pendientes posteriores al MVP
+## 11. Fuera del MVP (no son tareas de cierre)
 
 - Revisión humana independiente de QQP (A41) si se quiere más precio de referencia.
 - Recuperación de nombres por API OFF a escala (A39: hit 7,5 %, no se escaló).
 - Mostrar grasa saturada y `traces` en ficha si se reabre el contrato de UI.
 - Exponer `data_quality_*` en la ficha si se quiere transparencia de calidad en pantalla.
-- Capa LLM opcional (A13) y recetas, cuando se pidan.
-- ML solo si aparece un target observado (ver `docs/auditoria_preparacion_ml_20260927.md`).
+
+Aprendizaje supervisado: **no se reabre**. Sin target observado no hay modelo defendible.  
+LLM (A13) y recetas siguen fuera del MVP; no forman parte de este cierre.
 
 ---
 
