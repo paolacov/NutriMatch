@@ -1,0 +1,77 @@
+{
+  "n": 16851,
+  "n_puntuable": 5864,
+  "price_real": 263,
+  "price_open_prices": 242,
+  "price_qqp": 21,
+  "sha256": "8e19c4b97bad38bc93a29981cbade9bed2616a7adcac7f9879b47cac0ee9713e",
+  "calidad_total": "alta 36.2% · media 9.0% · baja 12.6% · insuficiente 42.2%",
+  "calidad_puntuable": "alta 98.5% · media 1.5% · baja 0.0% · insuficiente 0.0%",
+  "bandas": {
+    "Ana": {
+      "ranking": 7334,
+      "no_verificable": 0,
+      "informacion_insuficiente": 9517,
+      "excluido": 0
+    },
+    "Beto": {
+      "ranking": 7219,
+      "no_verificable": 0,
+      "informacion_insuficiente": 9632,
+      "excluido": 0
+    },
+    "Caro": {
+      "ranking": 5877,
+      "no_verificable": 0,
+      "informacion_insuficiente": 10974,
+      "excluido": 0
+    }
+  },
+  "has_nombre": 15184,
+  "has_marca": 13102,
+  "has_cat": 8728,
+  "has_ing": 7650,
+  "has_nut1": 12315,
+  "has_nut7": 8695,
+  "has_nova": 6781,
+  "has_add": 7650,
+  "has_labels": 4266,
+  "has_exceso": 1204,
+  "labels_sin_exceso": 3062,
+  "has_allergens": 2793,
+  "has_traces": 1994,
+  "has_all_or_tr": 3489,
+  "has_diet_tags": 7716,
+  "has_image": 13041,
+  "has_qty": 8001,
+  "d1_ok": 7040,
+  "d2_ok": 6781,
+  "perc_d1": {
+    "sugars_100g": 6743,
+    "salt_100g": 6734,
+    "saturated-fat_100g": 6690,
+    "fiber_100g": 6549,
+    "proteins_100g": 6949
+  },
+  "compare_completa": 5457,
+  "compare_parcial": 7134,
+  "compare_limitada": 4260,
+  "alg_apto": 1661,
+  "alg_no": 1828,
+  "alg_nv": 13362,
+  "vegan_comp": 917,
+  "vegan_inc": 2988,
+  "vegan_nv": 12946,
+  "calidad_puntuable_counts": {
+    "alta": 5775,
+    "media": 89,
+    "baja": 0,
+    "insuficiente": 0
+  },
+  "calidad_total_counts": {
+    "alta": 6102,
+    "media": 1512,
+    "baja": 2123,
+    "insuficiente": 7114
+  }
+}

@@ -1,3 +1,13 @@
-"""Infraestructura transversal: carga de configuración desde `.env`, logging que nunca registra
-secretos, guard de conformidad (atribución, avisos legales) y jerarquía de errores del proyecto.
-"""
+"""Infraestructura transversal: configuración, errores y (más adelante) logging/conformidad."""
+
+from nutrimatch.core.config import Settings, get_settings, project_root
+from nutrimatch.core.errors import CatalogNotFoundError, NutriMatchError, ProductNotFoundError
+
+__all__ = [
+    "CatalogNotFoundError",
+    "NutriMatchError",
+    "ProductNotFoundError",
+    "Settings",
+    "get_settings",
+    "project_root",
+]

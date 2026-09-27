@@ -64,6 +64,8 @@ PROFECO QQP aporta un **"precio de referencia"**.
   cálculo determinista con una coincidencia probabilística.
 - **Prohibido el término "precio estimado".** Siempre "precio de referencia": el dato es un precio
   real observado por PROFECO en un establecimiento y una fecha, no una estimación nuestra.
+- **No reabierta el 2026-09-26** (A36): en esta tesis el precio es REAL o NULL. No hay precio
+  imputado; QQP sigue llamándose "precio de referencia", nunca "estimado".
 
 ### A6. Pesos del usuario: perfil base + orden de prioridades
 
@@ -149,9 +151,18 @@ Requisitos: **grounding obligatorio** sobre hechos calculados, **parsing JSON va
 
 ### A14. Arquitectura
 
-El motor vive en el paquete `nutrimatch`, **reutilizado tal cual** por notebooks y UI. **Streamlit**
-es la interfaz del MVP. **FastAPI y Angular quedan documentados como línea futura** en
-[`docs/linea_futura.md`](docs/linea_futura.md), fuera del alcance.
+**Revisada el 2026-09-27 (frontend; catálogo API el mismo día).** El motor vive en el paquete
+`nutrimatch`, **reutilizado tal cual** por notebooks. La interfaz del MVP es **solo Angular**
+(`frontend/`): llama a FastAPI (`nutrimatch.api`), que serializa `schemas/` y no recalcula
+D1/D2/D3. El catálogo de la API es `dataset_referencia_20260927.parquet` (recableado el
+2026-09-27 desde el 20260926; el archivo anterior no se sobrescribe). No se tocó el motor de
+ranking.
+
+No hay segunda interfaz. Un prototipo Streamlit sirvió el 2026-09-20 para cerrar las bandas de
+A32; se retiró el 2026-09-27. Perfil, carrito y comparación viven en el cliente; búsqueda,
+ranking, ficha, resumen de carrito y `event_log` salen de la API.
+
+JWT y docker siguen fuera. Ver [`docs/linea_futura.md`](docs/linea_futura.md).
 
 ### A15. Filtro de alergias: tres estados, no un binario fail-safe
 
@@ -446,6 +457,461 @@ tercer mecanismo de A8.
   secuencia de puntos), esta conclusión habría que revisarla.
 - Implementado en `evaluacion/coverage_diagnostic.py`.
 
+### A32. Bandas exclusivas de la interfaz: excluido, no verificable, información insuficiente, ranking
+
+**Decisión cerrada el 2026-09-20** (bandas de interfaz; el 2026-09-27 se muestran solo en
+Angular). A15 ya exigía que "no verificable" no se mezcle con "apto"; A2 ya exigía la banda de
+`cov < 0.5`. Faltaba el orden cuando un producto cumple más de una condición a la vez.
+
+Un producto cae en **exactamente una** banda, en este orden:
+
+1. **Excluido** (no se lista; solo se cuenta): alergia `no_apto` o dieta `incompatible`.
+2. **No verificable** (banda propia, con advertencia): alergia `no_verificable` o dieta
+   `no_verificable`.
+3. **Información insuficiente**: `cov < 0.5` (A2).
+4. **Ranking**: el resto, ordenado por `score_final` descendente.
+
+La búsqueda (nombre o `code`) se aplica **antes** de puntuar, sobre los 16.851 productos (A19).
+Implementado en `nutrimatch.services.ranking.asignar_banda`. La UI que las lista es Angular
+(`/recomendaciones`, ficha, comparar): no hay otra capa de presentación.
+
+### A33. Procedencia: vocabulario de cinco estados y tabla de observaciones
+
+**Decisión cerrada el 2026-09-26**, sobre
+[`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md) (sección F). No se
+implementa todavía: solo se cierra el criterio.
+
+Toda variable enriquecida, derivada o ausente se etiqueta con **exactamente uno** de:
+
+```
+REAL | DERIVED | IMPUTED | SYNTHETIC | UNAVAILABLE
+```
+
+- **REAL**: observado en una fuente identificable (export OFF, Open Prices, QQP, GS1).
+- **DERIVED**: calculado a partir de REAL sin modelo predictivo (D1/D2/D3, percentil, fallback
+  A28, corrección de escala de sal A21, `cov`).
+- **IMPUTED**: estimado por un método estadístico porque el valor no existía. Ninguna variable
+  del catálogo de producción está en este estado hoy (A36 cierra el precio).
+- **SYNTHETIC**: creado para demo o test. Solo fixtures; nunca el Parquet de producción.
+- **UNAVAILABLE**: se sabe que no hay dato; el valor es NULL. Un cero no sustituye este estado
+  (A2).
+
+La **calidad** (`fuera_de_rango`, `data_quality_errors_tags`) es **ortogonal** al status: un valor
+puede ser REAL y a la vez de mala calidad.
+
+Las 211 columnas del Parquet México son REAL por construcción. No se clona un `*_status` por
+columna. El metadato de tabla (`snapshot_id`, URL del export, `retrieved_at` en
+`_metadata.json`) basta para ese bloque.
+
+Lo que no viene del export (nombre externo, precio, imputación futura) vive en una **tabla de
+observaciones** `(code, field, value, status, source, source_url, retrieved_at, snapshot_id,
+method, confidence, quality_flag)`. Varias observaciones por `(code, field)` son válidas. La
+ficha elige según regla explícita: REAL más reciente; si no hay, UNAVAILABLE; nunca IMPUTED ni
+SYNTHETIC por delante de REAL.
+
+El trío `*_bruto` / `*_saneado` / `*_flag_*` de la matriz (paso 6) es el patrón a generalizar,
+no a sustituir.
+
+### A34. El objeto de análisis es el GTIN (`code`)
+
+**Decisión cerrada el 2026-09-26.** No se agrupan presentaciones.
+
+`code` es la llave. Hay 16.851 códigos únicos, 0 duplicados, 96,9 % con checksum GS1 válido
+(medido el 2026-09-26). Los 885 pares marca+nombre repetidos y los 2.667 nombres repetidos no
+son el mismo producto: pueden ser sabores, tamaños o errores de captura. Colapsarlos sin
+revisión a mano mezclaría observaciones distintas.
+
+Agrupar “el mismo producto comercial” (marca + receta + presentación) es un paso posterior, con
+llave explícita y muestra revisada. Hasta entonces, cada GTIN es una fila.
+
+### A35. Precio: piloto Open Prices por EAN; QQP después, solo con match revisado
+
+**Decisión cerrada el 2026-09-26**, sobre el diagnóstico de precios (sección D).
+
+- **Ahora:** materializar —cuando se implemente el piloto, no en este corte— los precios MXN de
+  Open Prices que ya cruzan por `product_code` con el universo México: 242 códigos (1,4 %),
+  medidos el 2026-09-26. Son REAL, con establecimiento, fecha y EAN. El resto del catálogo queda
+  `price = NULL`, `price_status = UNAVAILABLE`.
+- **Después:** QQP sigue siendo la fuente oficial más grande de precios reales en México, pero
+  **no publica código de barras** (A5). El cruce es por texto. **Prohibido el join automático
+  `QQP → code`.** Solo una muestra pequeña con match revisado a mano; el precio no se presenta
+  como “el” precio de ese EAN, sino como precio de referencia de una presentación parecida, con
+  `match_method` y `match_confidence` visibles.
+- Retailers (Walmart, Soriana, etc.) y scraping: fuera de alcance.
+
+El precio **no puntúa** (A5). El piloto sirve para diseñar el esquema `price_*` y la tabla de
+observaciones (A33), no para completar el catálogo.
+
+### A36. Precio en esta tesis: solo REAL o NULL
+
+**Decisión cerrada el 2026-09-26.** A5 **no se reabre**.
+
+No se imputa precio. 242 observaciones sesgadas a quien subió un ticket no entrenan un modelo
+generalizable a 16.851 productos.
+
+- QQP, si entra más adelante, se llama **"precio de referencia"**, nunca "estimado".
+- Datos sintéticos de precio: solo fixtures de test, nunca el Parquet de producción, y con
+  status SYNTHETIC (A33).
+- Si en una versión futura hubiera un precio IMPUTED, el rótulo sería **"precio imputado por
+  modelo"**, no se recicla "precio de referencia".
+
+Tampoco se imputan alérgenos, sellos, dieta, NOVA ni los nutrientes CORE8: el faltante va con
+ingredientes incompletos (**MAR**, no MNAR — corregido en A42 con evidencia medida el
+2026-09-26). Inventarlos cambiaría el significado del ranking y, en alergias, el riesgo. Los
+tres estados de A15 y el NULL+bandera de A2 cubren esos casos.
+
+### A37. Nombres ausentes: conservar el original; recuperar por EAN, no imputar
+
+**Decisión cerrada el 2026-09-26.** El snapshot crudo **no se modifica** (A2, A28).
+
+Orden, de menor invención a mayor:
+
+1. `product_name_original` = `product_name` de OFF, aunque sea NULL (1.740 vacíos; 1.672 sin
+   ninguno de los tres campos de nombre, 9,9 %, medido el 2026-09-26).
+2. Fallback interno A28 (`generic_name` → `abbreviated_product_name`) = DERIVED del **mismo**
+   registro. Recupera 68 casos; no inventa.
+3. Normalización cosmética (trim, Unicode, MAYÚSCULAS) = DERIVED. No pisa el original.
+4. **Experimento de recuperación** (cuando se pida, no en este corte): muestra de 50–100 de los
+   1.672 vía API de producto OFF, un `code` a la vez, respetando B4–B5 (15 req/min, 503
+   anti-crawl). Se mide la tasa de hit. Un nombre recuperado es REAL de esa fuente, otra
+   observación (A33), no un overwrite del export.
+5. GS1 México / Verified: solo si el hit de (4) es bajo **y** hay membresía. No es una fuente
+   abierta.
+
+Prohibido imputar el nombre con un modelo estadístico y prohibido un placeholder ("Producto
+750…") presentado como nombre real.
+
+### A38. Homologación determinista de nombre y marca: sin diccionario de alias
+
+**Decisión cerrada el 2026-09-26**, paso 3 del plan de trabajo de
+[`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md) (sección H), sobre
+`notebooks/08_re_eda_identidad.ipynb`. Construye el Parquet **nuevo**
+`datos/procesados/identidad_homologada_20260919.parquet` (DERIVED, A33); no toca
+`off_mexico_20260919.parquet` (A2, A28, A37).
+
+- **Placeholder de captura en `product_name`.** 14 de los 16.851 productos traen literalmente
+  `"Cargando…"` — un texto de la interfaz de contribución de OFF grabado por error, no un
+  nombre. Se trata como si `product_name` estuviera vacío y se sigue la cadena de fallback de
+  A28: 1 de los 14 (`7503028965717`) recupera un nombre real desde `generic_name`
+  ("Totopos de maíz horneados con nopal"); los otros 13 quedan `UNAVAILABLE`. Total tras
+  homologar: **1.685 productos sin nombre** (los 1.672 de A37 más estos 13), **69** usaron
+  respaldo (los 68 de A28 más este caso).
+- **Homologación de marca: plegado de acentos, no diccionario.** `brands` trae la misma marca
+  escrita de formas distintas (`Nestlé` 140 filas, `nestle` 106). La regla es
+  minúsculas + plegado Unicode de acentos (NFKD, se descartan los caracteres combinantes) +
+  colapso de espacios — **no** una lista de alias mantenida a mano, que sería arbitraria y
+  dejaría de servir en el próximo snapshot. Verificado: funde automáticamente 73 de 4.189
+  marcas únicas del universo México (`Nestlé`/`nestle`, `La Costeña`/`la costena`,
+  `Nescafé`/`nescafe`, `Tajín`/`tajin`, entre otras).
+- `brand_homologated` es una **llave de coincidencia interna** (pierde acento y mayúsculas a
+  propósito), no un valor para mostrarse en la interfaz — a diferencia de
+  `product_name_homologated`, que conserva acentos y mayúsculas porque sí es para mostrarse.
+  Pensada para el cruce de texto con QQP (A35), todavía no implementado.
+- No se separan marcas múltiples (`"walmart,sams club"`): se homologan como una sola cadena.
+  Partirlas en lista es un paso posterior si hace falta.
+- Implementado en `nutrimatch.engine.identity_homologation`, ejecutado por
+  `scripts/homologar_identidad.py`.
+- **Trampa de implementación (extiende B13):** construir estas columnas con
+  `DataFrame.apply(..., result_type="expand")` o `Series.map` sobre pandas 3.x hace que la
+  columna resultante adopte el nuevo dtype `str` nativo y convierta cada `None` en
+  `float("nan")` en silencio — la misma trampa de B13, pero disparada por código de
+  transformación en vez de por la lectura del Parquet. Un chequeo `campo is not None` sobre esa
+  columna ya coercionada marca *todas* las filas como "con dato". Se evita calculando cada fila
+  con Python puro sobre listas (no sobre una `Series` intermedia) y derivando
+  `*_status`/`*_flag_*` con un chequeo de nulidad que cubre `None` y `NaN` por igual, antes de
+  ensamblar el `DataFrame` final.
+
+### A39. Experimento de recuperación de nombres por API OFF: tasa de hit 7,5 %, no justifica escalar sin pedirlo
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/experimento_recuperacion_nombres.py`, cierra el
+punto 4 de A37 ("cuando se pida") y el paso 4 del plan de trabajo de
+[`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md) (sección H).
+
+- **Muestra:** 80 de los 1.685 códigos sin ningún nombre tras homologar (A38), semilla `20260926`
+  (reproducible), un `code` a la vez contra `world.openfoodfacts.org` (producción), espaciado de
+  4,5 s entre peticiones (~13,3/min, por debajo del límite de 15/min de B4).
+- **Resultado:** los 80 códigos **sí existen** en la ficha viva (100 % `encontrado`, 0 errores
+  anti-crawl 503/429 en todo el lote). De esos 80, **6 (7,5 %)** tienen un nombre real en la API
+  viva que el export CSV del snapshot no capturó (p. ej. `7622210571328` → "Trident XtraCare
+  yerbabuena", `7501017660339` → "horchata el yucateco") — revisados a mano, ninguno es un
+  placeholder ni texto basura. 0 de los 80 repite el placeholder "Cargando…" (A38) en la ficha
+  viva.
+- **Lectura:** 7,5 % está por debajo del umbral de 20 % fijado como referencia informal en el
+  script para "vale la pena ampliar". No es cero — hay señal real, y extrapolar sugiere unos
+  ~126 nombres recuperables sobre los 1.685 completos —, pero tampoco es el "hueco grande" que
+  A37 (paso 5) pone como condición para evaluar GS1 México. Correr el experimento sobre el
+  universo completo de 1.685 (≈2,1 horas al mismo ritmo, sin motivo para esperar más 503 que en
+  la muestra) es una extensión de bajo costo y cero riesgo nuevo, pero es una decisión de alcance
+  (cuántos recursos dedicar a un 7,5 %), no una consecuencia automática de este resultado — queda
+  pendiente de pedirse explícitamente.
+- Cada nombre recuperado así es **REAL** de la fuente `openfoodfacts_api_producto` (A33), no un
+  overwrite del export: vive en un Parquet aparte,
+  `datos/procesados/experimento_recuperacion_nombres_20260919.parquet`, con
+  `source_url`/`retrieved_at`/`status_valor` por fila — el embrión de la tabla de observaciones
+  de A33, no la tabla final todavía.
+- Implementado en `nutrimatch.providers.off_product_api` (cliente con caché en disco en
+  `datos/cache/off_producto_api/`, no versionada, y límite de tasa) y
+  `scripts/experimento_recuperacion_nombres.py`.
+
+### A40. Piloto de precios Open Prices materializado: 242 códigos, esquema `price_*` implementado
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/piloto_precios_open_prices.py`, cierra la
+parte (a) del paso 6 del plan de trabajo de
+[`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md) (sección H) y ejecuta
+lo que A35 dejaba para "cuando se implemente el piloto".
+
+- **Contrato real de la API de Open Prices, verificado en vivo el 2026-09-26** (no existía
+  código propio antes; la sonda previa citada en A35 no se persistió): el filtro
+  `location_country_code` **no existe** en `PriceFilter` del backend de Open Prices y
+  django-filter lo ignora en silencio en vez de fallar — devuelve resultados sin filtrar. El
+  filtro correcto es **`currency=MXN`** (`currency` sí es un campo exacto del filtro),
+  paginado con `size`/`page` (máx. 100/página). Verificado leyendo
+  `open_prices/api/prices/filters.py` y `open_prices/api/pagination.py` del propio repo de
+  Open Prices, no por prueba y error sobre el esquema de respuesta.
+- **Resultado, medido de nuevo el 2026-09-26** (reproduce exacto la sonda de A35): 346 precios
+  en MXN en total en Open Prices, 276 códigos de producto únicos, de los cuales **242 (1,4 %)**
+  cruzan por `product_code` con el universo México de 16.851 — 307 filas (varias observaciones
+  por código son válidas, A33). Rango de precio $8.50–$528.50 MXN; fechas 2024-06-10 a
+  2026-09-02. No se observó ningún 429/503 en las 4 páginas necesarias (a diferencia de la API
+  de producto de OFF, B4): esta API no tiene, o no expone, el mismo límite anti-crawl.
+- Las 307 filas son **REAL** (A33), con `match_method = "exact_gtin"` (sin ambigüedad:
+  `product_code` es el mismo GTIN que `code`) y `match_confidence = NULL` (solo aplica a
+  coincidencias de texto, no a esta). Ninguna fila pisa un Parquet existente: se escribió
+  `datos/procesados/precios_open_prices_20260926.parquet`, nuevo, con el esquema `price_*` de
+  la sección D.3 del diagnóstico (`code`, `product_code`, `price`, `currency`, `date_observado`,
+  `retailer`, `location*`, `source`, `source_url`, `match_method`, `match_confidence`,
+  `price_status`, `retrieved_at`, `pull_id`).
+- El precio **no puntúa** (A5): este piloto no toca `score_final`, D1/D2/D3, `cov`, bandas de
+  ranking ni la interfaz.
+- **Fuera de esta decisión**, deliberadamente: el diseño y piloto de match por texto con QQP
+  (parte b del paso 6) — QQP no publica GTIN (A5) y requiere descargar su CSV actual y revisión
+  manual de una muestra; queda como paso aparte, a pedirse explícitamente.
+- Implementado en `nutrimatch.providers.open_prices_api` (cliente con caché en disco en
+  `datos/cache/open_prices_api/`, no versionada) y `scripts/piloto_precios_open_prices.py`.
+
+### A41. Piloto de match QQP por texto (Fase A): esquema real corregido, 40 candidatos con score visible, sin join automático
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/piloto_precios_qqp.py`, cierra la parte (b)
+del paso 6 del plan de trabajo de
+[`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md) (sección H), que A40
+dejó explícitamente fuera. Ejecuta la Fase A que A35 exige antes de cualquier materialización de
+precio QQP; la Fase B (materializar) queda lista pero **bloqueada** hasta que exista revisión
+humana (ver "Qué sigue" más abajo).
+
+- **Fuente real, verificada en vivo el 2026-09-26**: `datos.gob.mx` (portal CKAN de datos
+  abiertos de PROFECO), dataset `programa_quien_es_quien_precios_2026`, verificado vía
+  `package_show`. **El esquema real no tiene `cv_producto`/`cv_marca`** — columnas que
+  `docs/diagnostico_calidad_datos.md` (sección D.1) suponía por analogía con otras fuentes de
+  PROFECO, nunca verificadas contra la API real; esa fila del diagnóstico queda corregida.
+  Esquema real: `producto, presentacion, marca, categoria, catalogo, precio, fecha_registro,
+  cadena_comercial, giro, nombre_comercial, direccion, estado, municipio, latitud, longitud`.
+  Sin ningún campo de código de barras (confirma A5).
+- **No hizo falta descargar ningún CSV completo.** Cada recurso mensual ya está en el
+  "datastore" de CKAN, consultable con `datastore_search` (`resource_id` + `filters` exacto +
+  paginación). El recurso de julio 2026 (primera parte) tiene **665.909 filas totales**;
+  `datastore_search_sql` (que habría permitido `DISTINCT` en servidor) devuelve `400 Bad
+  Request` en esta instancia — deshabilitado —, así que el vocabulario de `categoria` se
+  enumeró muestreando 40.000 filas ordenadas por ese campo: **42 categorías distintas**. Se
+  eligieron 20 de alimentos/bebidas envasados con marca (p. ej. "Refrescos Envasados", "Leche
+  Procesada", "Café", "Cerveza"), excluyendo frescos sin marca (`marca="S/M"` casi siempre, p.
+  ej. "Hortalizas Frescas") y no-alimentos (Medicamentos, Material Escolar, Aparatos
+  Eléctricos/Electrónicos, Detergentes, Juguetes, Cigarrillos, etc.).
+- **Trampa real, no hipotética: un WAF (Akamai) frente a `www.datos.gob.mx` responde `HTTP 403`
+  a cualquier `User-Agent` no-navegador** — incluido el `User-Agent` identificable que exige la
+  convención B7 (`NombreApp/Version (contacto)`) y el `User-Agent` por defecto de `httpx`.
+  Verificado aislando la variable: mismo request, mismos parámetros, solo cambia el
+  `User-Agent`: `403` con uno identificable o el de `httpx`, `200` con uno de navegador
+  (Chrome/Mac). **Decisión explícita de Paola (2026-09-26)**: usar un `User-Agent` de navegador
+  **solo para este proveedor**, porque es un portal de datos abiertos público (CC-BY 4.0) y el
+  bloqueo es una configuración de WAF por defecto, no una política anti-bot documentada de
+  PROFECO — no es el mismo caso que OFF (B7), que sí controla su propio límite de tasa y pide
+  explícitamente identificación. Documentado en el docstring de
+  `nutrimatch.providers.qqp_api` como excepción explícita, no como el patrón por defecto de
+  proveedores futuros.
+- **El campo `marca` de QQP viene compuesto**, no es una llave de marca limpia: `"Nescafé.
+  Clásico"`, `"La Lechera. Original"`, `"Nido. Entera. Forticrece"` — marca + variante separadas
+  por punto. Confirma que el match debe ser holístico por texto (marca + producto + presentación
+  juntos, vía `rapidfuzz.fuzz.WRatio`), no un join de llave de marca exacta contra
+  `brand_homologated` (A38). El espacio de comparación se acota, aun así, por coincidencia del
+  primer segmento de `marca` (homologado con la misma función de A38) contra
+  `brand_homologated`, con una segunda pasada por primera palabra si la exacta no encuentra
+  candidatos — evita un producto cruzado inviable (miles de filas QQP × 16.851 del catálogo).
+- **Resultado de la Fase A, medido el 2026-09-26**: de las 20 categorías curadas, en ambas
+  partes de julio 2026, con un tope de 150 filas por (recurso, categoría) — nunca la categoría
+  completa —, se recolectaron **782 filas de QQP tras deduplicar** por
+  (`marca`, `producto`, `presentacion`). De esas, **647 (82,7 %)** superan el piso de score 60
+  contra el catálogo homologado (`identidad_homologada_20260919.parquet`, 12.543 productos con
+  marca y nombre disponibles), con **275 `code` candidatos únicos** y un score promedio de 85,7.
+  Muestra estratificada final de **40 filas** (semilla `20260926`, reproducible): 10 en
+  [60-70), 7 en [70-80), 13 en [80-90), 10 en [90-100] — escrita en
+  `datos/procesados/piloto_qqp_candidatos_20260926.csv`, columna `revisado` vacía.
+- **La inspección manual de la muestra confirma que el score solo no basta** (justo lo que A35
+  exige prevenir con revisión humana): varios candidatos en la banda alta (80-90) son
+  claramente incorrectos pese al score — p. ej. QQP "Schettino · Maíz Palomero" emparejado con
+  un `code` de "Schettino Lenteja" (85,5: misma marca, producto distinto), o "Mc Cormick ·
+  Orégano" con un `code` de "Mermelada McCormick" (85,5). Ningún precio QQP se materializa a
+  partir de este score sin que Paola marque la fila "correcto" a mano.
+- **`price_status` sigue siendo `"REAL"` para las filas que Paola confirme**, nunca
+  `"estimado"` (A5, A36): el precio que PROFECO observó es real; la incertidumbre vive en
+  `match_method="text_reviewed"` y `match_confidence=score/100`, visibles por separado.
+- Implementado en `nutrimatch.providers.qqp_api` (cliente con caché en disco en
+  `datos/cache/qqp_api/`, no versionada), `scripts/piloto_precios_qqp.py` (Fase A, ejecutada) y
+  `scripts/materializar_precios_qqp.py` (Fase B, con pruebas sobre un CSV sintético en
+  `tests/test_materializar_precios_qqp.py` — no corrida contra datos reales todavía).
+- **Qué sigue, y de quién**: la revisión manual de
+  `datos/procesados/piloto_qqp_candidatos_20260926.csv` (marcar cada fila `"correcto"` o
+  `"incorrecto"` en la columna `revisado`) es un paso que **solo Paola puede hacer** — es
+  precisamente lo que A35 prohíbe automatizar. Cuando esté lista, `materializar_precios_qqp.py`
+  escribe `datos/procesados/precios_qqp_<fecha>.parquet` con las filas confirmadas.
+- **Cómo se hizo la revisión en la práctica (2026-09-26), para que quede trazable:** el agente
+  añadió al mismo CSV dos columnas de apoyo, `sugerencia_ia` (`correcto`/`incorrecto`/`dudoso`)
+  y `razon_ia` (una línea de justificación por fila, comparando marca/producto/variante entre
+  QQP y el candidato), **antes** de que Paola llenara `revisado` — decisión explícita de Paola
+  ante la disyuntiva planteada (no delegar la revisión, ni reabrir A35, sino usar la sugerencia
+  como borrador acelerador). Paola confirmó verbalmente que, tras leer `sugerencia_ia` y
+  `razon_ia`, adopta esos veredictos como su decisión final; `revisado` se llenó copiando
+  `sugerencia_ia` literal (conservando el tercer estado `"dudoso"`, no forzado a binario).
+  `materializar_precios_qqp.py` solo materializa `revisado == "correcto"` exacto, así que las
+  10 filas `"dudoso"` quedaron excluidas automáticamente — mismo criterio fail-safe que A1/A15
+  ("ante la duda, se excluye"), sin necesidad de una regla nueva.
+- **Resultado de la Fase B, ejecutado el 2026-09-26**: de las 40 filas, **22 `"correcto"`**
+  (10 en dudoso, 8 en incorrecto) se materializaron en
+  `datos/procesados/precios_qqp_20260926.parquet`: 22 filas, **21 `code` únicos** (una fila
+  duplica `code` con otra por dos presentaciones distintas de QQP del mismo producto — válido,
+  A33), 100 % `price_status="REAL"`, 100 % `match_method="text_reviewed"`,
+  `match_confidence` entre 0,60 y 0,95. Columnas de texto original de QQP (`qqp_marca`,
+  `qqp_producto`, `qqp_presentacion`) se conservan en el Parquet para trazabilidad, aunque no
+  son parte del esquema mínimo `price_*` de D.3.
+- **Nota de honestidad metodológica**, por si se audita esta tesis: el primer borrador de cada
+  veredicto fue de la IA, no de Paola desde cero. La revisión humana real consistió en leer las
+  40 justificaciones y **confirmar** (no en juzgar cada match de forma independiente sin
+  ayuda). Es una forma más débil de "revisado a mano" que la que A35 imaginaba originalmente
+  (donde el humano parte de cero), aunque sigue habiendo una decisión humana explícita en cada
+  fila — no un join automático silencioso, que es lo que A35 prohíbe en el fondo. Se documenta
+  aquí sin maquillaje para que el criterio quede disponible si en el futuro se decide que la
+  tesis requiere una revisión independiente desde cero antes de usar este Parquet en algo más
+  que un piloto.
+
+### A42. Mecanismo de faltantes en CORE8, categoría y variables afines: MAR condicionado a `completeness`/ingredientes, no MNAR
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/analisis_mecanismo_faltantes.py`, cierra el
+paso 7 del plan de trabajo de [`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md)
+(sección H) y la fila "Decisión por variable de la tabla E" que ese paso exigía. **Corrige el
+término usado en A36** ("MNAR") — la decisión de no imputar de A36 **no cambia**; lo que cambia
+es la etiqueta estadística correcta de por qué falta el dato.
+
+- **Medido sobre el snapshot real** (`off_mexico_20260919.parquet`, 16.851 productos): la
+  ausencia de cada variable de la tabla E.1, y de `categories_tags`, se probó contra una
+  variable **observada** (si el producto tiene o no `ingredients_text`/`ingredients_tags`, y el
+  score `completeness` que ya calcula OFF):
+
+  | Variable | % faltante | P(falta\|sin ingredientes) | P(falta\|con ingredientes) | razón |
+  | --- | --- | --- | --- | --- |
+  | CORE8 (rango de las 8) | 27,4–39,3 % | 40,9–61,3 % | 11,0–15,4 % | 3,7–4,8× |
+  | `categories_tags` | 48,2 % | 83,0 % | 6,4 % | 12,9× |
+  | `nova_group` | 59,8 % | 99,0 % | 12,6 % | 7,9× |
+  | `ingredients_analysis_tags` (dieta) | 54,2 % | 99,2 % | 0,1 % | ~1.518× (casi determinista) |
+  | `allergens`+`traces` (ambos vacíos) | 79,3 % | 99,4 % | 55,1 % | 1,8× |
+  | `labels_tags` (sellos) | 74,7 % | 87,3 % | 59,6 % | 1,5× |
+
+  Las cifras de faltante total reproducen exactas las de la tabla E.1 del diagnóstico
+  (79,3 %/74,7 %/54,2 % para alérgenos/sellos/dieta): esa tabla ya estaba bien medida: lo que
+  faltaba era la prueba de mecanismo, no el porcentaje.
+- **Por qué es MAR y no MNAR, en términos estrictos:** MNAR exige que la ausencia dependa del
+  **valor no observado en sí** (algo que no se puede probar directamente con los datos
+  disponibles: nunca se observa el valor de una fila faltante para comprobarlo). Lo que se
+  midió aquí es justo lo contrario: la ausencia depende fuertemente de una variable **observada**
+  (¿hay ingredientes?, ¿qué tan completo está el registro?) — la definición de libro de **MAR**.
+  A36 llamaba a esto "MNAR (va con ingredientes incompletos)"; "va con ingredientes incompletos"
+  describe exactamente MAR, no MNAR. No se puede descartar que exista además un componente MNAR
+  residual (p. ej. que fabricantes de productos menos saludables documenten peor incluso
+  controlando por completitud) — eso es, por definición, imposible de probar solo con los datos
+  observados — pero no hay evidencia de que domine sobre el patrón MAR medido.
+- **Patrón "todo o nada", refuerza que es un efecto del contribuidor, no del producto:** la
+  distribución de cuántos de los 8 CORE8 le faltan a cada producto es fuertemente bimodal:
+  8.358 productos (49,6 %) con los 8 presentes, 4.534 (26,9 %) con los 8 ausentes, y solo 1.959
+  (11,6 %) con 1-3 faltantes dispersos. Correlación entre `completeness` y nº de CORE8 faltantes:
+  **−0,597**. Es consistente con una causa común por registro (qué tan bien lo documentó quien
+  lo subió a OFF), no con que cada nutriente falte de forma independiente.
+- **La decisión de no imputar de A2/A36 no se reabre.** Que el mecanismo sea MAR (más tratable
+  estadísticamente que MNAR) no cambia el argumento de fondo: imputar un nutriente CORE8 o un
+  alérgeno seguiría siendo inventar un hecho nutricional o de seguridad que nadie observó (A2),
+  y NOVA imputado seguiría siendo un modelo de clasificación disfrazado de dato observado. Esta
+  decisión solo corrige la etiqueta estadística y deja evidencia lista para el paso 8 si algún
+  día se reabre: el primer punto del orden de evidencia que pide ese paso ("¿el faltante es MAR
+  dado X?") ya tiene respuesta afirmativa, con `completeness`/presencia de ingredientes como `X`.
+- Implementado en `scripts/analisis_mecanismo_faltantes.py`; resumen versionado en
+  `datos/procesados/re_eda_20260926/mecanismo_faltantes.csv`.
+
+### A43. Dataset analítico de referencia: tabla de observaciones + Parquet nuevo, sin tocar el motor
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/construir_dataset_referencia.py`, cierra el
+paso 9 del plan de trabajo de [`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md)
+(sección H). Implementa el diseño de F.2 (tabla de observaciones) y el entregable "Parquet nuevo +
+diccionario". **No se tocó** `off_mexico_20260919.parquet` ni `src/nutrimatch/engine/*_score.py` /
+`services/catalog.py` / `services/ranking.py` — eso es el paso 10.
+
+- **Tabla de observaciones** (`datos/procesados/observaciones_20260926.parquet`): esquema F.2
+  (`code`, `field`, `value`, `status`, `source`, `source_url`, `retrieved_at`, `snapshot_id`,
+  `method`, `confidence`, `quality_flag`). `value` es texto (B14). Consolida solo observaciones
+  externas: 6 hits de nombre (A39, `field=product_name`, `source=openfoodfacts_api_producto`),
+  307 precios Open Prices (A40, `field=price`, `method=exact_gtin`) y 22 precios QQP (A41,
+  `field=price`, `method=text_reviewed`). Total: 335 filas. Implementado en
+  `nutrimatch.engine.observations`; la resolución es **REAL más reciente** por `retrieved_at`;
+  si no hay ninguna, UNAVAILABLE; nunca IMPUTED ni SYNTHETIC por delante de REAL. Open Prices y
+  QQP no comparten ningún `code` (0 solapes); 42 códigos de Open Prices tienen más de una
+  observación (desempate por fecha).
+- **Dataset de referencia** (`datos/procesados/dataset_referencia_20260926.parquet`): 16.851
+  filas (una por `code`, A34), 267 columnas. Base = las 211 de OFF **bit a bit iguales** al
+  crudo (verificado 2026-09-26; 0 sufijos `_x`/`_y`) + identidad homologada (A38) +
+  `matriz_nut_100g` (A18/A21/A23/A27) + precio resuelto + `product_name_source`.
+  `category_stats` queda fuera: es por categoría, no por producto.
+- **Colisión de columnas:** `matriz_nut_100g` trae `nova_group`/`additives_n` idénticos a OFF
+  (0 filas distintas). Se dropean al unir; si aparece otra colisión, el script falla en vez de
+  dejar que pandas renombre en silencio.
+- **Precio resuelto:** 263 `REAL` (242 Open Prices + 21 QQP únicos), 16.588 `UNAVAILABLE`.
+  Ausencia = `price=NULL` + `price_status=UNAVAILABLE`, nunca 0 (A2). 6 nombres con
+  `product_name_source=openfoodfacts_api_producto` (override REAL de A39 sobre el UNAVAILABLE
+  de A38).
+- **Metadato de tabla:** `datos/procesados/dataset_referencia_20260926_metadata.json` (F.2
+  punto 1: no se clona `*_status` por cada una de las 211). Diccionario:
+  [`docs/diccionario_dataset_referencia.md`](docs/diccionario_dataset_referencia.md).
+- No hay IMPUTED ni SYNTHETIC en este dataset (A33, A36). El paso 8 (bake-off de imputación)
+  no se reabrió.
+
+### A44. Ranking v1 confirmado: las fórmulas no cambian
+
+**Decisión cerrada el 2026-09-26**, sobre `scripts/confirmar_ranking_v1.py`, cierra el paso 10
+del plan de trabajo de [`docs/diagnostico_calidad_datos.md`](docs/diagnostico_calidad_datos.md)
+(sección H). El entregable es **confirmación del v1**, no un ranking v2. No se tocó
+`src/nutrimatch/engine/*_score.py` ni `services/ranking.py` / `services/catalog.py`.
+
+Reproducido sobre `dataset_referencia_20260926.parquet` (16.851 filas), no sobre
+`off_mexico` + `matriz` por separado:
+
+| Métrica | Publicado | Medido |
+| --- | --- | --- |
+| D1 v1 calculable (A27) | 7.040 (41,8 %) | 7.040 |
+| D2 calculable (A23) | 6.781 (40,2 %) | 6.781 |
+| `universo_puntuable` (A22) | 5.864 (34,8 %) | 5.864 |
+| `cov < 0.5` Ana (A31) | 9.517 (56,5 %) | 9.517; causa `D1+D2+D3` |
+| `cov < 0.5` Caro (A31) | 10.974 (65,1 %) | 10.974; causa `D1+D2+D3` |
+| Precio REAL (A43) | 263 | 263; **no puntúa** (A5) |
+
+Reaperturas consideradas y **rechazadas** (G.4):
+
+- Imputar D1/D2 para subir el 34,8 %: no (A2, A36, A42: el hueco es MAR, no un error de fórmula).
+- Bajar el umbral de `cov`: no, sin estudio de estabilidad del orden.
+- Meter precio en el score: no (A5); 263 observaciones no cambian eso.
+- Tratar Nutri-Score como D1: no (A4).
+- Ampliar D1 a energía / grasa total / carbohidratos: no; sigue A27.
+
+El cableado del catálogo al dataset de referencia (nombres homologados, precio para mostrar,
+copy F.3) es el paso 11, no este.
+
+Implementado en `scripts/confirmar_ranking_v1.py`; resumen en
+`datos/procesados/re_eda_20260926/confirmacion_ranking_v1.csv`.
+
 ---
 
 ## Sección B. Trampas verificadas en vivo (2026-09-19 y 2026-09-20)
@@ -596,6 +1062,37 @@ parte de CORE8, así que el paso 6 (`sanitize.py`) nunca lo tipó: sigue siendo 
 - Cualquier módulo futuro que use `nutriscore_score`, o cualquier otra columna del snapshot crudo
   que no pase por `sanitize.py` (paso 6), debe convertirla explícitamente antes de compararla
   numéricamente — el mismo tipo de trampa que B13, pero de tipo declarado en vez de valor nulo.
+
+### B15. `pd.read_csv` sin `dtype` infiere BIGINT de un `code` y borra ceros iniciales en silencio
+
+Verificado en vivo el 2026-09-26, sobre `datos/procesados/piloto_qqp_candidatos_20260926.csv`
+(paso 6b, A41), al construir el dataset analítico de referencia (paso 9, A43). El propio agente
+introdujo el bug al editar el CSV a mano con `pd.read_csv()` sin `dtype` (paso previo de
+`sugerencia_ia`/`razon_ia`, A41): 3 de los 22 códigos `code_candidato` marcados `"correcto"`
+perdieron su cero inicial (`661440000014` en vez de `0661440000014`, `731082001004` en vez de
+`0731082001004`, `74323081411` en vez de `0074323081411`), porque `code_candidato` es una columna
+de texto que **parece** numérica: sin `dtype` explícito, pandas la infiere como `int64`/BIGINT y
+descarta el cero inicial sin avisar.
+
+- El mismo patrón se repetía, de forma estructural, en `scripts/materializar_precios_qqp.py`
+  (Fase B): su lectura del CSV tampoco fijaba `dtype`, así que el bug se habría reproducido en
+  cualquier corrida futura de esa fase, incluso sobre un CSV ya limpio.
+- `code` (GTIN, A34) es siempre un identificador de texto, nunca un número: un GTIN con cero
+  inicial es un valor válido y distinto de su versión sin ese cero (`0074323081411` ≠
+  `74323081411` como claves de join), y **no hay ninguna operación aritmética legítima** que
+  requiera tratarlo como entero.
+- Corregido restaurando los 3 ceros en el CSV, fijando `dtype={"code_candidato": str}` en la
+  lectura de `materializar_precios_qqp.py` (extraído a `cargar_csv_revisado()` para que sea
+  testeable) y regenerando `datos/procesados/precios_qqp_20260926.parquet`.
+- La prueba sintética original de `tests/test_materializar_precios_qqp.py` nunca habría detectado
+  esta clase de bug: construye el `DataFrame` directo en Python, sin pasar nunca por un CSV real
+  en disco. Se añadió `test_cargar_csv_revisado_preserva_cero_inicial_en_code_candidato`, que sí
+  escribe y relee un CSV real vía `tmp_path`, como regresión.
+- Misma familia que B13 (valor nulo mal tipado al leer) y B14 (columna declarada como texto,
+  comparada como si fuera número): aquí el tipo declarado correcto (texto) se pierde **al leer**,
+  no al comparar — cualquier columna de identificador (`code`, `product_code`, cualquier futuro
+  GTIN u otro código con cero inicial posible) que pase por un CSV intermedio debe leerse siempre
+  con `dtype=str` explícito para esa columna, nunca dejarlo a la inferencia de pandas.
 
 ---
 

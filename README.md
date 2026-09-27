@@ -38,10 +38,11 @@ Las licencias y la forma de citar ambas fuentes están en [`docs/ATTRIBUTION.md`
 
 | Pieza | Elección | Por qué |
 | --- | --- | --- |
-| Lógica | Paquete `nutrimatch` instalable (src-layout) | Un solo motor compartido entre notebooks y UI, sin código duplicado |
-| Interfaz | Streamlit | Requisito de la rúbrica académica y suficiente para el MVP |
+| Lógica | Paquete `nutrimatch` instalable (src-layout) | Un solo motor compartido entre notebooks y la API, sin código duplicado |
+| Interfaz | Angular (`frontend/`) | Única UI del MVP: explica el porqué (A10) y habla con FastAPI |
+| API | FastAPI (`nutrimatch.api`) | Serializa `schemas/`; no recalcula D1/D2/D3 |
 | Análisis | DuckDB sobre Parquet | Consulta un snapshot de millones de filas sin servidor de base de datos |
-| Estado | SQLite en modo WAL | Solo estado mutable y regenerable |
+| Estado | SQLite en modo WAL | Solo estado mutable y regenerable (`ranking_run`, `event_log`) |
 | Validación | pydantic v2 | Contratos explícitos de entrada y salida |
 
 ## Jerarquía de datos en tres niveles
@@ -106,7 +107,8 @@ todas las peticiones. `OPENAI_API_KEY` puede quedarse vacía.
 ## Cómo correr
 
 ```bash
-make ui             # interfaz Streamlit
+make api            # FastAPI en :8000 (catálogo de referencia)
+make ui             # Angular en :4200 (proxy a la API)
 make test           # pruebas con pytest
 make lint           # estilo con ruff
 make help           # lista todos los targets
@@ -121,8 +123,15 @@ uv run python -c "import nutrimatch; print(nutrimatch.__version__)"
 
 Si prefieres activar el entorno a mano: `source .venv/bin/activate`.
 
-Los targets `make ingest-off`, `make ingest-qqp` y `make eda` están declarados pero **todavía
-avisan de que están pendientes de implementar**.
+`make api` sirve el catálogo `dataset_referencia_20260927.parquet` (no hace falta re-descargar
+OFF). `make ui` lanza Angular, que habla con esa API: perfil, carrito y comparación viven en el
+navegador; búsqueda, ranking, ficha, resumen de carrito e historial pasan por FastAPI. Cada
+`ranking_run` y el `event_log` se guardan en `nutrimatch.db` (gitignored, regenerable). La
+primera carga del catálogo precálcula D1 una vez y puede tardar unos segundos.
+
+`make ingest-qqp` sigue pendiente. `make ingest-off` construye el snapshot. `make eda` no lanza
+Jupyter: solo imprime las rutas de `notebooks/02_eda_universo_mexico.ipynb` (universo, nutrientes,
+NOVA) y `notebooks/08_re_eda_identidad.ipynb` (EAN, nombres, marcas, presentaciones).
 
 ## Mapa de carpetas
 
@@ -135,16 +144,19 @@ src/nutrimatch/       paquete instalable: toda la lógica
     repositories/     acceso a datos con patrón repositorio
   domain/             modelos de dominio (producto, usuario, carrito)
   engine/             motor determinista de scoring y operaciones
-  providers/          acceso a OFF y a PROFECO QQP, con caché y limitador
+  providers/          acceso a OFF, Open Prices y PROFECO QQP, con caché y limitador
   schemas/            esquemas pydantic v2 de entrada y salida
   services/           orquestación: ingesta, universo México, ranking
 datos/
   snapshots/          export crudo de OFF (no se versiona)
-  precios_qqp/        ZIP de PROFECO QQP (no se versiona)
-  procesados/         Parquet derivado del universo México
-docs/                 atribución de datos y línea futura
+  precios_qqp/        carpeta reservada, sin uso hoy: QQP se consulta por API (datastore_search,
+                      A41), no por descarga de ZIP; caché de esa API en cache/qqp_api/
+  cache/              caché en disco de las APIs externas (OFF, Open Prices, QQP; no se versiona)
+  procesados/         Parquet derivado del universo México, identidad homologada, piloto de
+                      precios Open Prices (A40), candidatos QQP por texto (A41) y CSV del re-EDA
+docs/                 atribución, línea futura y diagnóstico de calidad
 notebooks/            notebooks de análisis
-ui/                   aplicación Streamlit
+frontend/             aplicación Angular (única interfaz)
 scripts/              scripts de ingesta y mantenimiento
 tests/                pruebas
   fixtures/           datos de prueba
@@ -161,7 +173,9 @@ Orden planeado, con el estado real a la fecha (ver `AGENTS.md` para el detalle d
 4. `04_modelo_recomendacion` — hecho.
 5. `05_evaluacion` — hecho.
 6. `06_qqp_precios` — pendiente.
-7. `07_app_y_llm` — pendiente.
+7. `07_app_y_llm` — interfaz Angular + FastAPI: hecho; capa LLM pendiente.
+8. `08_re_eda_identidad` — hecho: EAN/GTIN, nombres, marcas, `quantity` y duplicados de texto.
+   Tablas en `datos/procesados/re_eda_20260926/`.
 
 ## Convenciones
 

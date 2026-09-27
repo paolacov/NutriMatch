@@ -1,0 +1,38 @@
+funcionalidad,requisitos_minimos,productos_evaluables,denominador,pct_universo,pct_denominador,calidad,estado,limitacion
+Búsqueda por GTIN/code,code (siempre presente),16851,16851,100.0,100.0,alta 36.2% · media 9.0% · baja 12.6% · insuficiente 42.2%,COMPLETA,La API busca contains literal en code. 100 % de los GTIN son consultables.
+Búsqueda por nombre,product_name tras _preparar_referencia (= product_name_homologated),15172,16851,90.04,90.04,alta 39.5% · media 9.2% · baja 10.8% · insuficiente 40.5%,COMPLETA,La API pisa product_name con homologated. 1.679 UNAVAILABLE no salen por texto. Ficha acepta también product_name crudo (unión 15.184).
+Búsqueda por marca,brand_original o brands (primer columna existente),13102,16851,77.75,77.75,alta 44.7% · media 9.9% · baja 11.5% · insuficiente 33.8%,PARCIAL,Implementada. 3.749 sin marca no coinciden por marca.
+Búsqueda por categoría,no implementada (ni categories_tags ni categoria_referencia),0,16851,0.0,0.0,n/a,NO DISPONIBLE,filtrar_por_query no lee categoría.
+Ficha: apertura por code,code en el catálogo,16851,16851,100.0,100.0,alta 36.2% · media 9.0% · baja 12.6% · insuficiente 42.2%,COMPLETA,GET /products/{code} responde para los 16.851. Atributos pueden ir UNAVAILABLE.
+Ficha: nombre para mostrar,product_name_homologated o product_name,15184,16851,90.11,90.11,alta 39.5% · media 9.2% · baja 10.8% · insuficiente 40.5%,COMPLETA,NULL se muestra como hueco; no se inventa placeholder.
+Ficha: marca,brand_original o brands,13102,16851,77.75,77.75,alta 44.7% · media 9.9% · baja 11.5% · insuficiente 33.8%,PARCIAL,UI: «Marca no disponible».
+Ficha: categoría,main_category o main_category_en o categoria_referencia,8728,16851,51.8,51.8,alta 69.9% · media 14.5% · baja 13.8% · insuficiente 1.7%,PARCIAL,No es filtro de búsqueda.
+Ficha: ingredientes,ingredients_text o ingredients_tags,7650,16851,45.4,45.4,alta 79.8% · media 16.3% · baja 3.9% · insuficiente 0.0%,PARCIAL,NULL ≠ «sin ingredientes».
+Ficha: ≥1 nutriente de los 7 mostrados,"saneado/bruto/crudo de energy, proteins, carbs, sugars, fat, fiber, salt",12315,16851,73.08,73.08,alta 48.8% · media 8.0% · baja 8.6% · insuficiente 34.6%,PARCIAL,saturated-fat puntúa D1 pero no se lista en la ficha.
+Ficha: 7 nutrientes de ficha,los 7 de NUTRIENTES_FICHA con algún valor,8695,16851,51.6,51.6,alta 64.2% · media 8.7% · baja 6.8% · insuficiente 20.3%,PARCIAL,Cero real cuenta como dato.
+Ficha: NOVA,nova_group,6781,16851,40.24,40.24,alta 86.9% · media 12.2% · baja 0.9% · insuficiente 0.0%,PARCIAL,"additives_n va a la explicación de ranking, no al schema de ficha."
+"Ficha: aditivos (explain, no ficha)",additives_n en ProductExplanation,7650,16851,45.4,45.4,alta 79.8% · media 16.3% · baja 3.9% · insuficiente 0.0%,PARCIAL,"0 aditivos es REAL, no missing."
+Ficha: etiquetas/sellos,labels_tags,4266,16851,25.32,25.32,alta 65.0% · media 13.0% · baja 21.8% · insuficiente 0.2%,LIMITADA,Sin labels ≠ «sin sellos NOM-051».
+Ficha: alérgenos declarados (campo ficha),allergens (no traces),2793,16851,16.57,16.57,alta 89.7% · media 8.3% · baja 2.0% · insuficiente 0.0%,LIMITADA,La ficha no muestra traces; el filtro de alergia sí los usa.
+Ficha: precio REAL,price_status=REAL y price no nulo,263,16851,1.56,1.56,alta 90.1% · media 4.6% · baja 1.9% · insuficiente 3.4%,NO DISPONIBLE,Overlay SYNTHETIC de Angular no cuenta. 16.588 UNAVAILABLE.
+Ficha: imagen,image_small_url o image_url,13041,16851,77.39,77.39,alta 45.8% · media 10.8% · baja 14.3% · insuficiente 29.1%,PARCIAL,Sin imagen se muestra marca de categoría.
+Comparación completa,7 nutrientes de ficha + D1 calculable + D2 calculable,5457,16851,32.38,32.38,alta 98.7% · media 1.3% · baja 0.0% · insuficiente 0.0%,LIMITADA,Cualquier par se puede abrir. Completa = se pueden contrastar score D1/D2 y los 7 nutrientes.
+Comparación parcial,"≥4 nutrientes de ficha o D1 o D2, y no completa",7134,16851,42.34,42.34,alta 10.1% · media 17.6% · baja 15.2% · insuficiente 57.1%,PARCIAL,UI pone «Sin dato» / — ; no inventa.
+Comparación limitada,solo identidad o <4 nutrientes y sin D1/D2,4260,16851,25.28,25.28,alta 0.0% · media 4.3% · baja 24.3% · insuficiente 71.3%,LIMITADA,Se puede listar el producto; no hay contraste numérico útil.
+Ranking: ejecutable (asigna banda A32),perfil + fila de catálogo (16.851),16851,16851,100.0,100.0,alta 36.2% · media 9.0% · baja 12.6% · insuficiente 42.2%,COMPLETA,Todos entran a exactamente una banda. No requiere universo_puntuable para existir.
+Ranking: universo_puntuable (A22),≥4/8 percentiles + D2,5864,16851,34.8,34.8,alta 98.5% · media 1.5% · baja 0.0% · insuficiente 0.0%,LIMITADA,Filtro previo agnóstico de perfil. Confirmado 5.864.
+Ranking: D1 calculable (A27),≥1 percentil de los 5 nutrientes con signo,7040,16851,41.78,41.78,alta 85.1% · media 7.7% · baja 7.2% · insuficiente 0.0%,PARCIAL,No materializado. Runtime.
+Ranking: D2 calculable (A23),d2 no nulo (= tiene NOVA),6781,16851,40.24,40.24,alta 86.9% · media 12.2% · baja 0.9% · insuficiente 0.0%,PARCIAL,Persistido en el Parquet.
+Alternativas (módulo dedicado),no existe en API ni Angular,0,16851,0.0,0.0,n/a,NO DISPONIBLE,No hay endpoint ni pantalla de «más proteína / menos azúcar».
+Capacidad D1: más proteína,percentil_proteins_100g,6949,16851,41.24,41.24,derived,PARCIAL,"Es el signo +1 de D1, no un motor de alternativas."
+Capacidad D1: menos azúcar,percentil_sugars_100g,6743,16851,40.02,40.02,derived,PARCIAL,Signo −1 de D1.
+Capacidad D1: menos sal,percentil_salt_100g,6734,16851,39.96,39.96,derived,LIMITADA,Signo −1 de D1. Grasa total no puntúa (A27).
+Capacidad D1: menos grasa saturada,percentil_saturated-fat_100g,6690,16851,39.7,39.7,derived,LIMITADA,"fat_100g es informativo en ficha, no D1."
+Capacidad D1: más fibra,percentil_fiber_100g,6549,16851,38.86,38.86,derived,LIMITADA,Signo +1 de D1.
+Alertas: sello NOM-051 determinable,labels_tags presente (exceso o no),4266,16851,25.32,25.32,alta 65.0% · media 13.0% · baja 21.8% · insuficiente 0.2%,LIMITADA,Con exceso: 1204. Labels sin exceso (determinado: sin sello): 3062. Sin labels: no se puede determinar.
+Alertas: sello exceso presente,labels_tags contiene 'exceso',1204,16851,7.14,7.14,alta 53.7% · media 14.0% · baja 31.8% · insuficiente 0.4%,LIMITADA,"Informan, no puntúan (A9). No es «no cumple» si falta labels."
+Alertas: alergia determinable (perfil con en:milk),allergens o traces con texto,3489,16851,20.71,20.71,alta 88.1% · media 9.5% · baja 2.4% · insuficiente 0.1%,LIMITADA,apto=1661; no_apto=1828; no_verificable=13362 (no se puede determinar). NULL ≠ no cumple.
+Alertas: dieta vegana determinable,ingredients_analysis_tags con en:vegan o en:non-vegan,3905,16851,23.17,23.17,alta 87.1% · media 10.4% · baja 2.4% · insuficiente 0.0%,LIMITADA,compatible=917; incompatible=2988; no_verificable=12946.
+Personalización (ranking con perfil Ana/Beto/Caro),priority_order + opcional alergia/dieta/labels; producto con D1/D2/D3 según cov,16851,16851,100.0,100.0,alta 36.2% · media 9.0% · baja 12.6% · insuficiente 42.2%,COMPLETA,Ana ranking=7334 insuf=9517; Caro ranking=5877 insuf=10974.
+Precio REAL (ficha/comparar),price_status=REAL,263,16851,1.56,1.56,alta 90.1% · media 4.6% · baja 1.9% · insuficiente 3.4%,NO DISPONIBLE,No puntúa. Comparar por precio solo es útil entre productos con REAL.
+Recetas / LLM,no hay motor; /recetas lista el carrito,0,16851,0.0,0.0,n/a,NO DISPONIBLE,Pantalla explícita: no propone platillos. Capa LLM apagada.

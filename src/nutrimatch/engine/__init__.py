@@ -26,6 +26,8 @@ Utilidad complementaria (no forma parte del score de compatibilidad):
 
 - ``product_naming``: resuelve el nombre de un producto para mostrar, con fallback entre columnas
   del propio OFF cuando ``product_name`` viene vacío (decisión A28).
+- ``data_quality``: ``data_quality_score`` / ``data_quality_level`` (DERIVED). Miden
+  disponibilidad y consistencia de la ficha, no calidad nutricional, y no puntúan.
 
 Pendiente para una siguiente pasada (fuera del alcance del paso 7): extender D1 a
 ``energy-kcal_100g``, ``fat_100g`` y ``carbohydrates_100g`` cuando se defina una taxonomía de

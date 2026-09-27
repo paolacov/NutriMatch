@@ -14,15 +14,14 @@ dependencies = [
     "pandas",
     "pyarrow",
     "duckdb",
-    "streamlit",
     "pydantic>=2",
     "pydantic-settings",
     "sqlalchemy>=2",
     "rapidfuzz",
     "python-dotenv",
-    # Gráficos interactivos: se usa en los notebooks de EDA y, más adelante,
-    # en la interfaz Streamlit (decisión 2026-09-20, en vez de matplotlib
-    # estático, porque se reutiliza en ambos lugares).
+    "fastapi",
+    "uvicorn[standard]",
+    # Gráficos de los notebooks de EDA (02, 03, 08). La interfaz Angular no los usa.
     "plotly",
 ]
 

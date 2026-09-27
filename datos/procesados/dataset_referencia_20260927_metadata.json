@@ -1,0 +1,30 @@
+{
+  "dataset_id": "dataset_referencia_20260927",
+  "generated_at": "2026-09-27T14:59:09.108082+00:00",
+  "n_filas": 16851,
+  "n_columnas": 270,
+  "origen": {
+    "parquet": "dataset_referencia_20260926.parquet",
+    "sha256": "f6e71355d7c8d12e1f29e25294d9ded0fa9d8ec68985c74520ceb69767804572",
+    "n_columnas": 267
+  },
+  "sha256": "8e19c4b97bad38bc93a29981cbade9bed2616a7adcac7f9879b47cac0ee9713e",
+  "columnas_nuevas": [
+    "data_quality_score",
+    "data_quality_level",
+    "data_quality_detalle"
+  ],
+  "procedencia_columnas_nuevas": "DERIVED",
+  "fuentes_reutilizadas": [
+    "n_percentiles_validos",
+    "ingredients_text",
+    "categoria_referencia",
+    "nova_group",
+    "additives_n",
+    "labels_tags",
+    "*_100g_flag_fuera_de_rango",
+    "flag_suma_macros_excede_100"
+  ],
+  "nota": "Copia del dataset de referencia 20260926 más tres columnas DERIVED de calidad de información. No hay SYNTHETIC ni IMPUTED. El Parquet 20260926 no se modificó. D1/D2/D3/cov/score no se recalcularon ni se persistieron.",
+  "fuera_de_alcance": "No se tocó engine/*_score.py, services/catalog.py, services/ranking.py ni Angular."
+}
