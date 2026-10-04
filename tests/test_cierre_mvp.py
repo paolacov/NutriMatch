@@ -1,7 +1,8 @@
-"""Cierre funcional del MVP: casos límite sobre el Parquet 20260927.
+"""Cierre funcional sobre el Parquet histórico 20260927 (16 851 filas).
 
-No toca fórmulas. No imputa. No genera sintéticos. Comprueba que los huecos
-del dataset se comportan como NULL + bandera, no como 0 ni como «no cumple».
+No toca fórmulas. El archivo se fija aquí y no sigue el `.env`, para no mezclarlo
+con el catálogo operativo de 13 093. Un precio ausente en el Parquet sale en la
+ficha como SYNTHETIC de demostración, nunca como REAL ni como cero.
 """
 
 from __future__ import annotations
@@ -15,12 +16,18 @@ from nutrimatch.api.app import create_app
 from nutrimatch.core.config import Settings, get_settings
 from nutrimatch.services.catalog import Catalog
 from nutrimatch.services.ranking import filtrar_por_query
-
-from tests.test_catalog_referencia_api import ANA, CARO, CODE_NO_PUNTUABLE, CODE_PRECIO_REAL, CODE_PUNTUABLE, CODE_SIN_NOMBRE
+from tests.test_catalog_referencia_api import (
+    ANA,
+    CARO,
+    CODE_NO_PUNTUABLE,
+    CODE_PRECIO_REAL,
+    CODE_PUNTUABLE,
+    CODE_SIN_NOMBRE,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 N = 16_851
-N_NOMBRE_HOMOLOGADO = 15_172
+N_NOMBRE_HOMOLOGADO = 15_185
 N_PUNTUABLE = 5_864
 
 CODE_NOMBRE_LITERAL_NAN = "7501058623201"
@@ -55,7 +62,11 @@ PERFIL_VEGANO = {
 @pytest.fixture(scope="module")
 def settings_api() -> Settings:
     get_settings.cache_clear()
-    return get_settings()
+    return Settings(
+        referencia_filename="dataset_referencia_20260927.parquet",
+        snapshot_id="off_csv_20260919",
+        _env_file=None,
+    )
 
 
 @pytest.fixture(scope="module")
@@ -136,8 +147,9 @@ def test_caso_1_completo_precio_real(cliente: TestClient) -> None:
 
 def test_caso_2_completo_sin_precio(cliente: TestClient) -> None:
     ficha = _ficha(cliente, CODE_PUNTUABLE_SIN_PRECIO)
-    assert ficha["price"]["status"] == "UNAVAILABLE"
-    assert ficha["price"]["value"] is None
+    assert ficha["price"]["status"] == "SYNTHETIC"
+    assert ficha["price"]["source"] == "demo"
+    assert ficha["price"]["value"] not in (None, 0)
     item = _explain(cliente, CODE_PUNTUABLE_SIN_PRECIO, ANA["profile"])
     assert item["score"] is not None
     assert item["d3"] is None
@@ -147,7 +159,9 @@ def test_caso_3_y_4_no_puntuable_con_score_a26(cliente: TestClient, catalogo: Ca
     fila = catalogo.df.loc[catalogo.df["code"] == CODE_NO_PUNTUABLE].iloc[0]
     assert not bool(fila["universo_puntuable"])
     ficha = _ficha(cliente, CODE_NO_PUNTUABLE)
-    assert ficha["price"]["value"] is None
+    assert ficha["price"]["status"] == "SYNTHETIC"
+    assert ficha["price"]["source"] == "demo"
+    assert ficha["price"]["value"] not in (None, 0)
     _nutrientes_nulos_no_son_cero(ficha)
     item = _explain(cliente, CODE_NO_PUNTUABLE, ANA["profile"])
     assert item["d1"] is None
@@ -257,11 +271,12 @@ def test_alertas_tres_estados_alergia_y_dieta(cliente: TestClient) -> None:
     assert _explain(cliente, CODE_SIN_NOMBRE, PERFIL_VEGANO)["diet_status"] == "no_verificable"
 
 
-def test_precio_unavailable_nunca_cero(cliente: TestClient) -> None:
+def test_precio_ausente_en_parquet_no_sale_como_real_ni_como_cero(cliente: TestClient) -> None:
     for code in (CODE_NO_PUNTUABLE, CODE_SIN_NOMBRE, CODE_PUNTUABLE_SIN_PRECIO):
         ficha = _ficha(cliente, code)
-        assert ficha["price"]["value"] is None
-        assert ficha["price"]["status"] == "UNAVAILABLE"
+        assert ficha["price"]["status"] == "SYNTHETIC"
+        assert ficha["price"]["source"] == "demo"
+        assert ficha["price"]["value"] not in (None, 0)
 
 
 def test_filtrar_por_query_no_convierte_nan_literal_en_nulo(catalogo: Catalog) -> None:

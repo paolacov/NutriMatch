@@ -1,19 +1,17 @@
-"""D2 — subpuntaje de procesamiento: NOVA combinado con `additives_n` (decisión A17).
+"""D2 — subpuntaje de procesamiento: NOVA combinado con `additives_n` (A17, A23).
 
-**Fórmula propuesta el 2026-09-20, pendiente de aprobación final de Paola.**
-La decisión A17 (AGENTS.md) cierra QUÉ combinar (NOVA como base, `additives_n`
-como ajuste dentro de cada grupo) pero no fijó la fórmula exacta; se propone
-aquí, calibrada con datos del propio snapshot, no con constantes inventadas.
+La fórmula queda cerrada en A23. NOVA define la banda y `additives_n` ajusta
+dentro de ella. El tope de aditivos se calibra en cada snapshot como el
+percentil 95 de `additives_n` entre los productos NOVA 4. No se usa una
+constante fija.
 
-Cada grupo NOVA ocupa una banda de 25 puntos en la escala 0-100, de forma que
-NOVA=1 sea siempre la banda más alta (75-100) y NOVA=4 la más baja (0-25).
-Esto preserva la primacía de NOVA sobre `additives_n`: ningún producto de un
-grupo NOVA mejor puede terminar por debajo de uno de un grupo peor, solo se
-reordena dentro de la banda de su propio grupo. Dentro de su banda,
-`additives_n` empuja el subpuntaje hacia el piso, hasta un tope de aditivos
-que se calibra empíricamente como un percentil alto de `additives_n` entre
-los productos NOVA=4 del propio snapshot (el grupo con más aditivos): no es
-un número inventado, se recalcula cada vez que cambie el snapshot.
+Cada grupo NOVA ocupa una banda de 25 puntos en la escala 0-100:
+NOVA 1 queda en 75-100 y NOVA 4 en 0-25. Un producto de mejor grupo NOVA
+no queda por debajo de uno de peor grupo. Dentro de la banda, `additives_n`
+desplaza el subpuntaje hacia el piso hasta el tope calibrado.
+
+Si `additives_n` falta, no se imputa cero. Se resta media banda (12,5 puntos)
+y el producto queda en el centro de su banda. Sin NOVA, D2 es NULL.
 """
 
 from __future__ import annotations
@@ -21,6 +19,8 @@ from __future__ import annotations
 import pandas as pd
 
 ANCHO_BANDA = 25.0  # 100 puntos / 4 grupos NOVA
+# Fracción de la banda que se resta cuando `additives_n` es NULL (punto medio).
+FRACCION_AJUSTE_ADITIVOS_AUSENTES = 0.5
 
 
 def calibrar_tope_aditivos(
@@ -49,19 +49,18 @@ def calcular_d2(
     """Subpuntaje D2 (0-100).
 
     NaN si el producto no tiene NOVA (D2 no es computable sin NOVA: es el
-    dato base de la dimensión). La ausencia de `additives_n` NO anula D2: se
-    trata como 0 aditivos, que es la posición más favorable dentro de la
-    banda, y es coherente con no penalizar por un dato que puede simplemente
-    no haberse declarado.
+    dato base de la dimensión). La ausencia de `additives_n` no anula D2 y
+    tampoco se imputa a 0 aditivos: el ajuste es neutro (mitad de la banda),
+    de modo que el producto queda en el centro de su piso NOVA y no en el techo.
     """
     nova_num = pd.to_numeric(nova_group.astype("string").str.strip(), errors="coerce")
-    aditivos_num = (
-        pd.to_numeric(additives_n.astype("string").str.strip(), errors="coerce")
-        .fillna(0.0)
-        .clip(lower=0.0, upper=tope_aditivos)
-    )
+    aditivos_raw = pd.to_numeric(additives_n.astype("string").str.strip(), errors="coerce")
+    aditivos_conocido = aditivos_raw.notna()
+    aditivos_num = aditivos_raw.clip(lower=0.0, upper=tope_aditivos)
 
     techo_banda = 100.0 - (nova_num - 1.0) * ANCHO_BANDA
-    ajuste = (aditivos_num / tope_aditivos) * ANCHO_BANDA
+    ajuste_observado = (aditivos_num / tope_aditivos) * ANCHO_BANDA
+    ajuste_neutro = FRACCION_AJUSTE_ADITIVOS_AUSENTES * ANCHO_BANDA
+    ajuste = ajuste_observado.where(aditivos_conocido, ajuste_neutro)
     d2 = techo_banda - ajuste
     return d2.where(nova_num.notna())

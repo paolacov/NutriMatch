@@ -1,188 +1,246 @@
 # NutriMatch
 
-Apoyo a la decisión de compra de alimentos en México, explicable y auditable.
+Desarrollé NutriMatch para apoyar la decisión de compra de alimentos empacados en México con un resultado explicable y auditable.
 
-> **Aviso importante: NutriMatch no emite diagnósticos médicos.** No sustituye la consulta con
-> personal de salud ni con profesionales de la nutrición. El sistema compara productos empacados
-> frente a un perfil declarado por la propia usuaria y explica el porqué de cada resultado; no
-> valora estados de salud, no prescribe dietas y no interpreta síntomas.
+> **Aviso.** NutriMatch no emite diagnósticos médicos. Compara productos empacados frente a un perfil que declara la propia persona y explica el porqué de cada resultado. No valora estados de salud, no prescribe dietas y no interpreta síntomas.
 
-## Qué es y para quién
+## Qué hace el sistema
 
-NutriMatch es un MVP académico. La persona declara un perfil (dieta, alergias, objetivo, orden de
-prioridades y presupuesto), busca un producto por nombre o escanea su código de barras, y recibe un
-**ranking personalizado con explicación detallada**: cuánto aportó cada dimensión, qué nutrientes
-pesaron, en qué percentil queda el producto dentro de su categoría y en qué estado están los datos.
+La persona declara dieta, alergias, etiquetas que valora y el orden de tres prioridades. Busca un producto por nombre o por código de barras y recibe un ranking personalizado. Cada resultado muestra cuánto aportó cada dimensión, qué nutrientes pesaron, en qué percentil queda el producto dentro de su categoría y en qué estado están los datos.
 
-Está pensado para quien compra en México y quiere entender por qué un producto le conviene más que
-otro, sin tener que interpretar una tabla nutrimental por su cuenta.
+El cálculo es determinista. Con los mismos datos de entrada, el motor devuelve siempre el mismo resultado. La capa de lenguaje es opcional y se limita a interpretar la pregunta y a narrar hechos que el motor ya calculó. Sin clave de API, la aplicación responde con plantillas deterministas.
 
-Dos ideas ordenan todo el diseño:
+## Catálogo operativo
 
-1. **El cálculo es determinista y explicable.** El motor de scoring es aritmética reproducible. Con
-   los mismos datos de entrada devuelve siempre el mismo resultado.
-2. **El LLM es opcional y nunca calcula.** Solo interpreta lo que pide la usuaria en lenguaje
-   natural y narra los hechos que ya calculó el motor. Sin clave de API, la aplicación funciona
-   igual con plantillas deterministas.
+La aplicación utiliza `datos/procesados/dataset_referencia_20261002.parquet`. Es la fuente de verdad del catálogo. La API lo abre en `Catalog.from_referencia()`. Ningún corte anterior lo sustituye.
 
-## Fuentes de datos
+| Indicador | Valor |
+| --- | --- |
+| Productos consolidados | 13 093 |
+| Universo de partida, filtrado por país México | 16 851 |
+| Calidad de información alta | 6 102 |
+| Calidad de información insuficiente | 4 206 |
+| Calidad de información media | 1 511 |
+| Calidad de información baja | 1 274 |
+| Universo puntuable | 5 864 |
+| Precios reales | 259 |
+| Open Prices, cruce exacto por código de barras | 239 |
+| PROFECO Quién es Quién en los Precios, coincidencia de texto revisada | 20 |
+| Resto del catálogo, sin observación de precio | 12 834 |
 
-- **Open Food Facts (OFF)** para los datos de producto: nutrientes, ingredientes, grupo NOVA,
-  etiquetas y sellos frontales.
-- **PROFECO "Quién es Quién en los Precios" (QQP)** para el **precio de referencia**. El precio es
-  informativo: no puntúa ni filtra.
+Los 13 093 productos salen del mismo export de Open Food Facts que las 16 851 filas con país México. Integré tres candados de ingesta, en este orden:
 
-Las licencias y la forma de citar ambas fuentes están en [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).
+1. **No alimento.** Excluye 3 registros. Quedan 16 848.
+2. **Integridad mínima.** Exige ingredientes, grupo NOVA o algún macronutriente mayor que cero. Excluye 3 737. Quedan 13 111.
+3. **Identidad de nombre.** Excluye 18 registros sin un nombre utilizable. Quedan 13 093.
 
-## Stack del MVP
+El universo puntuable reúne 5 864 productos bajo el umbral de inclusión técnica de al menos 4 percentiles válidos de los 8 nutrientes del núcleo y un subpuntaje de procesamiento calculable. El resto del catálogo sigue siendo buscable y consultable. Si la cobertura de las prioridades activas queda por debajo de la mitad del peso declarado, el producto se muestra en la banda de información insuficiente, separado del ranking.
 
-| Pieza | Elección | Por qué |
+El Parquet guarda 259 precios reales. Los 12 834 productos sin observación quedan con precio nulo y procedencia no disponible. Al responder la ficha, la API aplica un fallback dinámico de tipo `SYNTHETIC`: un monto de demostración derivado del código de barras, marcado como tal. Ese monto no entra al ranking ni se escribe en el dataset.
+
+La variable de entorno `REFERENCIA_FILENAME` apunta a `dataset_referencia_20261002.parquet`. El mismo valor es el predeterminado de `src/nutrimatch/core/config.py`.
+
+## Fuentes
+
+- **Open Food Facts** aporta nutrientes, ingredientes, grupo NOVA, etiquetas y sellos frontales.
+- **Open Prices** aporta precios en pesos mexicanos cruzados por el mismo código de barras.
+- **PROFECO, Quién es Quién en los Precios,** aporta el precio de referencia de presentaciones cuya coincidencia de texto revisé. Ese precio informa. No puntúa y no filtra.
+
+Las licencias y la cita están en [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).
+
+Para comprobar que el archivo local es el catálogo operativo:
+
+```bash
+shasum -a 256 datos/procesados/dataset_referencia_20261002.parquet
+```
+
+La huella esperada es `a621d471a2f47aa09ba481408d95a7a808fe84bd2fa7205c56fa050e1c66045b` (13 093 filas, 273 columnas). Está repetida en `datos/procesados/dataset_referencia_20261002_metadata.json`.
+
+En el mismo directorio hay Parquet de septiembre. La aplicación no los abre. Algunos scripts de construcción y algunas pruebas sí. El detalle está en [`docs/datos.md`](docs/datos.md). `.gitignore` admite el archivo del 2 de octubre y su metadato, y deja fuera del alta nueva a los demás Parquet de `datos/procesados/`.
+
+## Arquitectura
+
+| Pieza | Elección | Función |
 | --- | --- | --- |
-| Lógica | Paquete `nutrimatch` instalable (src-layout) | Un solo motor compartido entre notebooks y la API, sin código duplicado |
-| Interfaz | Angular (`frontend/`) | Única UI del MVP: explica el porqué (A10) y habla con FastAPI |
-| API | FastAPI (`nutrimatch.api`) | Serializa `schemas/`; no recalcula D1/D2/D3 |
-| Análisis | DuckDB sobre Parquet | Consulta un snapshot de millones de filas sin servidor de base de datos |
-| Estado | SQLite en modo WAL | Solo estado mutable y regenerable (`ranking_run`, `event_log`) |
+| Lógica | Paquete `nutrimatch` | Un solo motor para los cuadernos de análisis y para la API |
+| Interfaz | Angular (`frontend/`) | Explica el porqué de cada resultado y habla con FastAPI |
+| API | FastAPI (`nutrimatch.api`) | Serializa los contratos de `schemas/` y no recalcula las tres dimensiones por su cuenta |
+| Análisis | DuckDB sobre Parquet | Consulta el snapshot sin un servidor de base de datos |
+| Estado de uso | SQLite en modo WAL | Historial y corridas de ranking, regenerables |
 | Validación | pydantic v2 | Contratos explícitos de entrada y salida |
 
-## Jerarquía de datos en tres niveles
+Organicé los datos en tres niveles:
 
-Distinguir estos tres niveles es la decisión de arquitectura más importante del proyecto:
-
-1. **Export crudo de OFF: inmutable y citable.** Se descarga el CSV comprimido del día y no se
-   modifica nunca. Es el origen, y como OFF regenera los exports a diario, la fecha de descarga da
-   una cita exacta.
-2. **Parquet derivado: fuente de verdad analítica.** Del export se deriva el universo México, ya
-   filtrado y normalizado. Es reproducible: se puede regenerar desde el crudo con el script de
-   ingesta. Todo el análisis y el scoring leen de aquí.
-3. **SQLite: mutable y desechable.** Perfil, `event_log`, carrito, `ranking_run`, caché de
-   proveedor y de LLM. Se puede borrar y reconstruir; no contiene nada que no sea regenerable.
+1. **Export crudo de Open Food Facts.** Se descarga el CSV comprimido del día y permanece intacto. La fecha de descarga identifica la versión citada.
+2. **Parquet derivado.** Universo de México, ya filtrado, con identidad, nutrición, precio resuelto y calidad de información. El análisis y la API leen de aquí.
+3. **SQLite.** Perfil de servidor, historial, corridas de ranking y caché. Se puede borrar y reconstruir. El perfil activo, el carrito y la comparación de la interfaz viven en el navegador.
 
 ## Instalación
 
-El entorno se gestiona con **[uv](https://docs.astral.sh/uv/)**, el gestor de paquetes y de
-intérpretes de Astral. uv se encarga de descargar el Python correcto, crear `.venv` y resolver las
-dependencias, así que no hace falta ningún Python previo en la máquina más allá del del sistema.
-
-### Por qué Python 3.12.13
-
-El archivo `.python-version` fija **Python 3.12.13**, que es **exactamente la versión del runtime de
-Google Colab** (runtime 2026.07). No es una preferencia estética: el paquete `nutrimatch` se
-reutiliza tal cual desde los notebooks, y si el intérprete local y el de Colab divergen, el mismo
-código puede comportarse distinto en cada sitio. Fijar la versión elimina esa clase de problema de
-raíz.
-
-`pyproject.toml` mantiene `requires-python = ">=3.11"` porque es el **suelo de compatibilidad** del
-paquete; `.python-version` fija el **intérprete concreto del entorno local**. Son dos cosas
-distintas y por eso no coinciden. `.python-version` **sí se versiona**.
-
-### Puesta en marcha
+El entorno se gestiona con **[uv](https://docs.astral.sh/uv/)**. El archivo `.python-version` fija **Python 3.12.13**, la misma versión del runtime de Google Colab, para que el paquete se comporte igual en local y en los cuadernos. `pyproject.toml` mantiene `requires-python = ">=3.11"` como suelo de compatibilidad del paquete.
 
 ```bash
-# 1. Instalar uv (solo la primera vez; no pide contraseña de administrador)
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source "$HOME/.local/bin/env"        # o reinicia la terminal
+source "$HOME/.local/bin/env"
 
-# 2. Crear el entorno e instalar el paquete en modo editable con el extra dev
 make setup
-
-# 3. Copiar la plantilla de variables de entorno
 cp .env.example .env
 ```
 
-`make setup` equivale a estos tres pasos:
+`make setup` descarga el intérprete, crea `.venv` e instala el paquete en modo editable con las herramientas de desarrollo. La dependencia de lenguaje es opcional:
 
 ```bash
-uv python install          # descarga el 3.12.13 que pide .python-version
-uv venv                    # crea .venv con esa versión
-uv pip install -e ".[dev]" # instala el paquete editable + pytest y ruff
+uv pip install -e ".[dev,llm]"
 ```
 
-El extra **`llm` no se instala** a propósito: la capa LLM es opcional y el sistema funciona sin ella
-con plantillas deterministas. Cuando haga falta: `uv pip install -e ".[dev,llm]"`.
+En `.env`, el correo de `OFF_USER_AGENT` identifica las peticiones a Open Food Facts. `OPENAI_API_KEY` puede quedar vacía.
 
-Después edita `.env` y pon tu correo en `OFF_USER_AGENT`: OFF exige un User-Agent identificable en
-todas las peticiones. `OPENAI_API_KEY` puede quedarse vacía.
-
-## Cómo correr
+## Ejecución local
 
 ```bash
-make api            # FastAPI en :8000 (catálogo de referencia)
-make ui             # Angular en :4200 (proxy a la API)
-make test           # pruebas con pytest
-make lint           # estilo con ruff
-make help           # lista todos los targets
+make api     # FastAPI en http://127.0.0.1:8000
+make ui      # Angular en http://127.0.0.1:4200
+make test    # pytest
+make lint    # ruff
+make help
 ```
 
-Los targets del `Makefile` usan `uv run`, que resuelve el intérprete de `.venv` por sí solo: **no
-hace falta activar el entorno**. Para ejecutar algo suelto, el mismo prefijo sirve:
+Los targets usan `uv run`. La primera carga del catálogo precalcula la dimensión nutricional y puede tardar unos segundos. Cada corrida de ranking y el historial se guardan en `nutrimatch.db`, que no se versiona.
+
+En local, Angular y FastAPI viven en orígenes distintos. El proxy de `frontend/proxy.conf.json` reenvía las rutas de la API al puerto 8000, y FastAPI autoriza `http://localhost:4200` y `http://127.0.0.1:4200`.
+
+## Despliegue en Vercel
+
+`vercel.json`, en la raíz, publica los dos procesos bajo el mismo dominio:
+
+- La interfaz estática sale de `ng build` (`frontend/dist/frontend/browser`).
+- FastAPI entra por `api/index.py`, que carga el mismo catálogo operativo.
+- Las rutas de la API (`/meta`, `/search`, `/products`, `/catalog`, `/ranking`, `/cart`, `/events`, `/ai`) llegan a Python.
+- El resto de las rutas llega a `index.html`, para que el enrutador de Angular resuelva la pantalla.
+
+Como la interfaz y la API comparten dominio, el navegador trata las llamadas como mismo origen y no dispara un conflicto de CORS. Además, la API acepta los dominios `https://*.vercel.app` y los orígenes extra de `CORS_ALLOW_ORIGINS`, para el desarrollo local y las vistas previas.
+
+El historial SQLite de la función se escribe en `/tmp`, porque el disco de la función es de solo lectura fuera de esa carpeta. El catálogo no depende de esa base.
+
+Variables útiles en el proyecto de Vercel:
 
 ```bash
-uv run python -c "import nutrimatch; print(nutrimatch.__version__)"
+REFERENCIA_FILENAME=dataset_referencia_20261002.parquet
+SNAPSHOT_ID=off_csv_20260929
+OFF_USER_AGENT=NutriMatch/0.1.0 (tu-correo@ejemplo.com)
+OPENAI_API_KEY=
 ```
 
-Si prefieres activar el entorno a mano: `source .venv/bin/activate`.
+`REFERENCIA_FILENAME` ya tiene ese valor en el código. Hace falta repetirla en el panel solo si se quiere señalar otro archivo.
 
-`make api` sirve el catálogo `dataset_referencia_20260927.parquet` (no hace falta re-descargar
-OFF). `make ui` lanza Angular, que habla con esa API: perfil, carrito y comparación viven en el
-navegador; búsqueda, ranking, ficha, resumen de carrito e historial pasan por FastAPI. Cada
-`ranking_run` y el `event_log` se guardan en `nutrimatch.db` (gitignored, regenerable). La
-primera carga del catálogo precálcula D1 una vez y puede tardar unos segundos.
-
-`make ingest-qqp` sigue pendiente. `make ingest-off` construye el snapshot. `make eda` no lanza
-Jupyter: solo imprime las rutas de `notebooks/02_eda_universo_mexico.ipynb` (universo, nutrientes,
-NOVA) y `notebooks/08_re_eda_identidad.ipynb` (EAN, nombres, marcas, presentaciones).
-
-## Mapa de carpetas
+## Mapa del repositorio
 
 ```
-src/nutrimatch/       paquete instalable: toda la lógica
-  agents/             capa LLM opcional (planner, critic, narrate) + registro de herramientas
-    prompts/          plantillas de prompt de los tres roles
-  core/               configuración, logging, guard de conformidad, errores
-  db/                 SQLite WAL: única capa de persistencia
-    repositories/     acceso a datos con patrón repositorio
-  domain/             modelos de dominio (producto, usuario, carrito)
-  engine/             motor determinista de scoring y operaciones
-  providers/          acceso a OFF, Open Prices y PROFECO QQP, con caché y limitador
-  schemas/            esquemas pydantic v2 de entrada y salida
-  services/           orquestación: ingesta, universo México, ranking
+src/nutrimatch/       paquete instalable
+  agents/             nota de los tres roles de lenguaje; la implementación está en ai/
+  ai/                 capa de lenguaje opcional (POST /ai/ask)
+  core/               configuración, registro y errores
+  db/                 SQLite del historial
+  domain/             modelos de dominio
+  engine/             motor determinista
+  providers/          Open Food Facts, Open Prices y PROFECO
+  schemas/            contratos pydantic
+  services/           catálogo, ficha, ranking y carrito
 datos/
-  snapshots/          export crudo de OFF (no se versiona)
-  precios_qqp/        carpeta reservada, sin uso hoy: QQP se consulta por API (datastore_search,
-                      A41), no por descarga de ZIP; caché de esa API en cache/qqp_api/
-  cache/              caché en disco de las APIs externas (OFF, Open Prices, QQP; no se versiona)
-  procesados/         Parquet derivado del universo México, identidad homologada, piloto de
-                      precios Open Prices (A40), candidatos QQP por texto (A41) y CSV del re-EDA
-docs/                 atribución, línea futura, diagnóstico y auditoría de cierre MVP (2026-09-27)
-notebooks/            notebooks de análisis
-frontend/             aplicación Angular (única interfaz)
-scripts/              scripts de ingesta y mantenimiento
-tests/                pruebas
-  fixtures/           datos de prueba
-evaluacion/           golden set, parity-check y diagnóstico de cobertura
+  snapshots/          export crudo (no se versiona el archivo grande)
+  procesados/         Parquet operativo y tablas de apoyo
+  cache/              caché local de APIs (no se versiona)
+docs/                 atribución, diccionario y documentación técnica
+notebooks/            análisis del universo, la transformación y la evaluación
+frontend/             aplicación Angular
+scripts/              ingesta, identidad, precios y cierre del dataset
+api/                  entrada de FastAPI en Vercel
+tests/                pruebas del motor, de la API y de la interfaz de datos
+evaluacion/           conjunto de oro, parity-check y diagnóstico de cobertura
 ```
 
-## Notebooks
+## Análisis
 
-Orden planeado, con el estado real a la fecha (ver `AGENTS.md` para el detalle de cada paso):
+El análisis quedó registrado en este orden:
 
-1. `01_ingesta` — pendiente como notebook: hecho como script (`scripts/ingesta_off.py`).
-2. `02_eda_universo_mexico` — hecho.
-3. `03_transformacion_score` — hecho.
-4. `04_modelo_recomendacion` — hecho.
-5. `05_evaluacion` — hecho.
-6. `06_qqp_precios` — pendiente.
-7. `07_app_y_llm` — interfaz Angular + FastAPI: hecho; capa LLM pendiente.
-8. `08_re_eda_identidad` — hecho: EAN/GTIN, nombres, marcas, `quantity` y duplicados de texto.
-   Tablas en `datos/procesados/re_eda_20260926/`.
+1. Ingesta del export, en `scripts/ingesta_off.py`.
+2. Exploración del universo México, en `notebooks/02_eda_universo_mexico.ipynb`.
+3. Transformación y saneamiento, en `notebooks/03_transformacion_score.ipynb`.
+4. Modelo de recomendación, en `notebooks/04_modelo_recomendacion.ipynb`.
+5. Evaluación, en `notebooks/05_evaluacion.ipynb`.
+6. Precios reales de Open Prices y de PROFECO, en `scripts/piloto_precios_open_prices.py` y `scripts/materializar_precios_qqp.py`.
+7. Interfaz Angular, API y capa de lenguaje en `nutrimatch.ai`.
+8. Identidad de nombres y marcas, en `notebooks/08_re_eda_identidad.ipynb`.
 
-## Convenciones
+Los criterios metodológicos están en [`AGENTS.md`](AGENTS.md). El detalle técnico está en [`docs/NutriMatch_Documentacion_Tecnica_Completa.md`](docs/NutriMatch_Documentacion_Tecnica_Completa.md). El diccionario de columnas está en [`docs/diccionario_dataset_referencia.md`](docs/diccionario_dataset_referencia.md).
 
-Las decisiones metodológicas cerradas, las trampas ya verificadas de las fuentes de datos y las
-convenciones de código están en [`AGENTS.md`](AGENTS.md). Conviene leerlo antes de tocar el motor.
+## Motor, en una página
 
-## Licencias
+La persona ordena tres prioridades. Ese orden se convierte en pesos 0,50 / 0,33 / 0,17.
 
-La licencia del **código está PENDIENTE de decidir**; ver [`LICENSE`](LICENSE). Los **datos** de
-terceros se rigen por sus propias licencias: ver [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).
+| Dimensión | Qué mide |
+| --- | --- |
+| D1 Nutrición | Azúcares, sal y grasa saturada (menos es mejor); fibra y proteína (más es mejor). Percentil dentro de la categoría de referencia. |
+| D2 Procesamiento | Grupo NOVA en bandas de 25 puntos, afinado por el número de aditivos. |
+| D3 Preferencias | Porcentaje de etiquetas valoradas que el producto presenta. |
+
+El resultado es el promedio ponderado de las dimensiones que sí tienen dato. Si la cobertura queda por debajo de 0,5, el producto va a la banda de información insuficiente y el resultado queda vacío. Un dato ausente no se trata como cero. Alergia no apta o dieta incompatible excluyen el producto del listado. Alergia o dieta no verificable tienen su propia banda.
+
+NutriMatch no utiliza aprendizaje supervisado porque el catálogo no contiene un target observado que permita entrenar y evaluar de manera científicamente válida un modelo de recomendación.
+
+El detalle está en [`docs/mapa_proyecto.md`](docs/mapa_proyecto.md) y en [`AGENTS.md`](AGENTS.md).
+
+## Qué hace cada pantalla
+
+| Pantalla | Ruta | Qué muestra |
+| --- | --- | --- |
+| Inicio | `/` | Presentación de Nuti y escaneo de código |
+| Preferencias | `/onboarding` y panel de perfil | Nombre, prioridades, dieta y alergias |
+| Buscar | `/buscar` | Nombre o código de barras |
+| Catálogo | `/catalogo` | Exploración por categoría, sin filtrar el universo puntuable |
+| Para ti | `/recomendaciones` | Ranking del perfil |
+| Ficha | `/producto/:code` | Nutrientes, bandas, procedencia y alternativas |
+| Comparar | `/comparar` | Productos elegidos lado a lado |
+| Carrito | `/carrito` | Plato del Bien Comer, categorías y alternativas |
+| Alertas | `/alertas` | Sellos y porción, cuando el producto declara `serving_size` |
+| Recetas | `/recetas` | Ideas a partir del carrito, con la capa de lenguaje |
+| Historial | `/historial` | Eventos de uso guardados en SQLite |
+
+Nuti informa. NutriMatch organiza. La persona decide.
+
+## OpenAI, opcional
+
+`POST /ai/ask` vive en `nutrimatch.ai`. Traduce la pregunta, redacta y comprueba que el texto cite hechos ya calculados. El modelo por defecto es `gpt-4o-mini`. Si `OPENAI_API_KEY` está vacía, o si el paquete `openai` no está instalado, la respuesta sale de plantillas deterministas. El lenguaje no calcula el ranking ni modifica D1, D2 o D3.
+
+```bash
+uv pip install -e ".[dev,llm]"
+```
+
+## Límites conocidos
+
+- El catálogo es un corte de Open Food Facts, no el anaquel en tiempo real.
+- La cobertura de alérgenos es baja. «Sin dato» se muestra como no verificable.
+- 12 834 productos no tienen precio de mercado. La ficha puede mostrar un monto de demostración marcado `SYNTHETIC`. Ese monto no entra al orden ni se guarda en el Parquet.
+- El precio informa. No puntúa y no filtra.
+- Nutri-Score y los sellos frontales se muestran. Quedan fuera del puntaje.
+- No hay diagnóstico médico.
+
+## Qué queda fuera de Git
+
+Secretos (`.env`), el entorno virtual, `node_modules`, la base `nutrimatch.db`, la caché de APIs y el export comprimido de Open Food Facts (1,28 GB en `datos/snapshots/`). El Parquet operativo sí entra: pesa 8,8 MB. La clasificación completa está en [`docs/datos.md`](docs/datos.md).
+
+## Documentos
+
+| Documento | Para qué |
+| --- | --- |
+| [`docs/mapa_proyecto.md`](docs/mapa_proyecto.md) | Mapa del sistema y estado para Git |
+| [`docs/reproducibilidad.md`](docs/reproducibilidad.md) | Instalación y ejecución |
+| [`docs/datos.md`](docs/datos.md) | Cada archivo de `datos/` |
+| [`docs/decisiones.md`](docs/decisiones.md) | Decisiones que el código aplica |
+| [`docs/checklist_pre_git.md`](docs/checklist_pre_git.md) | Lista previa a publicar el repositorio |
+| [`AGENTS.md`](AGENTS.md) | Criterios ya aplicados del motor |
+| [`docs/diccionario_dataset_referencia.md`](docs/diccionario_dataset_referencia.md) | Columnas del catálogo |
+
+## Licencia
+
+El código se publica con todos los derechos reservados; ver [`LICENSE`](LICENSE). Los datos de terceros se rigen por sus propias licencias; ver [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).

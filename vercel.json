@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/frontend/browser"
+      }
+    },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": "{src/nutrimatch/**,datos/procesados/dataset_referencia_20261002.parquet}"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/(meta|search|products|catalog|ranking|cart|events|ai)(/.*)?$",
+      "dest": "/api/index.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^(.*)$",
+      "dest": "/index.html"
+    }
+  ]
+}

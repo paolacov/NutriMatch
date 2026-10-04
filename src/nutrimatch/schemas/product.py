@@ -39,9 +39,14 @@ class ProductDetail(BaseModel):
     nutrients: list[NutrientRow] = Field(default_factory=list)
     ingredients: list[str] = Field(default_factory=list)
     allergens: list[str] = Field(default_factory=list)
+    traces: list[str] = Field(default_factory=list)
     labels: list[str] = Field(default_factory=list)
     price: ProvenanceValue
     nova_group: float | None = None
+    data_quality_score: float | None = None
+    data_quality_level: str | None = None
+    data_quality_label: str | None = None
+    data_quality_detalle: str | None = None
 
 
 class MetaResponse(BaseModel):

@@ -19,6 +19,7 @@ from nutrimatch.engine.preference_score import calcular_d3
 from nutrimatch.engine.user_weights import convertir_prioridades_a_pesos
 from nutrimatch.schemas.profile import UserProfile
 from nutrimatch.schemas.ranking import (
+    AlternativesResult,
     Band,
     BandSlice,
     DimensionExplanation,
@@ -31,6 +32,7 @@ from nutrimatch.schemas.ranking import (
 from nutrimatch.services.catalog import Catalog
 
 DIETA_SIN_RESTRICCION = "compatible"
+ALTERNATIVAS_TOPE = 5
 
 
 def _es_nulo(valor: Any) -> bool:
@@ -262,3 +264,57 @@ class RankingService:
         fila = self.catalog.get_row(code)
         item, _banda = _item_desde_fila(fila, profile, pesos, con_explicacion=True)
         return item
+
+    def alternatives(self, code: str, profile: UserProfile) -> AlternativesResult:
+        """Pares del mismo grupo de referencia, con el ranking ya definido.
+
+        No recalcula percentiles ni crea otro score. Descarta al producto de
+        origen y se queda con la banda de ranking, hasta cinco.
+        """
+        fila = self.catalog.get_row(code)
+        categoria = (
+            _str_or_none(fila.get("categoria_referencia"))
+            if "categoria_referencia" in fila.index
+            else None
+        )
+        vacio = AlternativesResult(
+            code=str(fila["code"]),
+            category=categoria,
+            reason="sin_categoria",
+            snapshot_id=self.catalog.snapshot_id,
+            engine_version=__version__,
+            total=0,
+            items=[],
+        )
+        if categoria is None or "categoria_referencia" not in self.catalog.df.columns:
+            return vacio
+
+        pesos = convertir_prioridades_a_pesos(list(profile.priority_order))
+        categorias = self.catalog.df["categoria_referencia"].map(_str_or_none)
+        codigos = self.catalog.df["code"].astype(str)
+        candidatos = self.catalog.df.loc[(categorias == categoria) & (codigos != str(fila["code"]))]
+        pares: list[RankingItem] = []
+        columnas = list(candidatos.columns)
+        for tupla in candidatos.itertuples(index=False, name=None):
+            serie = pd.Series(dict(zip(columnas, tupla, strict=True)))
+            item, banda = _item_desde_fila(serie, profile, pesos, con_explicacion=False)
+            if banda == "ranking":
+                pares.append(item)
+
+        pares.sort(key=lambda i: (i.score is None, -(i.score or 0.0)))
+        items: list[RankingItem] = []
+        for rango, item in enumerate(pares[:ALTERNATIVAS_TOPE], start=1):
+            explicado, _banda = _item_desde_fila(
+                self.catalog.get_row(item.code),
+                profile,
+                pesos,
+                con_explicacion=True,
+            )
+            items.append(explicado.model_copy(update={"rank": rango}))
+        return vacio.model_copy(
+            update={
+                "reason": "ok" if items else "sin_opciones",
+                "total": len(pares),
+                "items": items,
+            }
+        )

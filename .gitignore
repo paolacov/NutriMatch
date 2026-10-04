@@ -11,12 +11,29 @@ dist/
 .ruff_cache/
 .pytest_cache/
 
+# Node y Angular. frontend/.gitignore cubre lo mismo dentro de frontend/.
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+coverage/
+*.log
+
+# IDE y sistema
+.idea/
+*.swp
+Thumbs.db
+
 # Secretos locales: solo se versiona .env.example
 .env
 
 # Base SQLite de estado mutable (incluye los ficheros -wal y -shm del modo WAL).
 # Es regenerable, no es fuente de verdad.
 nutrimatch.db*
+
+# Caché local de respuestas de APIs externas (ficha de Open Food Facts, Open Prices
+# y PROFECO). Acelerador de re-ejecución, no una fuente de verdad ni un dump versionable.
+datos/cache/
 
 # Notebooks y sistema operativo
 .ipynb_checkpoints/
@@ -37,12 +54,26 @@ datos/precios_qqp/*
 !datos/snapshots/*/
 datos/snapshots/*/*
 
-# Derivados del snapshot: SÍ se versionan.
-# Resuelto el 2026-09-19: el Parquet del universo México pesa 4,9 MB para
-# 16.851 productos, así que versionarlo hace el análisis reproducible sin
-# repetir la descarga de 1,19 GB.
+# Derivados del snapshot.
+# Entra el catálogo que abre la aplicación (8,8 MB) y su metadato.
+# El resto de los Parquet de septiembre queda fuera de un `git add` nuevo:
+# la API no los carga. Algunos scripts y pruebas sí los abren; esa
+# dependencia está en docs/datos.md. Un archivo ya seguido por Git no
+# deja de estarlo por esta regla.
+# Las figuras PNG de datos/procesados/figuras_*/ siguen fuera.
 datos/procesados/*
-!datos/procesados/*.parquet
+!datos/procesados/dataset_referencia_20261002.parquet
+!datos/procesados/dataset_referencia_20261002_metadata.json
+# Resúmenes del re-EDA de identidad (CSV chicos, citables; no sustituyen el Parquet).
+!datos/procesados/re_eda_20260926/
+!datos/procesados/re_eda_20260926/*.csv
+
+# Capturas locales de códigos de barras usadas en prueba manual. No hacen
+# falta para ejecutar la aplicación.
+/prueba-codigo*.png
+
+# PDF generado por scripts/render_documentacion_pdf.py. La fuente es el Markdown.
+docs/NutriMatch_Documentacion_Tecnica_Completa.pdf
 
 # Los metadatos de procedencia del snapshot (URL, Last-Modified, ETag, SHA-256,
 # esquema y reconciliación) son la trazabilidad del dato: pesan poco y se

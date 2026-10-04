@@ -1,0 +1,14 @@
+# Dependencias de la función FastAPI en Vercel.
+# El análisis (matplotlib, seaborn, plotly) no entra en esta lista:
+# la API no importa esas librerías.
+httpx
+pandas
+pyarrow
+duckdb
+pydantic>=2
+pydantic-settings
+sqlalchemy>=2
+rapidfuzz
+python-dotenv
+fastapi
+uvicorn

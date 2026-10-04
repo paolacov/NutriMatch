@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Motor determinista y explicable de compatibilidad alimentaria para apoyo a la decisión de compra en México."
 readme = "README.md"
 requires-python = ">=3.11"
-# La licencia del código está PENDIENTE de decidir: ver LICENSE.
+# Licencia: todos los derechos reservados. Ver LICENSE.
 dependencies = [
     "httpx",
     "pandas",
@@ -21,8 +21,10 @@ dependencies = [
     "python-dotenv",
     "fastapi",
     "uvicorn[standard]",
-    # Gráficos de los notebooks de EDA (02, 03, 08). La interfaz Angular no los usa.
+    # Gráficos del análisis. La interfaz Angular no los usa.
     "plotly",
+    "matplotlib",
+    "seaborn",
 ]
 
 [project.optional-dependencies]
@@ -42,3 +44,6 @@ line-length = 100
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "openai: llama a OpenAI de verdad; se omite sin OPENAI_API_KEY real",
+]

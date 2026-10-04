@@ -1,82 +1,47 @@
 # Atribución de fuentes de datos
 
-NutriMatch no genera datos de producto ni de precios: los toma de dos fuentes externas. Este
-documento recoge sus licencias, las obligaciones que imponen y cómo citarlas.
-
----
+NutriMatch no genera los datos de producto ni los precios de mercado. Los toma de fuentes externas. Este documento dice qué usa el código y qué licencia está registrada dentro del repositorio. El texto legal de cada licencia no está copiado aquí.
 
 ## Open Food Facts
 
-Base de datos colaborativa y abierta de productos alimentarios.
+Fuente de nutrientes, ingredientes, grupo NOVA, etiquetas, sellos e imágenes de producto. El catálogo operativo cita el snapshot `off_csv_20260929`. El export es el CSV comprimido cuyo SHA-256 coincide en las descargas del 19 y del 29 de septiembre de 2026.
 
-### Licencias
+El script `scripts/ingesta_off.py` y el metadato `datos/snapshots/off_csv_20260929/_metadata.json` registran esta cadena:
 
-Open Food Facts distribuye su contenido bajo **tres licencias distintas** según el tipo de material:
+`ODbL (base) / DbCL (contenidos) / CC-BY-SA (imagenes)`
 
-| Material | Licencia |
-| --- | --- |
-| La **base de datos** (su estructura y su selección de contenidos) | **Open Database License (ODbL)** |
-| Los **contenidos individuales** de cada registro | **Database Contents License (DbCL)** |
-| Las **imágenes de producto** | **Creative Commons Attribution ShareAlike (CC BY-SA)** |
+Esa cadena es el registro del proyecto. Los textos de la Open Database License, de la Database Contents License y de CC BY-SA no están en el repositorio. Confirmar el alcance de cada una es un punto de verificación documental en la ficha de Open Food Facts.
 
-### Qué obliga la ODbL, en la práctica
+## Open Prices
 
-La ODbL impone dos obligaciones que afectan directamente al diseño de NutriMatch:
+239 precios en pesos mexicanos, método `exact_gtin`, unidos al catálogo operativo. El cliente está en `src/nutrimatch/providers/open_prices_api.py`. El comentario de `scripts/piloto_precios_open_prices.py` nombra ODbL. El texto de esa licencia no está en el repositorio. Es un punto de verificación documental en el proyecto Open Prices.
 
-1. **Atribuir.** Hay que reconocer a Open Food Facts como fuente de los datos.
-2. **Compartir en las mismas condiciones (share-alike).** Cualquier **base derivada** que se
-   distribuya debe publicarse bajo ODbL. El Parquet del universo México que genera el script de
-   ingesta **es una base derivada**: si se distribuye, va bajo ODbL.
+## PROFECO, Quién es Quién en los Precios
 
-De la primera obligación se sigue una consecuencia concreta: **la atribución debe ser visible también
-en la interfaz de Streamlit**, no solo en este archivo. No basta con mencionar la fuente en el
-repositorio si la persona que usa la aplicación nunca llega a verla. La atribución en la UI es un
-requisito de la licencia, no una cortesía.
+20 precios de referencia, método `text_reviewed`, unidos al catálogo operativo. El cliente está en `src/nutrimatch/providers/qqp_api.py`. `AGENTS.md` y ese cliente afirman la licencia CC-BY 4.0. El texto de la licencia no está en el repositorio. Es un punto de verificación documental en la ficha del conjunto en el portal de datos abiertos.
 
-Las imágenes de producto, al estar bajo CC BY-SA, requieren atribución y share-alike por separado si
-se reutilizan.
+Esos 20 precios se presentan como precio de referencia de una presentación parecida. La coincidencia es de texto. El sistema no los calcula ni los proyecta.
 
----
+## Lo que no es una fuente del catálogo
 
-## PROFECO, "Quién es Quién en los Precios"
+USDA FoodData Central no alimenta el catálogo. La única aparición de USDA en el código es la traducción de la etiqueta `en:usda-organic` a «Orgánico USDA» en `frontend/src/app/shared/sello-label.ts`.
 
-Programa de monitoreo de precios de la Procuraduría Federal del Consumidor.
+Las ilustraciones de Nuti y los marcadores de categoría viven en `frontend/public/`. El repositorio no trae un aviso de banco de imágenes para esos archivos. La licencia del código está en [`LICENSE`](../LICENSE).
 
-- **Naturaleza**: **datos abiertos oficiales del Gobierno de México**.
-- **Publicación**: `datos.profeco.gob.mx`.
-
-### Cómo se presentan los precios
-
-Los precios de QQP se presentan **siempre como "precio de referencia"** y **nunca como "precio
-estimado"**.
-
-La distinción no es cosmética. Un precio de QQP es un precio **real**, observado por PROFECO en un
-establecimiento concreto y en una fecha concreta. Llamarlo "estimado" sugeriría que NutriMatch lo
-calculó o lo proyectó, lo cual sería falso y trasladaría al proyecto una responsabilidad que no le
-corresponde. Además, el cruce con los productos de Open Food Facts es **por texto** (marca +
-presentación + producto), porque QQP no publica código de barras: motivo adicional para no presentar
-la cifra como una estimación propia.
-
----
-
-## Formato de cita en APA
-
-Sustituir los marcadores `[FECHA DE CONSULTA]` y `[FECHA DEL SNAPSHOT]` por las fechas reales antes
-de entregar cualquier documento. La fecha del snapshot de Open Food Facts queda registrada en la
-variable `SNAPSHOT_DATE` del archivo `.env` durante la ingesta.
+## Cita
 
 ### Open Food Facts
 
-> Open Food Facts. (`[AÑO DEL SNAPSHOT]`). *Open Food Facts database* \[Conjunto de datos].
-> Recuperado el `[FECHA DE CONSULTA]` de https://world.openfoodfacts.org
+> Open Food Facts. (2026). *Open Food Facts database* [Conjunto de datos]. Recuperado el 2 de octubre de 2026 de https://world.openfoodfacts.org
 >
-> Snapshot utilizado: export CSV del `[FECHA DEL SNAPSHOT]`.
+> Snapshot utilizado: export CSV identificado como `off_csv_20260929` (el archivo comprimido coincide con el del 19 de septiembre de 2026).
 
-Se indica la fecha del snapshot porque Open Food Facts **regenera sus exports a diario**: sin esa
-fecha la cita no identifica una versión concreta de los datos y el análisis no sería reproducible.
+Open Food Facts regenera sus exports a diario. La fecha del snapshot identifica la versión usada.
 
-### PROFECO, "Quién es Quién en los Precios"
+### Open Prices
 
-> Procuraduría Federal del Consumidor. (`[AÑO DE PUBLICACIÓN]`). *Quién es Quién en los Precios*
-> \[Conjunto de datos]. Gobierno de México. Recuperado el `[FECHA DE CONSULTA]` de
-> https://datos.profeco.gob.mx
+> Open Food Facts. (2026). *Open Prices* [Conjunto de datos]. Recuperado el 2 de octubre de 2026 de https://prices.openfoodfacts.org
+
+### PROFECO, Quién es Quién en los Precios
+
+> Procuraduría Federal del Consumidor. (2026). *Quién es Quién en los Precios* [Conjunto de datos]. Gobierno de México. Recuperado el 2 de octubre de 2026 de https://datos.profeco.gob.mx

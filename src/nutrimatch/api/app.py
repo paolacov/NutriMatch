@@ -1,7 +1,15 @@
-"""FastAPI: puente HTTP sobre Catalog + RankingService. No recalcula D1/D2/D3."""
+"""FastAPI: puente HTTP sobre el catálogo y el servicio de ranking.
+
+No vuelve a derivar las fórmulas de nutrición, procesamiento y preferencias:
+serializa lo que el motor ya resolvió. El middleware de CORS autoriza el
+desarrollo local (Angular en el puerto 4200) y los dominios de Vercel. En
+producción, `vercel.json` sirve la interfaz y esta API en el mismo dominio,
+así que el navegador trata la llamada como mismo origen.
+"""
 
 from __future__ import annotations
 
+import os
 from collections.abc import Iterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -12,20 +20,49 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from nutrimatch import __version__
+from nutrimatch.ai.schemas import AskRequest, AskResponse
+from nutrimatch.ai.service import preguntar
 from nutrimatch.core.errors import ProductNotFoundError
 from nutrimatch.db.connection import connect, init_db
 from nutrimatch.db.repositories.event_log import EventLogRepository
 from nutrimatch.db.repositories.ranking_run import RankingRunRepository
 from nutrimatch.schemas.cart import CartSummary, CartSummaryRequest
+from nutrimatch.schemas.catalog import CatalogCategory, CatalogPage
 from nutrimatch.schemas.event import EventCreate, EventRow
 from nutrimatch.schemas.product import ExplainRequest, MetaResponse, ProductDetail
-from nutrimatch.schemas.ranking import RankingItem, RankingRequest, RankingResult
+from nutrimatch.schemas.ranking import (
+    AlternativesRequest,
+    AlternativesResult,
+    RankingItem,
+    RankingRequest,
+    RankingResult,
+)
 from nutrimatch.services.cart import resumir_codes
 from nutrimatch.services.catalog import Catalog
+from nutrimatch.services.catalog_browse import (
+    PAGE_SIZE_MAXIMO,
+    PAGE_SIZE_POR_DEFECTO,
+    listar_categorias,
+    paginar_catalogo,
+)
 from nutrimatch.services.product import detalle_desde_fila
 from nutrimatch.services.ranking import RankingService, filtrar_por_query
 
 SEARCH_LIMITE_POR_DEFECTO = 40
+
+# Angular en local corre en otro puerto. Esos dos orígenes son los únicos
+# del desarrollo. CORS_ALLOW_ORIGINS añade URLs concretas, separadas por comas.
+_ORIGENES_LOCALES = (
+    "http://127.0.0.1:4200",
+    "http://localhost:4200",
+)
+
+
+def _origenes_cors() -> list[str]:
+    """Orígenes explícitos autorizados a leer la API desde un navegador."""
+    extra = os.environ.get("CORS_ALLOW_ORIGINS", "")
+    agregados = [origen.strip() for origen in extra.split(",") if origen.strip()]
+    return [*_ORIGENES_LOCALES, *agregados]
 
 
 def create_app(
@@ -50,11 +87,17 @@ def create_app(
     app.state.catalog = cat
     app.state.ranking = servicio
     app.state.db = conexion
+    # Mismo origen en Vercel: el navegador no pide CORS. El regex cubre la URL
+    # de producción y las vistas previas (https://*.vercel.app) por si la
+    # interfaz se abre desde otra dirección del proyecto. Sin credenciales de
+    # cookie: el perfil de la sesión vive en el navegador.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://127.0.0.1:4200", "http://localhost:4200"],
-        allow_methods=["*"],
+        allow_origins=_origenes_cors(),
+        allow_origin_regex=r"https://([a-zA-Z0-9-]+\.)*vercel\.app",
+        allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
         allow_headers=["*"],
+        allow_credentials=False,
     )
 
     @app.exception_handler(ProductNotFoundError)
@@ -102,6 +145,28 @@ def create_app(
         cat: Catalog = request.app.state.catalog
         return detalle_desde_fila(cat.get_row(code))
 
+    @app.get("/catalog/categories", response_model=list[CatalogCategory])
+    def catalog_categories(request: Request) -> list[CatalogCategory]:
+        cat: Catalog = request.app.state.catalog
+        return listar_categorias(cat.df)
+
+    @app.get("/catalog/products", response_model=CatalogPage)
+    def catalog_products(
+        request: Request,
+        search: str = "",
+        category: str = "",
+        page: int = Query(default=1, ge=1),
+        page_size: int = Query(default=PAGE_SIZE_POR_DEFECTO, ge=1, le=PAGE_SIZE_MAXIMO),
+    ) -> CatalogPage:
+        cat: Catalog = request.app.state.catalog
+        return paginar_catalogo(
+            cat.df,
+            search=search,
+            category=category,
+            page=page,
+            page_size=page_size,
+        )
+
     @app.post("/ranking", response_model=RankingResult)
     def ranking(payload: RankingRequest, request: Request) -> RankingResult:
         servicio: RankingService = request.app.state.ranking
@@ -130,9 +195,20 @@ def create_app(
         servicio: RankingService = request.app.state.ranking
         return servicio.explain(payload.code, payload.profile)
 
+    @app.post("/ranking/alternatives", response_model=AlternativesResult)
+    def ranking_alternatives(payload: AlternativesRequest, request: Request) -> AlternativesResult:
+        servicio: RankingService = request.app.state.ranking
+        return servicio.alternatives(payload.code, payload.profile)
+
     @app.post("/cart/summary", response_model=CartSummary)
     def cart_summary(payload: CartSummaryRequest, request: Request) -> CartSummary:
         cat: Catalog = request.app.state.catalog
         return resumir_codes(cat, payload.codes)
+
+    @app.post("/ai/ask", response_model=AskResponse)
+    def ai_ask(payload: AskRequest, request: Request) -> AskResponse:
+        cat: Catalog = request.app.state.catalog
+        ranking: RankingService = request.app.state.ranking
+        return preguntar(payload, catalogo=cat, servicio=ranking)
 
     return app

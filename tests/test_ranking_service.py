@@ -104,6 +104,23 @@ def test_caro_d3_vacio_renormaliza_y_no_inventa_cero() -> None:
     assert "75000004" in codes_ins
 
 
+def test_el_precio_no_cambia_el_score() -> None:
+    perfil = UserProfile()
+    real = _catalogo_minimo().df.copy()
+    demo = real.copy()
+    real["price"] = 10.0
+    real["price_status"] = "REAL"
+    real["price_source"] = "open_prices"
+    demo["price"] = 180.0
+    demo["price_status"] = "SYNTHETIC"
+    demo["price_source"] = "demo"
+    ra = RankingService(Catalog(df=real, snapshot_id="t")).rank(RankingRequest(profile=perfil, top_n=10))
+    rb = RankingService(Catalog(df=demo, snapshot_id="t")).rank(RankingRequest(profile=perfil, top_n=10))
+    assert [(i.code, i.score, i.band, i.d1, i.d2, i.d3) for i in ra.ranking.items] == [
+        (i.code, i.score, i.band, i.d1, i.d2, i.d3) for i in rb.ranking.items
+    ]
+
+
 def test_explain_incluye_detalle_a10() -> None:
     servicio = RankingService(_catalogo_minimo())
     item = servicio.explain("75000001", UserProfile(valued_labels=["en:organic"]))
@@ -112,3 +129,106 @@ def test_explain_incluye_detalle_a10() -> None:
     assert item.explanation.dimensions["D3"].subscore == 100.0
     assert item.explanation.allergy_status == "apto"
     assert "D1" in item.explanation.dimensions
+
+
+def test_alternativas_solo_el_mismo_grupo_y_la_banda_de_ranking() -> None:
+    servicio = RankingService(_catalogo_minimo())
+    resultado = servicio.alternatives("75000001", UserProfile())
+    assert resultado.reason == "ok"
+    assert resultado.category == "en:breads"
+    assert resultado.code == "75000001"
+    # 01 es el origen. 04 solo tiene D2: cobertura < 0.5, fuera del ranking.
+    assert [item.code for item in resultado.items] == ["75000002", "75000005", "75000003"]
+    assert resultado.total == 3
+    assert resultado.items[0].rank == 1
+    assert resultado.items[0].d1 == 70.0
+    assert resultado.items[0].band == "ranking"
+    assert resultado.items[0].explanation is not None
+
+
+def test_alternativas_ignoran_otra_categoria_y_el_precio() -> None:
+    df = _catalogo_minimo().df.copy()
+    df.loc[df["code"] == "75000002", "categoria_referencia"] = "en:milks"
+    df["price"] = [10.0, 180.0, 12.0, 12.0, 12.0]
+    df["price_status"] = "REAL"
+    servicio = RankingService(Catalog(df=df, snapshot_id="test_snapshot"))
+    perfil = UserProfile()
+    resultado = servicio.alternatives("75000001", perfil)
+    assert "75000002" not in {item.code for item in resultado.items}
+    caro = df.copy()
+    caro["price"] = 999.0
+    caro["price_status"] = "SYNTHETIC"
+    otro = RankingService(Catalog(df=caro, snapshot_id="test_snapshot")).alternatives("75000001", perfil)
+    assert [(i.code, i.score) for i in resultado.items] == [(i.code, i.score) for i in otro.items]
+
+
+def test_alternativas_sin_categoria_no_inventan_grupo() -> None:
+    df = _catalogo_minimo().df.copy()
+    df.loc[df["code"] == "75000001", "categoria_referencia"] = None
+    resultado = RankingService(Catalog(df=df, snapshot_id="test_snapshot")).alternatives(
+        "75000001", UserProfile()
+    )
+    assert resultado.reason == "sin_categoria"
+    assert resultado.category is None
+    assert resultado.items == []
+    assert resultado.total == 0
+
+
+def test_alternativas_vacias_si_el_grupo_no_entra_al_ranking() -> None:
+    servicio = RankingService(_catalogo_minimo())
+    perfil = UserProfile(allergen_tags=["en:gluten"], diet="vegano")
+    resultado = servicio.alternatives("75000003", perfil)
+    # 03 declara leche y es non-vegan: el origen no se lista. El resto del grupo
+    # queda excluido o no verificable con este perfil.
+    assert resultado.reason == "sin_opciones"
+    assert resultado.category == "en:breads"
+    assert resultado.items == []
+
+
+def test_alternativas_recortan_a_cinco_sin_perder_el_total() -> None:
+    filas = []
+    for indice in range(7):
+        filas.append(
+            {
+                "code": f"7500001{indice}",
+                "product_name": f"Pan {indice}",
+                "categoria_referencia": "en:breads",
+                "d1": float(90 - indice),
+                "d2": 80.0,
+                "labels_tags": None,
+                "allergens": "en:milk",
+                "traces": None,
+                "ingredients_analysis_tags": "en:vegan",
+                "product_name_flag_respaldo_usado": False,
+                "nova_group": 1.0,
+                "additives_n": 0.0,
+            }
+        )
+    filas.append(
+        {
+            "code": "75000020",
+            "product_name": "Leche",
+            "categoria_referencia": "en:milks",
+            "d1": 99.0,
+            "d2": 99.0,
+            "labels_tags": None,
+            "allergens": "en:milk",
+            "traces": None,
+            "ingredients_analysis_tags": "en:vegan",
+            "product_name_flag_respaldo_usado": False,
+            "nova_group": 1.0,
+            "additives_n": 0.0,
+        }
+    )
+    servicio = RankingService(Catalog(df=pd.DataFrame(filas), snapshot_id="test_snapshot"))
+    resultado = servicio.alternatives("75000010", UserProfile())
+    assert resultado.reason == "ok"
+    assert resultado.total == 6
+    assert [item.code for item in resultado.items] == [
+        "75000011",
+        "75000012",
+        "75000013",
+        "75000014",
+        "75000015",
+    ]
+    assert "75000020" not in {item.code for item in resultado.items}

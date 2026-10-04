@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import pandas as pd
 
-from nutrimatch.engine.processing_score import calcular_d2, calibrar_tope_aditivos
+from nutrimatch.engine.processing_score import (
+    ANCHO_BANDA,
+    FRACCION_AJUSTE_ADITIVOS_AUSENTES,
+    calcular_d2,
+    calibrar_tope_aditivos,
+)
 
 
 def test_nova_1_nunca_puntua_por_debajo_de_nova_2_sin_importar_aditivos():
@@ -39,12 +44,26 @@ def test_sin_nova_no_es_computable():
     assert d2.isna().all()
 
 
-def test_sin_additives_n_no_anula_d2_se_trata_como_cero():
+def test_sin_additives_n_no_anula_d2_usa_ajuste_neutro_de_media_banda():
     nova = pd.Series(["3"])
     aditivos = pd.Series([None])
     d2 = calcular_d2(nova, aditivos, tope_aditivos=9)
+    techo_nova_3 = 100.0 - (3 - 1) * ANCHO_BANDA
+    esperado = techo_nova_3 - FRACCION_AJUSTE_ADITIVOS_AUSENTES * ANCHO_BANDA
     assert not d2.isna().any()
-    assert d2.iloc[0] == 100.0 - (3 - 1) * 25.0  # techo de la banda de NOVA=3, sin ajuste
+    assert d2.iloc[0] == esperado  # centro de la banda NOVA=3 (25-50) → 37.5
+    assert 25.0 <= d2.iloc[0] <= 50.0
+
+
+def test_additives_n_ausente_queda_en_el_centro_de_cada_banda_nova():
+    nova = pd.Series(["1", "2", "3", "4"])
+    aditivos = pd.Series([None, float("nan"), None, float("nan")])
+    d2 = calcular_d2(nova, aditivos, tope_aditivos=9)
+    centros = [87.5, 62.5, 37.5, 12.5]
+    bandas = [(75.0, 100.0), (50.0, 75.0), (25.0, 50.0), (0.0, 25.0)]
+    for valor, centro, (piso, techo) in zip(d2.tolist(), centros, bandas, strict=True):
+        assert valor == centro
+        assert piso <= valor <= techo
 
 
 def test_calibrar_tope_aditivos_usa_percentil_de_nova_4():

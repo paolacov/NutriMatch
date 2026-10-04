@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" role="img" aria-label="Sin foto">
+  <rect width="800" height="800" rx="64" fill="#F7F3EB"/>
+  <circle cx="400" cy="372" r="228" fill="#FFFDF8"/>
+
+  <rect x="250" y="236" width="300" height="268" rx="24" fill="#EEE8DC" stroke="#0F6B63" stroke-width="10"/>
+  <path d="M280 236V196h240v40M400 236v268" fill="none" stroke="#0F6B63" stroke-width="10"/>
+  <rect x="292" y="300" width="80" height="16" rx="8" fill="#8A7A66" opacity="0.35"/>
+
+
+  <g opacity="0.14" transform="translate(352 40)">
+    <path d="M12 32 24 43 48 16" fill="none" stroke="#0F6B63" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="32" r="4.2" fill="#C41E3A"/>
+  </g>
+
+  <text x="400" y="724" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="600" fill="#8A7A66">Sin foto</text>
+</svg>

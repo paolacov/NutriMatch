@@ -1,35 +1,37 @@
-"""Motor determinista de scoring y las operaciones que lo acompañan.
+"""Motor determinista de compatibilidad y las operaciones que lo acompañan.
 
-Score aditivo de tres dimensiones (D1 nutrición, D2 procesamiento NOVA, D3 preferencias) con
-subpuntajes, percentiles calculados dentro de la categoría de referencia, regla de cobertura `cov`
-y banda de "información insuficiente". Incluye las operaciones deterministas de filtro, ranking,
-comparación, alertas y carrito. Es la única capa autorizada a calcular.
+El resultado es la suma ponderada de tres dimensiones, cada una en escala 0–100:
 
-Módulos del paso de transformación (paso 6 del plan), ya implementados:
+- Nutrición: percentiles dentro de la categoría de referencia, con signo fijo
+  en azúcares, sal, grasa saturada, fibra y proteína.
+- Procesamiento: grupo NOVA afinado con el número de aditivos.
+- Preferencias: porcentaje de etiquetas valoradas que el producto presenta.
 
-- ``constants``: núcleo nutricional (CORE8) y umbrales de saneamiento.
-- ``sanitize``: saneamiento de valores fuera de rango físico (decisión A18).
-- ``reference_category``: resolución de la categoría de referencia para D1 (decisión A16).
-- ``nutrition_percentile``: percentiles de D1 dentro de la categoría y ``category_stats``.
-- ``processing_score``: subpuntaje D2, NOVA combinado con ``additives_n`` (decisión A17).
+La cobertura decide si el producto entra al ranking o a la banda de información
+insuficiente. Esta es la única capa que calcula esos números.
 
-Módulos del paso de modelo de recomendación (paso 7), ya implementados:
+Módulos de transformación:
 
-- ``user_weights``: convierte el orden de 3 prioridades del usuario en pesos normalizados (A6).
-- ``hard_filters``: filtros de alergia y dieta, tres estados, fuera del score (A1, A15).
-- ``nutrition_score``: subpuntaje D1 con signo, sobre 5 nutrientes de dirección fija (A7).
-- ``preference_score``: subpuntaje D3, porcentaje de etiquetas valoradas presentes (A7).
-- ``coverage``: regla de cobertura ``cov`` y banda de "información insuficiente" (A2).
-- ``compatibility_score``: ensamblado del score final ponderado y explicación (A7, A10).
+- ``constants``: núcleo nutricional y umbrales de saneamiento.
+- ``sanitize``: valores fuera de rango físico.
+- ``reference_category``: categoría usada para el percentil.
+- ``nutrition_percentile``: percentiles y estadísticas de categoría.
+- ``processing_score``: subpuntaje de procesamiento.
 
-Utilidad complementaria (no forma parte del score de compatibilidad):
+Módulos del resultado personalizado:
 
-- ``product_naming``: resuelve el nombre de un producto para mostrar, con fallback entre columnas
-  del propio OFF cuando ``product_name`` viene vacío (decisión A28).
-- ``data_quality``: ``data_quality_score`` / ``data_quality_level`` (DERIVED). Miden
-  disponibilidad y consistencia de la ficha, no calidad nutricional, y no puntúan.
+- ``user_weights``: convierte el orden de tres prioridades en pesos que suman 1.
+- ``hard_filters``: alergia y dieta, en tres estados, fuera del resultado.
+- ``nutrition_score``: subpuntaje nutricional.
+- ``preference_score``: subpuntaje de preferencias.
+- ``coverage``: fracción de peso con dato disponible.
+- ``compatibility_score``: resultado final y explicación por dimensión.
 
-Pendiente para una siguiente pasada (fuera del alcance del paso 7): extender D1 a
-``energy-kcal_100g``, ``fat_100g`` y ``carbohydrates_100g`` cuando se defina una taxonomía de
-objetivos nutricionales del usuario (el documento maestro los deja "según meta" sin especificarla).
+Utilidades que no entran al resultado:
+
+- ``product_naming``: nombre visible, con respaldo entre columnas del mismo registro.
+- ``data_quality``: disponibilidad y coherencia de la ficha. No puntúa.
+
+Energía, grasa total y carbohidratos conservan percentil para la ficha y quedan
+fuera del subpuntaje nutricional.
 """

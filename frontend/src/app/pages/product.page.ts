@@ -1,261 +1,360 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, map, of, switchMap, tap } from 'rxjs';
 import { CartStore } from '../core/data/cart.store';
 import { CompareStore } from '../core/data/compare.store';
 import { ProductRepository } from '../core/data/product.repository';
 import { ProfileStore } from '../core/data/profile.store';
+import { Product } from '../core/models/domain';
 import { BandChip } from '../shared/band-chip/band-chip';
 import { CategoryMark } from '../shared/category-mark/category-mark';
+import { LoadingWell } from '../shared/loading-well/loading-well';
 import { OtterGuide } from '../shared/otter-guide/otter-guide';
-import { ProvenanceBadge } from '../shared/provenance-badge/provenance-badge';
-import { ShelfStamps } from '../shared/shelf-stamps/shelf-stamps';
+import { ProductPhoto } from '../shared/product-photo/product-photo';
+import { ShelfStamps, etiquetasDeSelloVisibles } from '../shared/shelf-stamps/shelf-stamps';
 import {
-  allergyLabel,
   categoryLabel,
-  dietLabel,
-  dimensionLabel,
+  dataQualityLevelName,
   displayName,
-  flagLabel,
-  nutrientD1Label,
-  nutrientSignLabel,
-  priceCaption,
-  scoreCaption,
+  friendlyNutrientText,
+  friendlyQuantity,
+  nutrientSheetLabel,
+  priceAmount,
+  priceKindLabel,
 } from '../shared/format';
+import { CartAlternatives } from './cart-alternatives';
+
+type PerfilMarca = { tone: 'bad' | 'ok' | 'unknown'; label: string };
 
 @Component({
   selector: 'app-product-page',
-  imports: [RouterLink, OtterGuide, ProvenanceBadge, DecimalPipe, BandChip, CategoryMark, ShelfStamps],
+  imports: [RouterLink, OtterGuide, DecimalPipe, BandChip, CategoryMark, ShelfStamps, LoadingWell, CartAlternatives, ProductPhoto],
   template: `
     @if (product(); as p) {
-      <article class="space-y-6">
-        <app-otter-guide variant="result" />
-        <header class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p class="flex items-center gap-1.5 text-sm text-mute">
+      <article class="ficha">
+        <div class="ficha-intro">
+          <div class="ficha-welcome">
+            <app-otter-guide
+              variant="explain"
+              size="compact"
+              caption="Mira cómo encaja este producto contigo."
+            />
+          </div>
+          <header class="card-paper ficha-identity">
+            <p class="ficha-kicker">
               <app-category-mark [category]="p.category" />
-              {{ categoryLabel(p.category) }} · {{ p.code }}
+              <span>{{ categoryLabel(p.category) }}</span>
             </p>
-            <h1 class="text-3xl font-bold">{{ displayName(p) }}</h1>
-            <p class="text-mute">{{ p.brand.value ?? 'Marca no disponible' }} · {{ p.quantity ?? 'Presentación no declarada' }}</p>
-            <div class="mt-2 flex flex-wrap items-center gap-2">
+            <h1 class="page-title">{{ displayName(p) }}</h1>
+            <div class="ficha-identity-meta">
+              <span class="ficha-identity-brand">{{ p.brand.value ?? 'Marca no disponible' }}</span>
+              @if (presentacion(p); as cant) {
+                <span class="ficha-identity-pill">{{ cant }}</span>
+              }
+              <span class="ficha-identity-pill ficha-identity-code">{{ p.code }}</span>
               @if (p.fit.status === 'DERIVED') {
                 <app-band-chip [band]="p.fit.band" />
               }
-              <app-provenance-badge [status]="p.name.status" />
-              <app-provenance-badge [status]="p.brand.status" />
             </div>
-          </div>
-          <div class="rounded-xl bg-paper p-4 ring-1 ring-sand">
-            <p class="text-sm font-semibold">{{ priceCaption(p) }}</p>
-            <app-provenance-badge [status]="p.price.status" />
-          </div>
-        </header>
-
-        <div class="grid gap-4 lg:grid-cols-2">
-          <section class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-            <h2 class="text-lg font-semibold">¿Qué tan bien encaja contigo?</h2>
-            <p class="mt-2 text-4xl font-bold">
-              @if (p.fit.score === null) { — } @else { {{ p.fit.score | number:'1.0-1' }} }
-              <span class="text-base font-normal text-mute">/ 100</span>
-            </p>
-            <div class="mt-1 flex flex-wrap items-center gap-2">
-              <app-provenance-badge [status]="p.fit.status" />
-              <p class="text-xs text-mute">{{ scoreCaption(p) }}</p>
-            </div>
-            <p class="mt-2 text-sm">Cobertura {{ p.fit.cov | number:'1.0-2' }}</p>
-            <p class="text-sm text-mute">
-              Alergia: {{ allergyLabel(p.fit.allergyStatus) }} · Dieta: {{ dietLabel(p.fit.dietStatus) }}
-            </p>
-            @if (p.fit.warnings.length) {
-              <ul class="mt-2 space-y-1 text-sm text-mute">
-                @for (w of p.fit.warnings; track w) {
-                  <li>{{ flagLabel(w) }}</li>
+          </header>
+        </div>
+        <div class="ficha-pair">
+          <aside class="card-paper ficha-offer">
+            <div class="ficha-offer-visual">
+              <div class="ficha-photo anaquel-photo">
+                <app-product-photo [imageUrl]="p.imageUrl" [category]="p.category" [alt]="displayName(p)" />
+                <div class="ficha-photo-stamps">
+                  <app-shelf-stamps [labels]="p.labels" [compact]="true" />
+                </div>
+              </div>
+              <div class="ficha-price" [attr.data-price-kind]="p.price.status">
+                @if (priceAmount(p); as monto) {
+                  <p class="ficha-price-amount">{{ monto }}</p>
+                  <p class="price-badge" [attr.data-price-kind]="p.price.status">{{ priceKindLabel(p) }}</p>
+                } @else {
+                  <p class="ficha-price-missing">Precio no disponible</p>
                 }
-              </ul>
-            }
-            <ul class="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
-              <li class="rounded-lg bg-cream p-2">
-                {{ dimensionLabel('D1') }}<br />
-                <strong>{{ p.fit.d1 === null ? '—' : (p.fit.d1 | number:'1.0-1') }}</strong>
-              </li>
-              <li class="rounded-lg bg-cream p-2">
-                {{ dimensionLabel('D2') }}<br />
-                <strong>{{ p.fit.d2 === null ? '—' : (p.fit.d2 | number:'1.0-1') }}</strong>
-              </li>
-              <li class="rounded-lg bg-cream p-2">
-                {{ dimensionLabel('D3') }}<br />
-                <strong>{{ p.fit.d3 === null ? '—' : (p.fit.d3 | number:'1.0-1') }}</strong>
-              </li>
-            </ul>
-            @if (p.fit.dimensions.length) {
-              <table class="mt-4 w-full text-left text-sm">
-                <caption class="mb-2 text-left font-semibold">Peso y contribución</caption>
-                <thead>
-                  <tr class="text-mute">
-                    <th class="py-1 font-medium">Dimensión</th>
-                    <th class="py-1 text-right font-medium">Peso</th>
-                    <th class="py-1 text-right font-medium">Aporta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (d of p.fit.dimensions; track d.key) {
-                    <tr class="border-t border-sand">
-                      <td class="py-1">{{ dimensionLabel(d.key) }}</td>
-                      <td class="py-1 text-right">{{ d.weight | number:'1.0-2' }}</td>
-                      <td class="py-1 text-right">
-                        @if (!d.available || d.weightedContribution === null) { Información no disponible }
-                        @else { {{ d.weightedContribution | number:'1.0-1' }} }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-            @if (p.fit.nutrients.length) {
-              <table class="mt-4 w-full text-left text-sm">
-                <caption class="mb-2 text-left font-semibold">Nutrientes de D1</caption>
-                <thead>
-                  <tr class="text-mute">
-                    <th class="py-1 font-medium">Nutriente</th>
-                    <th class="py-1 text-right font-medium">Percentil</th>
-                    <th class="py-1 text-right font-medium">Aporta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (n of p.fit.nutrients; track n.key) {
-                    <tr class="border-t border-sand">
-                      <td class="py-1">
-                        {{ nutrientD1Label(n.key) }}
-                        <span class="block text-xs text-mute">{{ nutrientSignLabel(n.sign) }}</span>
-                      </td>
-                      <td class="py-1 text-right">
-                        @if (!n.available || n.percentile === null) { Información no disponible }
-                        @else { {{ n.percentile | number:'1.0-0' }} }
-                      </td>
-                      <td class="py-1 text-right">
-                        @if (!n.available || n.contribution === null) { Información no disponible }
-                        @else { {{ n.contribution | number:'1.0-1' }} }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-          </section>
-
-          <section class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-            <div class="anaquel-photo relative flex h-64 items-center justify-center overflow-hidden rounded-lg">
-              @if (p.imageUrl) {
-                <img [src]="p.imageUrl" [alt]="displayName(p)" class="h-full w-full object-contain" />
-              } @else {
-                <app-category-mark [category]="p.category" size="lg" class="mark-float" />
-              }
-              <div class="pointer-events-none absolute bottom-2 left-2 right-2">
-                <app-shelf-stamps [labels]="p.labels" [compact]="true" />
               </div>
             </div>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <button type="button" class="cta-brick rounded-lg bg-brick px-4 py-2 text-white" (click)="cart.add(p.code)">
-                Agregar al carrito
+            <div class="ficha-actions">
+              <button
+                type="button"
+                class="btn btn-tide"
+                [disabled]="cart.has(p.code)"
+                (click)="cart.add(p.code)"
+              >
+                {{ cart.has(p.code) ? 'En el carrito' : 'Agregar al carrito' }}
               </button>
-              <button type="button" class="cta-shelf rounded-lg bg-ink px-4 py-2 text-cream" (click)="compare.toggle(p.code)">
+              <button
+                type="button"
+                class="btn btn-ghost"
+                [attr.aria-expanded]="abiertas() === p.code"
+                (click)="explorar(p.code)"
+              >
+                {{ abiertas() === p.code ? 'Cerrar alternativas' : 'Explorar alternativas' }}
+              </button>
+              <button type="button" class="btn btn-quiet" (click)="compare.toggle(p.code)">
                 {{ compare.has(p.code) ? 'Quitar de comparación' : 'Comparar' }}
               </button>
-              <a routerLink="/comparar" class="rounded-lg px-4 py-2 ring-1 ring-sand">Ver comparación</a>
             </div>
+          </aside>
+          <section class="card-paper ficha-fit">
+              <h2>¿Cómo encaja contigo?</h2>
+              <div class="ficha-fit-head">
+                <div class="ficha-score-block">
+                  <p class="ficha-score">
+                    @if (p.fit.score === null) {
+                      <strong>—</strong>
+                    } @else {
+                      <strong>{{ p.fit.score | number:'1.0-1' }}</strong>
+                      <span>/ 100</span>
+                    }
+                  </p>
+                  <p class="text-sm text-mute">
+                    {{ p.fit.score === null ? 'Sin resultado disponible' : 'Según tus preferencias' }}
+                  </p>
+                </div>
+                @if (razones(p).length) {
+                  <ul class="ficha-reasons">
+                    @for (razon of razones(p); track razon.text) {
+                      <li [attr.data-tone]="razon.tone">{{ razon.text }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+          <ul class="ficha-dims">
+            @for (dim of dimensiones(p); track dim.key) {
+              <li>
+                <span>{{ dim.label }}</span>
+                <strong>{{ dim.value }}</strong>
+                @if (dim.note) {
+                  <small>{{ dim.note }}</small>
+                }
+              </li>
+            }
+          </ul>
+          <div class="ficha-meta">
+            @if (p.fit.cov >= 0.5) {
+              <span class="ficha-meta-chip" data-tone="ok">✓ Información suficiente</span>
+            } @else {
+              <span class="ficha-meta-chip">Información parcial</span>
+            }
+            @if (calidadChip(p); as calidad) {
+              <span class="ficha-meta-chip" [attr.data-level]="p.dataQualityLevel">{{ calidad }}</span>
+            }
+            @if (p.fit.status === 'DERIVED') {
+              <span class="ficha-meta-note">ⓘ Score calculado por NutriMatch</span>
+            }
+          </div>
           </section>
         </div>
+        @if (abiertas() === p.code) {
+          <app-cart-alternatives [code]="p.code" />
+        }
 
-        <section class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-          <h2 class="text-lg font-semibold">Nutrición por 100 g</h2>
-          <table class="mt-3 w-full text-sm">
+        <div class="ficha-duo">
+        <section class="card-paper ficha-block ficha-nutrition">
+          <h2>Información nutricional</h2>
+          <p class="ficha-block-kicker">Por 100 g</p>
+          <ul class="ficha-nutrients">
             @for (n of p.nutrients; track n.key) {
-              <tr class="border-t border-sand">
-                <td class="py-2">{{ n.label }}</td>
-                <td class="py-2 text-right">
-                  @if (n.per100g === null) { No disponible } @else { {{ n.per100g }} {{ n.unit }} }
-                </td>
-                <td class="py-2 text-right"><app-provenance-badge [status]="n.status" /></td>
-              </tr>
+              <li>
+                <span>{{ nutrientSheetLabel(n.key, n.label) }}</span>
+                <strong [class.is-missing]="n.per100g === null">{{ nutrientText(n.per100g, n.unit) }}</strong>
+              </li>
             }
-          </table>
+          </ul>
         </section>
 
-        <section class="grid gap-4 md:grid-cols-3">
-          <div class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-            <h3 class="font-semibold">Ingredientes</h3>
-            <p class="mt-2 text-sm">{{ p.ingredients.length ? p.ingredients.join(', ') : 'No disponibles' }}</p>
+        <section class="card-paper ficha-block">
+          <h2>Tu perfil</h2>
+          <ul class="ficha-profile">
+            <li>
+              <span>Alergia</span>
+              <strong [attr.data-tone]="marcaAlergia(p).tone">{{ marcaAlergia(p).label }}</strong>
+            </li>
+            <li>
+              <span>Dieta</span>
+              <strong [attr.data-tone]="marcaDieta(p).tone">{{ marcaDieta(p).label }}</strong>
+            </li>
+          </ul>
+        </section>
+        </div>
+
+        <section class="ficha-facts">
+          <div class="card-paper ficha-block">
+            <h2>Ingredientes</h2>
+            @if (!p.ingredients.length) {
+              <p class="text-sm">Información no disponible</p>
+            } @else {
+              <p class="text-sm">{{ p.ingredients.join(', ') }}</p>
+            }
           </div>
-          <div class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-            <h3 class="font-semibold">Alérgenos</h3>
+          <div class="card-paper ficha-block">
+            <h2>Alérgenos</h2>
             @if (p.allergens.length) {
-              <div class="mt-3">
-                <app-shelf-stamps [allergens]="p.allergens" />
-              </div>
+              <app-shelf-stamps [allergens]="p.allergens" />
             } @else {
-              <p class="mt-2 text-sm">Alérgenos no disponibles en el registro · no verificable</p>
+              <p class="text-sm">Información de alérgenos no disponible</p>
             }
           </div>
-          <div class="rounded-xl bg-paper p-5 ring-1 ring-sand">
-            <h3 class="font-semibold">Sellos</h3>
-            @if (p.labels.length) {
-              <div class="mt-3">
-                <app-shelf-stamps [labels]="p.labels" />
-              </div>
+          <div class="card-paper ficha-block">
+            <h2>Puede contener</h2>
+            @if (p.traces.length) {
+              <app-shelf-stamps [allergens]="p.traces" />
             } @else {
-              <p class="mt-2 text-sm">Sellos no disponibles en el registro. No se puede determinar.</p>
+              <p class="text-sm">Información de alérgenos no disponible</p>
             }
           </div>
+          <div class="card-paper ficha-block">
+            <h2>Sellos</h2>
+            @if (etiquetasDeSelloVisibles(p.labels).length) {
+              <app-shelf-stamps [labels]="p.labels" />
+            } @else {
+              <p class="text-sm">Información de sellos no disponible</p>
+            }
+          </div>
+          <p class="ficha-facts-note">
+            Si un sello o un alérgeno no aparece, el registro no lo trae. No se afirma que el producto no lo tenga.
+          </p>
         </section>
       </article>
     } @else if (missing()) {
-      <p>No encontramos ese código en el catálogo.</p>
+      <div class="empty-well">
+        <app-otter-guide variant="empty" size="compact" />
+        <p>No encontramos ese código en el catálogo.</p>
+        <a routerLink="/buscar" class="btn btn-tide">Buscar producto</a>
+      </div>
     } @else {
-      <p class="text-mute">Cargando ficha…</p>
+      <app-loading-well label="Cargando ficha…" />
     }
   `,
 })
 export class ProductPage {
   private readonly repo = inject(ProductRepository);
   private readonly route = inject(ActivatedRoute);
-  private readonly profile = inject(ProfileStore);
+  readonly profile = inject(ProfileStore);
   readonly cart = inject(CartStore);
   readonly compare = inject(CompareStore);
   readonly displayName = displayName;
-  readonly priceCaption = priceCaption;
-  readonly scoreCaption = scoreCaption;
+  readonly etiquetasDeSelloVisibles = etiquetasDeSelloVisibles;
+  readonly priceAmount = priceAmount;
+  readonly priceKindLabel = priceKindLabel;
   readonly categoryLabel = categoryLabel;
-  readonly allergyLabel = allergyLabel;
-  readonly dietLabel = dietLabel;
-  readonly dimensionLabel = dimensionLabel;
-  readonly flagLabel = flagLabel;
-  readonly nutrientD1Label = nutrientD1Label;
-  readonly nutrientSignLabel = nutrientSignLabel;
+  readonly nutrientSheetLabel = nutrientSheetLabel;
+  readonly nutrientText = friendlyNutrientText;
+  readonly abiertas = signal<string | null>(null);
+  private lastLoggedCode = '';
 
   private readonly code = toSignal(this.route.paramMap.pipe(map((p) => p.get('code') ?? '')), {
     initialValue: '',
   });
 
   private readonly loaded = toSignal(
-    toObservable(this.code).pipe(
-      switchMap((code) =>
-        this.repo.explain(code, this.profile.profile()).pipe(
+    combineLatest([toObservable(this.code), toObservable(this.profile.profile)]).pipe(
+      switchMap(([code, profile]) => {
+        if (!code) {
+          return of({ product: undefined, missing: false });
+        }
+        return this.repo.explain(code, profile).pipe(
           tap((product) => {
-            if (product) {
+            if (product && product.code !== this.lastLoggedCode) {
+              this.lastLoggedCode = product.code;
               this.repo.logEvent('product_viewed', { code: product.code }).subscribe();
             }
           }),
           map((product) => ({ product, missing: !product })),
           catchError(() => of({ product: undefined, missing: true })),
-        ),
-      ),
+        );
+      }),
     ),
     { initialValue: { product: undefined, missing: false } },
   );
 
   readonly product = computed(() => this.loaded().product);
   readonly missing = computed(() => this.loaded().missing);
+
+  explorar(code: string): void {
+    this.abiertas.update((actual) => (actual === code ? null : code));
+  }
+
+  presentacion(product: Product): string | null {
+    return friendlyQuantity(product.quantity);
+  }
+
+  razones(product: Product): { tone: 'bad' | 'muted'; text: string }[] {
+    const profile = this.profile.profile();
+    const razones: { tone: 'bad' | 'muted'; text: string }[] = [];
+    if (profile.allergenTags.length && product.fit.allergyStatus === 'no_apto') {
+      razones.push({ tone: 'bad', text: '⚠ No apto por alergia' });
+    }
+    if (profile.diet && product.fit.dietStatus === 'incompatible') {
+      razones.push({ tone: 'bad', text: '⚠ No apto por dieta' });
+    }
+    if (profile.allergenTags.length && product.fit.allergyStatus === 'no_verificable') {
+      razones.push({ tone: 'muted', text: 'Alergia: no verificable' });
+    }
+    if (profile.diet && product.fit.dietStatus === 'no_verificable') {
+      razones.push({ tone: 'muted', text: 'Dieta: no verificable' });
+    }
+    return razones;
+  }
+
+  dimensiones(product: Product): { key: string; label: string; value: string; note: string | null }[] {
+    const sinPreferencias = this.profile.profile().valuedLabels.length === 0;
+    const valor = (n: number) => n.toFixed(1);
+    return [
+      { key: 'D1', label: 'Nutrición', value: product.fit.d1 === null ? 'No evaluado' : valor(product.fit.d1), note: null },
+      { key: 'D2', label: 'Procesamiento', value: product.fit.d2 === null ? 'No evaluado' : valor(product.fit.d2), note: null },
+      {
+        key: 'D3',
+        label: 'Etiquetas',
+        value: product.fit.d3 === null ? 'No evaluado' : valor(product.fit.d3),
+        note: product.fit.d3 === null && sinPreferencias ? 'Sin preferencias' : null,
+      },
+    ];
+  }
+
+  marcaAlergia(product: Product): PerfilMarca {
+    if (!this.profile.profile().allergenTags.length) {
+      return { tone: 'unknown', label: 'Sin información' };
+    }
+    if (product.fit.allergyStatus === 'no_apto') {
+      return { tone: 'bad', label: 'No apto' };
+    }
+    if (product.fit.allergyStatus === 'no_verificable') {
+      return { tone: 'unknown', label: 'No verificable' };
+    }
+    return { tone: 'ok', label: 'Compatible' };
+  }
+
+  marcaDieta(product: Product): PerfilMarca {
+    if (!this.profile.profile().diet) {
+      return { tone: 'unknown', label: 'Sin información' };
+    }
+    if (product.fit.dietStatus === 'incompatible') {
+      return { tone: 'bad', label: 'No apto' };
+    }
+    if (product.fit.dietStatus === 'no_verificable') {
+      return { tone: 'unknown', label: 'No verificable' };
+    }
+    return { tone: 'ok', label: 'Compatible' };
+  }
+
+  calidadChip(product: Product): string | null {
+    const level = product.dataQualityLevel?.trim().toLowerCase();
+    if (level === 'alta') {
+      return 'Información: Alta';
+    }
+    if (level === 'media' || level === 'baja') {
+      return 'Información: Parcial';
+    }
+    if (level === 'insuficiente') {
+      return 'Información: Insuficiente';
+    }
+    const nombre = dataQualityLevelName(product);
+    return nombre ? `Información: ${nombre}` : null;
+  }
 }

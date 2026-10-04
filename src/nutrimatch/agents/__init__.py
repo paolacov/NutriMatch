@@ -1,6 +1,12 @@
-"""Capa LLM OPCIONAL con tres roles: `planner` (traduce lenguaje natural a JSON validado),
-`critic` (auditor determinista que verifica que cada afirmación esté respaldada por hechos
-calculados) y `narrate` (redacta la explicación en markdown). Aquí vive también `tools.py`, un
-registro DELGADO que expone al planner las operaciones deterministas implementadas en `engine/`:
-esta capa nunca calcula. El sistema debe funcionar completo sin ella.
+"""Roles de la capa de lenguaje.
+
+Este paquete no ejecuta el ranking. Documenta los tres papeles que implementa
+``nutrimatch.ai`` y que la API expone en ``POST /ai/ask``:
+
+1. Planner. Traduce la pregunta a una operación ya definida. No calcula.
+2. Critic. Comprueba, con reglas deterministas, que el texto cite hechos ya calculados.
+3. Narrate. Redacta la explicación.
+
+El motor de compatibilidad permanece en ``nutrimatch.engine``. Esta capa no
+calcula nutrición, procesamiento, preferencias ni precio.
 """

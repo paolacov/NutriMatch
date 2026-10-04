@@ -1,0 +1,11 @@
+{
+  "/meta": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/search": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/catalog/products": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/catalog/categories": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/ranking": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/products": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/cart": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/events": { "target": "http://127.0.0.1:8000", "secure": false },
+  "/ai": { "target": "http://127.0.0.1:8000", "secure": false }
+}

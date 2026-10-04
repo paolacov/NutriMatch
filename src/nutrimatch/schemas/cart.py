@@ -30,6 +30,7 @@ class GroupBucket(BaseModel):
     label: str
     n: int
     share: float
+    codes: list[str] = Field(default_factory=list)
 
 
 class CartSummary(BaseModel):

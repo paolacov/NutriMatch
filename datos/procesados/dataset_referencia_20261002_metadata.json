@@ -1,0 +1,42 @@
+{
+  "dataset_id": "dataset_referencia_20261002",
+  "generated_at": "2026-10-03T03:16:16.077696+00:00",
+  "n_filas": 13093,
+  "n_columnas": 273,
+  "universo": "operativo",
+  "origen": {
+    "parquet": "dataset_referencia_20260929.parquet",
+    "sha256": "a802b2a94961c70edfdc909350105d14d227d7832617bbf93881ff13d8ae6021",
+    "n_filas": 13093,
+    "nota": "No se modificó. Percentiles, D2 y universo_puntuable se copiaron."
+  },
+  "observaciones": "observaciones_20260926.parquet",
+  "sha256": "a621d471a2f47aa09ba481408d95a7a808fe84bd2fa7205c56fa050e1c66045b",
+  "candados_ingesta": {
+    "fuente": "datos/snapshots/off_csv_20260929/_metadata.json",
+    "export_identico_a": "off_csv_20260919",
+    "sha256_gzip_20260919": "f72687ee8bc6522054fe69dbfda6b91902c16af1ec2e043cde27bc6c29ad8176",
+    "sha256_gzip_20260929": "f72687ee8bc6522054fe69dbfda6b91902c16af1ec2e043cde27bc6c29ad8176",
+    "mismo_gzip": true,
+    "filas_solo_pais": 16851,
+    "tras_no_alimento": 16848,
+    "excluidas_no_alimento": 3,
+    "tras_integridad": 13111,
+    "excluidas_integridad": 3737,
+    "tras_identidad": 13093,
+    "excluidas_identidad": 18,
+    "filas_operativas": 13093,
+    "nota": "El gzip del 29 de septiembre es el mismo archivo que el del 19. La baja de 16 851 a 13 093 la producen los tres candados de scripts/ingesta_off.py (no-alimento, integridad, identidad), no un export nuevo. Los 13 093 códigos son un subconjunto de los 16 851."
+  },
+  "precios": {
+    "REAL": 259,
+    "UNAVAILABLE": 12834,
+    "SYNTHETIC_en_parquet": 0,
+    "open_prices_exact_gtin": 239,
+    "qqp_profeco_text_reviewed": 20,
+    "nota": "SYNTHETIC no se materializa. La ficha lo emite al responder cuando price_status es UNAVAILABLE y hay GTIN. QQP no es match por código de barras."
+  },
+  "nombres_api": 5,
+  "calidad": "DERIVED sobre las 13 093 filas. No entra a D1/D2/D3.",
+  "ranking": "Fórmulas no recalculadas. d2 y percentiles iguales al origen del 29."
+}

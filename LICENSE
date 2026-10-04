@@ -1,20 +1,17 @@
 # Licencia
 
-## Código: PENDIENTE de decidir
+## Código
 
-La licencia del código de NutriMatch está **PENDIENTE de decidir por la autora del proyecto**.
+El código de NutriMatch se publica con todos los derechos reservados por su autora.
 
-Mientras no se elija una licencia explícita, no se conceden permisos de uso, copia, modificación ni
-distribución más allá de los que otorgue la ley aplicable. Este archivo debe sustituirse por el texto
-completo de la licencia elegida cuando se tome la decisión.
+Mientras este archivo no incorpore el texto de una licencia abierta, no se conceden permisos de uso, copia, modificación ni distribución más allá de los que otorgue la ley aplicable.
 
-## Datos de terceros: sus propias licencias
+## Datos de terceros
 
-Los datos utilizados por NutriMatch **no son propiedad de este proyecto** y se rigen por las
-licencias de sus respectivas fuentes, que son independientes de la licencia del código:
+Los datos de producto y de precios no son propiedad de este proyecto. Se rigen por las licencias de sus fuentes, con independencia de la licencia del código:
 
 - Open Food Facts
-- PROFECO, "Quién es Quién en los Precios"
+- PROFECO, Quién es Quién en los Precios
+- Open Prices
 
-Las licencias concretas, sus obligaciones y el formato de cita están documentados en
-[`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).
+Las obligaciones y el formato de cita están en [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md).

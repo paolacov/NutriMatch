@@ -132,7 +132,11 @@ def _preparar_referencia(crudo: pd.DataFrame) -> pd.DataFrame:
     df["code"] = df["code"].astype(str)
     if "product_name_homologated" in df.columns:
         homologado = [_texto_o_none(v) for v in df["product_name_homologated"].tolist()]
-        df["product_name"] = homologado
+        crudo = [_texto_o_none(v) for v in df["product_name"].tolist()]
+        df["product_name"] = [
+            limpio if limpio is not None else base
+            for limpio, base in zip(homologado, crudo, strict=True)
+        ]
     d1_pares = df.apply(lambda r: calcular_subpuntaje_d1(_percentiles_de_fila(r)), axis=1)
     df["d1"] = d1_pares.apply(lambda t: t[0])
     return df

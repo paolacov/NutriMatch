@@ -1,4 +1,8 @@
-"""Repositorio del perfil local (una sola fila, id=1: el MVP no tiene autenticación)."""
+"""Repositorio del perfil local.
+
+Una sola fila, id=1. El perfil de la interfaz vive en el navegador; esta tabla
+guarda el perfil que la API usa cuando una petición lo persiste en SQLite.
+"""
 
 from __future__ import annotations
 

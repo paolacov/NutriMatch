@@ -1,5 +1,4 @@
 # Makefile de NutriMatch.
-# Los targets marcados como pendientes solo imprimen un aviso: el script todavía no existe.
 #
 # El entorno se gestiona con uv. La versión del intérprete la fija .python-version (3.12.13,
 # la misma que el runtime de Google Colab), así que aquí no se nombra ningún python del sistema.
@@ -12,11 +11,11 @@ help: ## Lista los targets disponibles
 	@echo "Targets de NutriMatch:"
 	@echo "  setup        Crea .venv con uv e instala el paquete en modo editable (extra dev)"
 	@echo "  ingest-off   Descarga y procesa el export de Open Food Facts (1,28 GB)"
-	@echo "  ingest-qqp   Descarga y procesa los precios de PROFECO QQP    [pendiente]"
+	@echo "  ingest-qqp   Indica cómo reconstruir los precios de referencia de PROFECO"
 	@echo "  homologar-identidad  Homologa nombre y marca (DERIVED, sin tocar el crudo)"
-	@echo "  piloto-precios       Materializa precios REALES de Open Prices (A35/A40)"
-	@echo "  piloto-qqp           Fase A: genera candidatos QQP por texto para revisión manual (A35/A41)"
-	@echo "  materializar-qqp     Fase B: materializa el CSV QQP ya revisado a mano (A35/A41, requiere CSV=ruta)"
+	@echo "  piloto-precios       Materializa precios reales de Open Prices por código de barras"
+	@echo "  piloto-qqp           Genera candidatos PROFECO por texto, en CSV"
+	@echo "  materializar-qqp     Escribe el Parquet de PROFECO desde el CSV revisado (CSV=ruta)"
 	@echo "  eda          Rutas de los notebooks de EDA (02 y 08)"
 	@echo "  api          Lanza FastAPI (catálogo de referencia, puerto 8000)"
 	@echo "  ui           Lanza Angular (habla con FastAPI en :8000)"
@@ -24,7 +23,8 @@ help: ## Lista los targets disponibles
 	@echo "  lint         Revisa el estilo con ruff"
 
 # uv python install (sin argumentos) descarga el intérprete que pide .python-version si falta.
-# El extra llm queda fuera a propósito: la capa LLM es opcional y todavía no se necesita.
+# El extra llm queda fuera de setup: la capa de lenguaje funciona con plantillas
+# si no se instala. Para activarla: uv pip install -e ".[dev,llm]".
 setup: ## Crea .venv con uv e instala el paquete en modo editable con el extra dev
 	uv python install
 	uv venv
@@ -35,27 +35,28 @@ setup: ## Crea .venv con uv e instala el paquete en modo editable con el extra d
 ingest-off: ## Construye el snapshot México desde el export de Open Food Facts
 	uv run python scripts/ingesta_off.py
 
-ingest-qqp: ## Pendiente: ingesta de los precios de referencia de PROFECO QQP
-	@echo "pendiente de implementar: ingesta de PROFECO QQP"
+ingest-qqp: ## Precios PROFECO ya integrados en el dataset operativo
+	@echo "Los 20 precios de referencia PROFECO están en dataset_referencia_20261002.parquet."
+	@echo "Para reconstruir su Parquet: make materializar-qqp CSV=datos/procesados/piloto_qqp_candidatos_20260926.csv"
 
-# Homologa nombre (A28 + placeholders de captura) y marca (plegado de acentos, A38) en un
-# Parquet nuevo. No modifica off_mexico_*.parquet (A2).
+# Homologa nombre (respaldo entre columnas del mismo registro y placeholder de captura)
+# y marca (plegado de acentos) en un Parquet nuevo. No modifica off_mexico_*.parquet.
 homologar-identidad: ## Homologa nombre y marca (DERIVED, sin tocar el crudo)
 	uv run python scripts/homologar_identidad.py
 
 # Descarga los precios en MXN de Open Prices y cruza por product_code (GTIN) con el universo
-# México. El precio no puntúa (A5); no toca ningún Parquet existente.
-piloto-precios: ## Materializa precios REALES de Open Prices por GTIN (A35/A40)
+# México. El precio no entra al ranking. No toca el Parquet del catálogo.
+piloto-precios: ## Materializa precios reales de Open Prices por código de barras
 	uv run python scripts/piloto_precios_open_prices.py
 
-# Fase A (A35/A41): genera candidatos de match por texto contra QQP y escribe un CSV pequeño
-# para revisión manual. Nunca materializa un precio por sí solo.
-piloto-qqp: ## Fase A: candidatos QQP por texto para revisión manual (A35/A41)
+# Genera candidatos de coincidencia por texto contra PROFECO y escribe un CSV.
+# No materializa un precio por sí solo.
+piloto-qqp: ## Candidatos PROFECO por texto, en CSV
 	uv run python scripts/piloto_precios_qqp.py
 
-# Fase B (A35/A41): solo corre sobre un CSV ya revisado a mano (columna 'revisado' llena).
+# Solo corre sobre un CSV con la columna 'revisado' llena.
 # Uso: make materializar-qqp CSV=datos/procesados/piloto_qqp_candidatos_20260926.csv
-materializar-qqp: ## Fase B: materializa el CSV QQP ya revisado (requiere CSV=ruta)
+materializar-qqp: ## Escribe el Parquet de PROFECO desde el CSV revisado (requiere CSV=ruta)
 	uv run python scripts/materializar_precios_qqp.py --csv $(CSV)
 
 eda: ## Documenta los notebooks de EDA (no lanza Jupyter)

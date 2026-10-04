@@ -8,6 +8,7 @@ import pandas as pd
 from fastapi.testclient import TestClient
 
 from nutrimatch.api.app import create_app
+from nutrimatch.engine.demo_price import precio_demostracion_mxn
 from nutrimatch.schemas.profile import UserProfile
 from nutrimatch.services.catalog import Catalog
 from nutrimatch.services.product import detalle_desde_fila
@@ -60,15 +61,17 @@ def test_search_por_nombre_y_tope(tmp_path: Path) -> None:
     assert len(limitado.json()) == 2
 
 
-def test_product_precio_real_y_unavailable_nunca_cero(tmp_path: Path) -> None:
+def test_product_precio_real_y_demostracion_no_se_confunden(tmp_path: Path) -> None:
     cliente = _client(tmp_path)
     real = cliente.get("/products/75000001").json()
     assert real["price"]["status"] == "REAL"
     assert real["price"]["value"] == 20.5
     assert real["price"]["source"] == "open_prices"
-    ausente = cliente.get("/products/75000002").json()
-    assert ausente["price"]["status"] == "UNAVAILABLE"
-    assert ausente["price"]["value"] is None
+    demo = cliente.get("/products/75000002").json()
+    assert demo["price"]["status"] == "SYNTHETIC"
+    assert demo["price"]["source"] == "demo"
+    assert demo["price"]["value"] == float(precio_demostracion_mxn("75000002"))
+    assert demo["price"]["value"] != 0
 
 
 def test_product_404(tmp_path: Path) -> None:
@@ -79,6 +82,21 @@ def test_product_404(tmp_path: Path) -> None:
 def test_products_por_codes(tmp_path: Path) -> None:
     respuesta = _client(tmp_path).get("/products", params={"codes": "75000001,75000002,nope"})
     assert [p["code"] for p in respuesta.json()] == ["75000001", "75000002"]
+
+
+def test_alternativas_por_http(tmp_path: Path) -> None:
+    cliente = _client(tmp_path)
+    perfil = UserProfile().model_dump()
+    respuesta = cliente.post("/ranking/alternatives", json={"code": "75000001", "profile": perfil})
+    assert respuesta.status_code == 200
+    cuerpo = respuesta.json()
+    assert cuerpo["reason"] == "ok"
+    assert cuerpo["category"] == "en:breads"
+    assert [item["code"] for item in cuerpo["items"]] == ["75000002", "75000005", "75000003"]
+    assert cuerpo["items"][0]["explanation"]["dimensions"]["D1"]["subscore"] == 70.0
+    assert cliente.get("/events").json() == []
+    faltante = cliente.post("/ranking/alternatives", json={"code": "no-existe", "profile": perfil})
+    assert faltante.status_code == 404
 
 
 def test_ranking_y_explain(tmp_path: Path) -> None:
@@ -149,6 +167,20 @@ def test_from_referencia_frame_usa_nombre_homologado() -> None:
     assert cat.df.iloc[0]["d1"] is not None
 
 
+def test_from_referencia_frame_conserva_nombre_crudo_si_homologado_falta() -> None:
+    df = pd.DataFrame(
+        [
+            {
+                "code": "75000002",
+                "product_name": "Leche entera",
+                "product_name_homologated": None,
+            }
+        ]
+    )
+    cat = Catalog.from_referencia_frame(df, "test_ref")
+    assert cat.df.iloc[0]["product_name"] == "Leche entera"
+
+
 def test_detalle_conserva_nombre_literal_nan() -> None:
     """El dataset guarda el nombre real ``NAN``; no es el NaN de pandas (B13)."""
     detalle = detalle_desde_fila(
@@ -208,5 +240,6 @@ def test_detalle_precio_texto_b14_y_ausencia() -> None:
     vacio = detalle_desde_fila(
         pd.Series({"code": "2", "price": None, "price_status": "UNAVAILABLE"})
     )
-    assert vacio.price.value is None
-    assert vacio.price.status == "UNAVAILABLE"
+    assert vacio.price.status == "SYNTHETIC"
+    assert vacio.price.source == "demo"
+    assert vacio.price.value == float(precio_demostracion_mxn("2"))

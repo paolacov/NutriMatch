@@ -11,7 +11,7 @@ producto, simplemente no siempre sincronizados entre sí por quien contribuyó e
 Este módulo **no modifica el snapshot crudo**: `datos/procesados/off_mexico_20260919.parquet` sigue
 teniendo `product_name` vacío tal cual lo entrega OFF, consistente con A2 (el dato crudo se
 conserva, nunca se sobreescribe en silencio). La resolución se aplica solo al construir el nombre
-que se muestra (notebook, ficha de producto, UI futura), con una bandera de trazabilidad que indica
+que se muestra (notebook y ficha de producto), con una bandera de trazabilidad que indica
 si se usó un campo de respaldo — el mismo patrón que `salt_100g_flag_correccion_escala_aplicada`
 (A21): reconciliar datos del propio producto, no inventar ni traer un valor externo.
 """

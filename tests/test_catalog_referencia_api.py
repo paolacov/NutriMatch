@@ -1,6 +1,8 @@
-"""Regresión del recableado API → dataset_referencia_20260927.parquet.
+"""Regresión del dataset histórico `dataset_referencia_20260927.parquet` (16 851).
 
-Carga el Parquet real. No toca fórmulas: comprueba conteos ya publicados y el contrato HTTP.
+El default de la API es el catálogo operativo de 13 093
+(`dataset_referencia_20261002.parquet`). Estas pruebas fijan el archivo del 27
+para no mezclar los dos universos.
 """
 
 from __future__ import annotations
@@ -16,6 +18,8 @@ from nutrimatch.core.config import Settings, get_settings
 from nutrimatch.services.catalog import Catalog
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+PARQUET_REFERENCIA_A43 = REPO_ROOT / "datos" / "procesados" / "dataset_referencia_20260927.parquet"
+PARQUET_INGESTA_LIMPIA = REPO_ROOT / "datos" / "procesados" / "off_mexico_20260929.parquet"
 N = 16_851
 N_PUNTUABLE = 5_864
 N_PRICE_REAL = 263
@@ -77,7 +81,11 @@ CARO = {
 @pytest.fixture(scope="module")
 def settings_api() -> Settings:
     get_settings.cache_clear()
-    return get_settings()
+    return Settings(
+        referencia_filename=PARQUET_REFERENCIA_A43.name,
+        snapshot_id="off_csv_20260919",
+        _env_file=None,
+    )
 
 
 @pytest.fixture(scope="module")
@@ -99,9 +107,21 @@ def cliente(catalogo: Catalog, tmp_path_factory: pytest.TempPathFactory) -> Test
     return TestClient(create_app(catalog=catalogo, db_path=db))
 
 
-def test_config_apunta_al_20260927(settings_api: Settings) -> None:
+def test_config_por_defecto_apunta_al_catalogo_operativo() -> None:
+    get_settings.cache_clear()
+    try:
+        settings = Settings(_env_file=None)
+        assert settings.referencia_filename == "dataset_referencia_20261002.parquet"
+        assert settings.referencia_parquet().name == "dataset_referencia_20261002.parquet"
+        assert settings.snapshot_id == "off_csv_20260929"
+        assert settings.snapshot_parquet() == PARQUET_INGESTA_LIMPIA
+    finally:
+        get_settings.cache_clear()
+
+
+def test_config_a43_sigue_disponible_para_ranking(settings_api: Settings) -> None:
     assert settings_api.referencia_filename == "dataset_referencia_20260927.parquet"
-    assert settings_api.referencia_parquet() == REPO_ROOT / "datos" / "procesados" / "dataset_referencia_20260927.parquet"
+    assert settings_api.referencia_parquet() == PARQUET_REFERENCIA_A43
 
 
 def test_parquet_universo_y_calidad(parquet_crudo) -> None:
@@ -148,14 +168,35 @@ def test_meta_y_ficha_por_gtin(cliente: TestClient) -> None:
     assert pop["price"]["source"] == "open_prices"
 
     tisane = cliente.get(f"/products/{CODE_NO_PUNTUABLE}").json()
-    assert tisane["price"]["status"] == "UNAVAILABLE"
-    assert tisane["price"]["value"] is None
+    assert tisane["price"]["status"] == "SYNTHETIC"
+    assert tisane["price"]["source"] == "demo"
+    assert tisane["price"]["value"] not in (None, 0)
     assert any(n["per100g"] is None for n in tisane["nutrients"])
 
     sin_nombre = cliente.get(f"/products/{CODE_SIN_NOMBRE}").json()
     assert sin_nombre["name"]["value"] is None
     assert sin_nombre["name"]["status"] == "UNAVAILABLE"
-    assert sin_nombre["price"]["value"] is None
+    assert sin_nombre["price"]["status"] == "SYNTHETIC"
+    assert sin_nombre["price"]["source"] == "demo"
+
+
+def test_catalogo_incluye_no_puntuables_paginado(cliente: TestClient) -> None:
+    categorias = cliente.get("/catalog/categories").json()
+    assert categorias[0]["id"] == ""
+    assert categorias[0]["count"] == N
+
+    pagina = cliente.get("/catalog/products", params={"page": 1, "page_size": 24}).json()
+    assert pagina["total"] == N
+    assert pagina["page_size"] == 24
+    assert pagina["total_pages"] == 703
+    assert len(pagina["items"]) == 24
+
+    hueco = cliente.get("/catalog/products", params={"search": CODE_NO_PUNTUABLE}).json()
+    assert hueco["total"] >= 1
+    assert any(item["code"] == CODE_NO_PUNTUABLE for item in hueco["items"])
+
+    sin_nombre = cliente.get("/catalog/products", params={"search": CODE_SIN_NOMBRE}).json()
+    assert any(item["code"] == CODE_SIN_NOMBRE and item["name"]["value"] is None for item in sin_nombre["items"])
 
 
 def test_busqueda_por_nombre(cliente: TestClient) -> None:

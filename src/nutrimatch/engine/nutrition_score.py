@@ -5,14 +5,10 @@ Los percentiles que consume este módulo vienen de
 agnósticos del objetivo, 0 el valor más bajo del grupo de referencia y 100 el más alto. Este
 módulo les aplica el signo y los agrega en un único subpuntaje D1.
 
-**Alcance de esta versión (paso 7, ver plan del 2026-09-20)**: D1 solo puntúa los 5 nutrientes
-con signo fijo y universal que el documento maestro define sin ambigüedad — azúcares, sal y
-grasa saturada (menos es mejor), fibra y proteína (más es mejor). `energy-kcal_100g`,
-`fat_100g` (grasa total) y `carbohydrates_100g` el documento los deja "según meta" sin definir
-en ningún lugar del proyecto qué valores toma esa meta; en vez de inventar una taxonomía de
-objetivos, esta versión los deja fuera del score (siguen calculándose y mostrándose como
-percentil informativo, ver `nutrimatch.engine.constants.CORE8_NUTRIENTES`). Añadirlos más
-adelante es aditivo: no rompe esta función ni sus llamadas existentes.
+El alcance de D1 está cerrado en A27. Se puntúan cinco nutrientes de signo fijo:
+azúcares, sal y grasa saturada (signo −1) y fibra y proteína (signo +1).
+Energía, grasa total y carbohidratos conservan percentil y se muestran en la
+ficha; no entran al subpuntaje mientras no exista una taxonomía de objetivos.
 """
 
 from __future__ import annotations
@@ -30,8 +26,7 @@ NUTRIENTES_D1_SIGNO: dict[str, int] = {
     "proteins_100g": 1,
 }
 
-# Calculados en el paso 6 (tienen percentil en matriz_nut_100g) pero sin signo definido: no
-# puntúan en esta versión de D1. Ver docstring del módulo.
+# Percentil calculado en la matriz. Fuera de D1 por A27: no tienen signo fijo.
 NUTRIENTES_D1_PENDIENTES: tuple[str, ...] = (
     "energy-kcal_100g",
     "fat_100g",

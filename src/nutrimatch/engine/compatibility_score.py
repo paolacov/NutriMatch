@@ -4,13 +4,9 @@ Combina los subpuntajes ya calculados de D1 (`nutrition_score`), D2 (`processing
 y D3 (`preference_score`) con los pesos de la usuaria (`user_weights`), aplicando la regla de
 cobertura `cov` (`coverage`) y devolviendo una explicación completa por dimensión (A10).
 
-**Fórmula de renormalización propuesta en el paso 7, pendiente de verificación en el
-notebook**: cuando una dimensión no tiene dato, el score se calcula como el promedio ponderado
-de las dimensiones disponibles, renormalizado sobre la suma de sus pesos
-(``Σ wᵢ·Dᵢ / Σ wᵢ`` solo sobre las dimensiones con dato) — coherente con que `cov` ya mide
-exactamente esa fracción de peso disponible. AGENTS.md (A7) fija que el score es "la suma
-ponderada por los pesos de A6", pero no especifica esta renormalización para el caso de datos
-parciales; se propone aquí y se documenta como tal.
+Cuando falta una dimensión, el score se renormaliza sobre las dimensiones con
+dato (A26): ``Σ wᵢ·Dᵢ / Σ wᵢ``. La dimensión ausente no se trata como cero.
+Si ``cov < 0,5``, el score final es NULL.
 """
 
 from __future__ import annotations

@@ -4,11 +4,9 @@ La usuaria ordena tres prioridades (nutrición D1, procesamiento D2, preferencia
 manipular ningún número directamente ("Sin controles numéricos directos", A6). Ese orden se
 convierte aquí en pesos que suman 1.
 
-**Fórmula propuesta en el paso 7, pendiente de verificación en el notebook**: pesos
-proporcionales a una secuencia fija 3/2/1 según la posición (1º lugar = 3 puntos, 2º = 2,
-3º = 1), normalizada para sumar 1. Da 0,50 / 0,33 / 0,17 para 1º/2º/3º lugar. Es una escala
-simple y fácil de explicar en la interfaz, no una medición: se documenta como propuesta, igual
-que se hizo con la fórmula de D2 en el paso 6 (decisión A17/A23).
+La conversión está cerrada en A25. Cada posición recibe 3, 2 o 1 punto y el
+resultado se normaliza para sumar 1: 0,50 / 0,33 / 0,17. Es una escala fija de
+presentación, no una medición estimada sobre el catálogo.
 
 `perfil_base` (Equilibrado / Salud máxima / Económico / Mínimo procesado) es un concepto de
 UI/dominio que fija un orden de prioridades por defecto; este módulo no lo modela, solo recibe

@@ -72,6 +72,32 @@ class RankingRequest(BaseModel):
     top_n: int = 25
 
 
+AlternativeReason = Literal["ok", "sin_categoria", "sin_opciones"]
+
+
+class AlternativesRequest(BaseModel):
+    """Pide alternativas de un producto ya elegido. El perfil es el de la sesión."""
+
+    code: str
+    profile: UserProfile
+
+
+class AlternativesResult(BaseModel):
+    """Hasta cinco pares del mismo `categoria_referencia`, solo de la banda de ranking.
+
+    El orden es el score existente. El precio no entra. Si el producto no tiene
+    categoría de referencia, o nadie más de ese grupo entra al ranking, `items` va vacío.
+    """
+
+    code: str
+    category: str | None
+    reason: AlternativeReason
+    snapshot_id: str
+    engine_version: str
+    total: int
+    items: list[RankingItem]
+
+
 class RankingResult(BaseModel):
     snapshot_id: str
     engine_version: str

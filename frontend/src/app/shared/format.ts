@@ -5,7 +5,9 @@ import {
   LABEL_CHOICES,
   PRIORITY_LABELS,
   Product,
+  UserProfile,
 } from '../core/models/domain';
+import { selloLabel } from './sello-label';
 
 const TAG_LABELS = new Map<string, string>([
   ...ALLERGEN_CHOICES,
@@ -17,37 +19,147 @@ const TAG_LABELS = new Map<string, string>([
   ['es:exceso-grasas-saturadas', 'Exceso de grasas saturadas'],
   ['es:exceso-grasas-trans', 'Exceso de grasas trans'],
   ['es:exceso-sodio', 'Exceso de sodio'],
+  ['en:sulphur-dioxide-and-sulphites', 'Sulfitos'],
+  ['en:mustard', 'Mostaza'],
+  ['en:celery', 'Apio'],
+  ['en:molluscs', 'Moluscos'],
 ]);
 
 const FLAG_LABELS: Record<string, string> = {
   D1_sin_dato: 'Sin dato de nutrición',
   D2_sin_dato: 'Sin dato de procesamiento',
   D3_sin_dato: 'Sin dato de etiquetas',
-  alergia_no_verificable: 'Alérgenos no verificables',
-  dieta_no_verificable: 'Dieta no verificable',
+  alergia_no_verificable: 'Alérgenos: no se puede determinar',
+  dieta_no_verificable: 'Dieta: no se puede determinar',
 };
+
+export interface FlagContext {
+  valuedLabels: string[];
+  productLabels: string[];
+  allergenTags?: string[];
+  diet?: UserProfile['diet'];
+}
 
 export function displayName(product: Product): string {
   return product.name.value ?? 'Sin nombre verificado';
 }
 
-export function formatPrice(product: Product): string {
-  if (product.price.status === 'SYNTHETIC' && product.price.value !== null) {
-    return `$${product.price.value.toFixed(2)} · simulado`;
+export function resolveCatalogPrice(api: {
+  code: string;
+  price: Product['price'];
+}): Product['price'] {
+  if (api.price.status === 'REAL' && api.price.value !== null) {
+    return {
+      value: api.price.value,
+      status: 'REAL',
+      source: api.price.source,
+    };
   }
-  if (product.price.status === 'UNAVAILABLE' || product.price.value === null) {
+  if (api.price.status === 'SYNTHETIC' && api.price.value !== null) {
+    return {
+      value: api.price.value,
+      status: 'SYNTHETIC',
+      source: api.price.source ?? 'demo',
+      note: api.price.note ?? 'Dato simulado para demostración',
+    };
+  }
+  return { value: null, status: 'UNAVAILABLE' };
+}
+
+export function priceAmount(product: Product): string | null {
+  const value = product.price.value;
+  if (value === null || !Number.isFinite(value)) {
+    return null;
+  }
+  if (product.price.status !== 'REAL' && product.price.status !== 'SYNTHETIC') {
+    return null;
+  }
+  return `$${value.toFixed(2)}`;
+}
+
+export function formatPrice(product: Product): string {
+  const amount = priceAmount(product);
+  const badge = priceKindLabel(product);
+  if (product.price.status === 'SYNTHETIC' && amount) {
+    return `${amount} · ${badge}`;
+  }
+  if (!amount) {
     return 'Precio no disponible';
   }
-  return `$${product.price.value.toFixed(2)}`;
+  return amount;
+}
+
+export function priceKindLabel(product: Product): string {
+  if (product.price.status === 'REAL' && product.price.value !== null) {
+    const fuente = priceSourceShort(product.price.source);
+    return fuente ? `Precio real · ${fuente}` : 'Precio real';
+  }
+  if (product.price.status === 'SYNTHETIC' && product.price.value !== null) {
+    return 'Precio de demostración';
+  }
+  return 'Precio no disponible';
+}
+
+export function priceLine(product: Product): string {
+  const amount = priceAmount(product);
+  if (!amount) {
+    return 'Precio no disponible';
+  }
+  if (product.price.status === 'REAL') {
+    const fuente = priceSourceShort(product.price.source);
+    return fuente ? `${amount} · ${fuente}` : `${amount} · Precio real`;
+  }
+  return `${amount} · Precio de demostración`;
+}
+
+export function percentilePlace(percentile: number): string {
+  if (percentile > 50) {
+    return 'Su valor está por encima de la mayoría de los productos de su grupo.';
+  }
+  if (percentile < 50) {
+    return 'Su valor está por debajo de la mayoría de los productos de su grupo.';
+  }
+  return 'Su valor está en la mitad de los productos de su grupo.';
+}
+
+export function priceSourceShort(source: string | null | undefined): string | null {
+  if (source === 'open_prices') {
+    return 'Open Prices';
+  }
+  if (source === 'qqp_profeco' || source === 'profeco') {
+    return 'PROFECO';
+  }
+  return null;
+}
+
+export function priceSourceLine(product: Product): string | null {
+  if (product.price.status !== 'REAL' || product.price.value === null) {
+    return null;
+  }
+  return `Fuente: ${priceSourceLabel(product.price.source)}`;
+}
+
+export function brandPriceLine(product: Product): string {
+  const marca = product.brand.value?.trim() || 'Marca no disponible';
+  return `${marca} · ${formatPrice(product)}`;
+}
+
+export function historialProductName(product: Product | undefined): string {
+  const nombre = product?.name.value;
+  if (typeof nombre === 'string' && nombre.trim()) {
+    return nombre;
+  }
+  return 'Producto sin nombre verificado';
 }
 
 export function priceCaption(product: Product): string {
-  if (product.price.status === 'REAL' && product.price.value !== null) {
-    const fuente = priceSourceLabel(product.price.source);
-    return `Precio de referencia · $${product.price.value.toFixed(2)} · ${fuente}`;
+  const amount = priceAmount(product);
+  const badge = priceKindLabel(product);
+  if (amount && product.price.status === 'REAL') {
+    return `${amount} · ${badge}`;
   }
-  if (product.price.status === 'SYNTHETIC' && product.price.value !== null) {
-    return `Dato simulado para demostración · $${product.price.value.toFixed(2)}`;
+  if (amount && product.price.status === 'SYNTHETIC') {
+    return `${amount} · ${badge}`;
   }
   if (product.price.status === 'IMPUTED') {
     return 'Precio imputado · no es un precio de anaquel';
@@ -87,8 +199,52 @@ export function humanizeTag(tag: string): string {
   return segmento.replace(/-/g, ' ').trim() || tag;
 }
 
-export function flagLabel(flag: string): string {
+export function etiquetaDeSello(tag: string): string {
+  const conocido = TAG_LABELS.get(tag);
+  if (conocido) {
+    return conocido.replace(/\s*\(sello\)\s*$/i, '');
+  }
+  return selloLabel(tag);
+}
+
+export function usableProductImage(url: string | null | undefined): string | null {
+  const texto = url?.trim() ?? '';
+  if (!texto || /\/invalid\//i.test(texto)) {
+    return null;
+  }
+  if (!/^https?:\/\//i.test(texto)) {
+    return null;
+  }
+  return texto;
+}
+
+export function d3MissingReason(valuedLabels: string[], productLabels: string[]): string {
+  if (!valuedLabels.length) {
+    return 'No elegiste etiquetas que valorar; esta dimensión no se evalúa.';
+  }
+  if (!productLabels.length) {
+    return 'El producto no tiene etiquetas registradas. No se puede determinar.';
+  }
+  return 'No se puede determinar esta dimensión con la información disponible.';
+}
+
+export function flagLabel(flag: string, ctx?: FlagContext): string {
+  if (flag === 'D3_sin_dato') {
+    return d3MissingReason(ctx?.valuedLabels ?? [], ctx?.productLabels ?? []);
+  }
   return FLAG_LABELS[flag] ?? humanizeTag(flag);
+}
+
+export function visibleFlags(flags: string[], profile: UserProfile): string[] {
+  return flags.filter((flag) => {
+    if (flag === 'alergia_no_verificable' && !profile.allergenTags.length) {
+      return false;
+    }
+    if (flag === 'dieta_no_verificable' && !profile.diet) {
+      return false;
+    }
+    return true;
+  });
 }
 
 export function allergyLabel(status: AllergyStatus): string {
@@ -98,7 +254,7 @@ export function allergyLabel(status: AllergyStatus): string {
     case 'no_apto':
       return 'no apto';
     case 'no_verificable':
-      return 'no verificable';
+      return 'no se puede determinar';
   }
 }
 
@@ -109,8 +265,49 @@ export function dietLabel(status: DietStatus): string {
     case 'incompatible':
       return 'incompatible';
     case 'no_verificable':
-      return 'no verificable';
+      return 'no se puede determinar';
   }
+}
+
+export function allergyCaption(status: AllergyStatus, allergenTags: string[]): string | null {
+  if (!allergenTags.length) {
+    return null;
+  }
+  return `Alergia: ${allergyLabel(status)}`;
+}
+
+export function dietCaption(status: DietStatus, diet: UserProfile['diet']): string | null {
+  if (!diet) {
+    return null;
+  }
+  return `Dieta: ${dietLabel(status)}`;
+}
+
+export function scorePhrase(product: Product): string {
+  const { band, score } = product.fit;
+  if (band === 'excluido') {
+    return 'Este producto no entra en la comparación por una restricción de tu perfil.';
+  }
+  if (band === 'no_verificable') {
+    return 'No se puede determinar si este producto encaja con tus restricciones: falta información verificable.';
+  }
+  if (band === 'informacion_insuficiente' || score === null) {
+    return 'No hay información suficiente para calcular un encaje con tus prioridades.';
+  }
+  if (score >= 70) {
+    return 'Este producto obtiene una puntuación alta para tus prioridades con la información disponible.';
+  }
+  if (score >= 40) {
+    return 'Este producto obtiene una puntuación intermedia para tus prioridades con la información disponible.';
+  }
+  return 'Este producto obtiene una puntuación baja para tus prioridades con la información disponible.';
+}
+
+export function coveragePhrase(cov: number): string {
+  if (cov >= 0.5) {
+    return 'La recomendación se basa en información suficiente del producto.';
+  }
+  return 'Falta información en más de la mitad de lo que pesa tu perfil. No se compara en el ranking.';
 }
 
 const CATEGORY_ES: Record<string, string> = {
@@ -168,6 +365,22 @@ const CATEGORY_ES: Record<string, string> = {
   'flavored waters': 'Aguas saborizadas',
   'en:dehydrated-soups': 'Sopas deshidratadas',
   'dehydrated soups': 'Sopas deshidratadas',
+  'en:milk-and-dairy-products': 'Lácteos',
+  'milk and dairy products': 'Lácteos',
+  'en:cereals-and-potatoes': 'Cereales y pan',
+  'cereals and potatoes': 'Cereales y pan',
+  'en:sugary-snacks': 'Dulces',
+  'sugary snacks': 'Dulces',
+  'en:fats-and-sauces': 'Salsas y aceites',
+  'fats and sauces': 'Salsas y aceites',
+  'en:fish-meat-eggs': 'Carnes y huevo',
+  'fish meat eggs': 'Carnes y huevo',
+  'en:fruits-and-vegetables': 'Frutas y verduras',
+  'fruits and vegetables': 'Frutas y verduras',
+  'en:composite-foods': 'Preparados',
+  'composite foods': 'Preparados',
+  'en:baby-foods-and-milks': 'Lácteos infantiles',
+  'baby foods and milks': 'Lácteos infantiles',
   'en:breads': 'Panes',
   breads: 'Panes',
   'en:durum-wheat-pasta': 'Pasta de trigo durum',
@@ -540,6 +753,160 @@ export function scoreCaption(product: Product): string {
     return 'Dato simulado para demostración';
   }
   return 'Aún no se calculó el encaje';
+}
+
+export function catalogDataCaption(product: Product): string {
+  const withData = product.nutrients.filter((row) => row.per100g !== null);
+  if (!withData.length) {
+    return 'Información nutricional no disponible';
+  }
+  if (withData.length < 4) {
+    return 'Información nutricional parcial';
+  }
+  return 'Información nutricional disponible';
+}
+
+export function catalogNutrientLine(product: Product): string | null {
+  const wanted = new Set(['proteins', 'sugars']);
+  const parts = product.nutrients
+    .filter((row) => wanted.has(row.key) && row.per100g !== null)
+    .map((row) => `${row.label} ${Number(row.per100g).toFixed(1)} ${row.unit}`);
+  return parts.length ? parts.join(' · ') : null;
+}
+
+export type CatalogPlaceholder =
+  | 'dairy'
+  | 'drink'
+  | 'cereal'
+  | 'sweet'
+  | 'snack'
+  | 'sauce'
+  | 'protein'
+  | 'produce'
+  | 'prepared'
+  | 'shelf';
+
+const PLACEHOLDER_POR_TAG: Record<string, CatalogPlaceholder> = {
+  'en:milk-and-dairy-products': 'dairy',
+  'en:dairies': 'dairy',
+  'en:beverages': 'drink',
+  'en:alcoholic-beverages': 'drink',
+  'en:cereals-and-potatoes': 'cereal',
+  'en:cereals-and-their-products': 'cereal',
+  'en:breads': 'cereal',
+  'en:sugary-snacks': 'sweet',
+  'en:salty-snacks': 'snack',
+  'en:fats-and-sauces': 'sauce',
+  'en:sauces': 'sauce',
+  'en:spreads': 'sauce',
+  'en:fish-meat-eggs': 'protein',
+  'en:fruits-and-vegetables': 'produce',
+  'en:composite-foods': 'prepared',
+};
+
+export function catalogPlaceholderId(category: string | null | undefined): CatalogPlaceholder {
+  const k = (category ?? '').toLowerCase();
+  const exacto = PLACEHOLDER_POR_TAG[k];
+  if (exacto) {
+    return exacto;
+  }
+  if (/milk|yogurt|cheese|dairy|cream|leche|queso|yogur|butter/.test(k)) {
+    return 'dairy';
+  }
+  if (/water|beverage|juice|soda|coffee|tea|jugo|refresco|cola|beer|wine|alcohol/.test(k)) {
+    return 'drink';
+  }
+  if (/flour|cornmeal|cereal|oat|muesli|grain|rice|quinoa|polenta|harina|pasta|bread|tortilla|toast|bakery|pan/.test(k)) {
+    return 'cereal';
+  }
+  if (/gum|candy|chocolate|biscuit|sweet|dulce|chicle|jam|ice-cream|helado/.test(k)) {
+    return 'sweet';
+  }
+  if (/snack|crisp|chip|botana/.test(k)) {
+    return 'snack';
+  }
+  if (/sauce|oil|spread|salsa|aceite|fat|condiment|untable/.test(k)) {
+    return 'sauce';
+  }
+  if (/fish|meat|tuna|egg|turkey|seafood|atun|pescado|sausage/.test(k)) {
+    return 'protein';
+  }
+  if (/fruit|vegetable|produce|verdura|fruta|bean|legume/.test(k)) {
+    return 'produce';
+  }
+  if (/soup|meal|composite|preparado|sopa|ready/.test(k)) {
+    return 'prepared';
+  }
+  return 'shelf';
+}
+
+export function catalogPlaceholderSrc(category: string | null | undefined): string {
+  return `/placeholders/${catalogPlaceholderId(category)}.jpg`;
+}
+
+const CALIDAD_VISIBLE: Record<string, string> = {
+  alta: 'Alta',
+  media: 'Media',
+  baja: 'Baja',
+  insuficiente: 'Insuficiente',
+};
+
+export function dataQualityLevelName(product: Product): string | null {
+  const crudo = product.dataQualityLevel?.trim().toLowerCase();
+  if (crudo && CALIDAD_VISIBLE[crudo]) {
+    return CALIDAD_VISIBLE[crudo];
+  }
+  return product.dataQualityLabel?.trim() || null;
+}
+
+export function dataQualityHeadline(product: Product): string | null {
+  const nivel = dataQualityLevelName(product);
+  if (!nivel) {
+    return null;
+  }
+  return `Calidad de información: ${nivel}`;
+}
+
+export function dataQualityDetails(detalle: string | null | undefined): string[] {
+  if (!detalle?.trim()) {
+    return [];
+  }
+  return detalle
+    .split(';')
+    .map((parte) => parte.trim())
+    .filter(Boolean);
+}
+
+export function friendlyQuantity(quantity: string | null | undefined): string | null {
+  const raw = quantity?.trim();
+  if (!raw) {
+    return null;
+  }
+  const metric = raw.match(/\(\s*([^)]+?)\s*\)\s*$/);
+  if (metric && /\d/.test(metric[1]) && /\b(kg|g|ml|l)\b/i.test(metric[1])) {
+    return metric[1].trim();
+  }
+  return raw;
+}
+
+export function friendlyNutrientText(value: number | null, unit: string): string {
+  if (value === null || !Number.isFinite(value)) {
+    return 'No disponible';
+  }
+  const kcal = unit.trim().toLowerCase() === 'kcal';
+  const rounded = Number(value.toFixed(kcal ? 0 : 1));
+  const text = Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  return `${text} ${unit}`;
+}
+
+export function nutrientSheetLabel(key: string, fallback: string): string {
+  if (key === 'energy') {
+    return 'Energía';
+  }
+  if (key === 'saturated-fat') {
+    return 'Grasas saturadas';
+  }
+  return fallback;
 }
 
 export function formatCount(n: number): string {

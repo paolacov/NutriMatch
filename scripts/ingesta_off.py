@@ -13,7 +13,8 @@ El proceso tiene cuatro fases y se detiene en cuanto una falla:
   2. Esquema     lee la cabecera real, detecta el separador y reporta que
                  columnas necesarias estan presentes y cuales faltan.
   3. Filtrado    recorre el archivo comprimido con DuckDB sin descomprimirlo a
-                 disco y escribe en Parquet solo las filas de Mexico.
+                 disco, se queda con Mexico y aplica tres candados de calidad
+                 (no-alimento, integridad minima, identidad) al Parquet.
   4. Reconcilia  compara el numero de filas con el count medido en la API para
                  detectar un criterio de filtrado mal planteado.
 
@@ -38,7 +39,8 @@ import duckdb
 import httpx
 
 EXPORT_URL = "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz"
-USER_AGENT = "NutriMatch/0.1-dev (MVP academico; contacto: paola.nutrimatch@proton.me)"
+# Open Food Facts exige un agente identificable en cada petición.
+USER_AGENT = "NutriMatch/0.1.0 (contacto: paola.nutrimatch@proton.me)"
 
 # Count medido en la API de produccion el 2026-09-19 con
 # countries_tags_en=mexico. Sirve de contraste, no de verdad absoluta: el
@@ -49,7 +51,7 @@ TOLERANCIA_RECONCILIACION = 0.10
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
-# Columnas que el MVP necesita, agrupadas por bloque del inventario de datos.
+# Columnas que el sistema necesita, agrupadas por bloque del inventario de datos.
 # La fase 2 reporta cuales existen realmente en el export; no se asume ninguna.
 COLUMNAS_REQUERIDAS = {
     "identidad": [
@@ -133,6 +135,237 @@ COLUMNAS_PAIS = [
     ("countries_en", "mexico"),
     ("countries", "mexico"),
 ]
+
+# Candado 1: taxonomía OFF de no-alimento (denylist). Se busca como subcadena
+# en categories_tags / main_category / categories / pnns_groups_1. No se exige
+# categoría presente: ~48 % del universo México no trae main_category (A42);
+# esos casos los cubren integridad e identidad, no un allow-list que vaciaría
+# el catálogo buscable (A19).
+TAGS_NO_ALIMENTO = (
+    "en:non-food-products",
+    "en:open-beauty-facts",
+    "en:cosmetics",
+    "en:cosmetic",
+    "en:cosmeticos",
+    "en:clothing",
+    "en:clothes",
+    "en:fashion",
+    "en:pet-food",
+    "en:tobacco",
+    "en:cigarettes",
+    "en:electronics",
+    "en:electronic-products",
+)
+
+COLUMNAS_CATEGORIA_FILTRO = (
+    "categories_tags",
+    "main_category",
+    "categories",
+    "pnns_groups_1",
+    "pnns_groups_2",
+    "food_groups_tags",
+)
+
+# Candado 2: al menos una señal de ficha alimentaria real.
+COLUMNAS_INTEGRIDAD_TEXTO = ("ingredients_text", "ingredients_tags", "nova_group")
+COLUMNAS_MACRO_CORE = (
+    "energy-kcal_100g",
+    "fat_100g",
+    "carbohydrates_100g",
+    "proteins_100g",
+    "sugars_100g",
+    "fiber_100g",
+    "salt_100g",
+)
+# Suma de macros en cero "sospechosa": todos los CORE anteriores, incluida la sal
+# (la sal de mesa tiene salt_100g > 0 y no debe caer aquí).
+
+# Candado 3: nombres/marcas placeholder o GTIN pegado como nombre, sin respaldo.
+TOKENS_IDENTIDAD_BASURA = (
+    "test",
+    "unknown",
+    "vacio",
+    "vacío",
+    "dummy",
+    "lorem",
+    "placeholder",
+    "sample",
+    "cargando",
+)
+NOMBRES_PLACEHOLDER_EXACTOS = (
+    "cargando",
+    "cargando…",
+    "cargando...",
+    "unknown",
+    "test",
+    "vacio",
+    "vacío",
+    "dummy",
+    "sample",
+    "n/a",
+    "na",
+    "none",
+    "null",
+    "lorem ipsum",
+)
+MINIMO_DIGITOS_NOMBRE_BASURA = 8
+
+
+def _identificador_sql(columna: str) -> str:
+    return '"' + columna.replace('"', '""') + '"'
+
+
+def _sql_texto_presente(columna: str) -> str:
+    c = _identificador_sql(columna)
+    return f"({c} IS NOT NULL AND length(trim({c})) > 0)"
+
+
+def _sql_solo_digitos_largos(columna: str, minimo: int = MINIMO_DIGITOS_NOMBRE_BASURA) -> str:
+    c = _identificador_sql(columna)
+    return f"regexp_matches(trim(coalesce({c}, '')), '^[0-9]{{{minimo},}}$')"
+
+
+def clausula_pais(columna: str, valor: str) -> str:
+    """Filtro de mercado (México). Independiente de los candados de calidad."""
+    c = _identificador_sql(columna)
+    valor_sql = valor.replace("'", "''")
+    return f"{c} IS NOT NULL AND contains(lower({c}), '{valor_sql}')"
+
+
+def clausula_no_alimento(columnas_presentes: set[str]) -> str:
+    """Candado 1: excluye no-alimento y PNNS 'not food'. No exige categoría llena."""
+    campos = [c for c in COLUMNAS_CATEGORIA_FILTRO if c in columnas_presentes]
+    if not campos:
+        return "TRUE"
+    blob = " || ' ' || ".join(
+        f"lower(coalesce({_identificador_sql(c)}, ''))" for c in campos
+    )
+    denylist = " OR ".join(
+        f"contains(({blob}), '{tag.replace(chr(39), chr(39)+chr(39))}')" for tag in TAGS_NO_ALIMENTO
+    )
+    pnns_not_food = "FALSE"
+    if "pnns_groups_1" in columnas_presentes:
+        pnns_not_food = (
+            f"lower(trim(coalesce({_identificador_sql('pnns_groups_1')}, ''))) "
+            "IN ('not food', 'not-food', 'not_food')"
+        )
+    return f"NOT (({denylist}) OR ({pnns_not_food}))"
+
+
+def clausula_integridad_minima(columnas_presentes: set[str]) -> str:
+    """Candado 2: ingredientes, NOVA o al menos un macro core > 0.
+
+    Si todos los macros CORE parsean a 0 (o nulo) y no hay ingredientes/NOVA, no
+    hay señal. Si están declarados en 0 y tampoco hay ingredientes, es ficha
+    en cero sospechosa — no se acepta aunque el OR de macros sea vacuamente 0.
+    """
+    signals: list[str] = []
+    for col in COLUMNAS_INTEGRIDAD_TEXTO:
+        if col in columnas_presentes:
+            signals.append(_sql_texto_presente(col))
+
+    macros = [c for c in COLUMNAS_MACRO_CORE if c in columnas_presentes]
+    if macros:
+        positivos = " OR ".join(
+            f"coalesce(try_cast({_identificador_sql(c)} AS DOUBLE), 0) > 0" for c in macros
+        )
+        signals.append(f"({positivos})")
+
+    if not signals:
+        return "TRUE"
+    has_signal = " OR ".join(signals)
+
+    suma_cols = [c for c in COLUMNAS_MACRO_CORE if c in columnas_presentes]
+    if len(suma_cols) == len(COLUMNAS_MACRO_CORE):
+        suma = " + ".join(
+            f"coalesce(try_cast({_identificador_sql(c)} AS DOUBLE), 0)" for c in suma_cols
+        )
+        any_macro = " OR ".join(
+            f"try_cast({_identificador_sql(c)} AS DOUBLE) IS NOT NULL" for c in suma_cols
+        )
+        has_ingredient_or_nova = "FALSE"
+        for col in COLUMNAS_INTEGRIDAD_TEXTO:
+            if col in columnas_presentes:
+                piece = _sql_texto_presente(col)
+                has_ingredient_or_nova = (
+                    piece if has_ingredient_or_nova == "FALSE" else f"{has_ingredient_or_nova} OR {piece}"
+                )
+        suspicious_zero = (
+            f"(({suma}) = 0 AND ({any_macro}) AND NOT ({has_ingredient_or_nova}))"
+        )
+        return f"({has_signal}) AND NOT ({suspicious_zero})"
+    return f"({has_signal})"
+
+
+def clausula_identidad(columnas_presentes: set[str]) -> str:
+    """Candado 3: placeholder / nombre=GTIN, salvo que haya categoría o nombre de respaldo.
+
+    Un `product_name` que es solo un código de barras (p. ej. Jumex, Nestlé) se
+    conserva si hay `main_category`/`categories_tags`: el ruido está en el
+    nombre, no en el registro. El caso `0000100561067` (dígitos + sin categoría)
+    sí se elimina.
+    """
+    if "product_name" not in columnas_presentes:
+        return "TRUE"
+
+    nombre = _identificador_sql("product_name")
+    exactos = ", ".join(
+        "'" + n.replace("'", "''") + "'" for n in NOMBRES_PLACEHOLDER_EXACTOS
+    )
+    tokens = "|".join(TOKENS_IDENTIDAD_BASURA)
+    nombre_norm = f"lower(trim(coalesce({nombre}, '')))"
+    es_placeholder = (
+        f"({nombre_norm} IN ({exactos}) "
+        f"OR {nombre_norm} LIKE 'cargando%' "
+        f"OR regexp_matches({nombre_norm}, "
+        f"'(^|[^a-z0-9áéíóúüñ])({tokens})([^a-z0-9áéíóúüñ]|$)'))"
+    )
+    nombre_digitos = _sql_solo_digitos_largos("product_name")
+
+    respaldo = "FALSE"
+    for col in ("generic_name", "abbreviated_product_name"):
+        if col not in columnas_presentes:
+            continue
+        c = _identificador_sql(col)
+        respaldo_ok = (
+            f"({_sql_texto_presente(col)} AND NOT {_sql_solo_digitos_largos(col)} "
+            f"AND lower(trim({c})) NOT IN ({exactos}) AND lower(trim({c})) NOT LIKE 'cargando%')"
+        )
+        respaldo = respaldo_ok if respaldo == "FALSE" else f"{respaldo} OR {respaldo_ok}"
+
+    categoria = "FALSE"
+    for col in ("main_category", "categories_tags"):
+        if col in columnas_presentes:
+            pieza = _sql_texto_presente(col)
+            categoria = pieza if categoria == "FALSE" else f"{categoria} OR {pieza}"
+
+    marca = "FALSE"
+    marca_digitos = "FALSE"
+    if "brands" in columnas_presentes:
+        marca = _sql_texto_presente("brands")
+        marca_digitos = _sql_solo_digitos_largos("brands")
+
+    basura_con_contexto = (
+        f"(({es_placeholder}) AND NOT ({respaldo}) AND NOT (({marca}) AND ({categoria})))"
+        f" OR (({nombre_digitos}) AND NOT ({respaldo}) AND NOT ({categoria}))"
+        f" OR (({marca_digitos}) AND (NOT {_sql_texto_presente('product_name')} OR ({nombre_digitos})) "
+        f"AND NOT ({categoria}))"
+    )
+    return f"NOT ({basura_con_contexto})"
+
+
+def clausulas_calidad_alimento(columnas_presentes: set[str]) -> dict[str, str]:
+    """Tres candados de calidad, combinables con AND sobre el universo México."""
+    return {
+        "categorias": clausula_no_alimento(columnas_presentes),
+        "integridad": clausula_integridad_minima(columnas_presentes),
+        "identidad": clausula_identidad(columnas_presentes),
+    }
+
+
+def sql_where_calidad(columnas_presentes: set[str]) -> str:
+    partes = clausulas_calidad_alimento(columnas_presentes)
+    return " AND ".join(f"({partes[k]})" for k in ("categorias", "integridad", "identidad"))
 
 
 def log(mensaje: str) -> None:
@@ -305,7 +538,7 @@ def inspeccionar_esquema(ruta: Path) -> dict:
 
 
 def filtrar_mexico(ruta_gz: Path, esquema: dict, destino_parquet: Path) -> dict:
-    """Filtra Mexico con DuckDB en streaming y escribe el resultado en Parquet."""
+    """Filtra México (país) y escribe solo alimento válido en Parquet."""
     log("Fase 3: filtrando el universo Mexico con DuckDB (sin descomprimir a disco)")
     inicio = time.monotonic()
 
@@ -336,22 +569,37 @@ def filtrar_mexico(ruta_gz: Path, esquema: dict, destino_parquet: Path) -> dict:
         f")"
     )
 
-    columna = esquema["columna_pais"]
-    valor = esquema["valor_pais"]
-    condicion = f'"{columna}" IS NOT NULL AND contains(lower("{columna}"), \'{valor}\')'
+    presentes = set(esquema["columnas"])
+    where_pais = clausula_pais(esquema["columna_pais"], esquema["valor_pais"])
+    candados = clausulas_calidad_alimento(presentes)
+    where_calidad = sql_where_calidad(presentes)
 
     con.execute(
-        f"CREATE OR REPLACE TEMP VIEW off_mexico AS SELECT * FROM {lector} WHERE {condicion}"
+        f"CREATE OR REPLACE TEMP VIEW off_mexico_pais AS SELECT * FROM {lector} WHERE {where_pais}"
     )
+    n_pais = con.execute("SELECT count(*) FROM off_mexico_pais").fetchone()[0]
+    n_tras_categoria = con.execute(
+        f"SELECT count(*) FROM off_mexico_pais WHERE ({candados['categorias']})"
+    ).fetchone()[0]
+    n_tras_integridad = con.execute(
+        f"SELECT count(*) FROM off_mexico_pais "
+        f"WHERE ({candados['categorias']}) AND ({candados['integridad']})"
+    ).fetchone()[0]
+    n_tras_identidad = con.execute(
+        f"SELECT count(*) FROM off_mexico_pais WHERE {where_calidad}"
+    ).fetchone()[0]
+
+    parquet_sql = str(destino_parquet).replace("'", "''")
     con.execute(
-        f"COPY off_mexico TO '{destino_parquet}' (FORMAT PARQUET, COMPRESSION ZSTD)"
+        f"COPY (SELECT * FROM off_mexico_pais WHERE {where_calidad}) "
+        f"TO '{parquet_sql}' (FORMAT PARQUET, COMPRESSION ZSTD)"
     )
 
     filas = con.execute(
-        f"SELECT count(*) FROM read_parquet('{destino_parquet}')"
+        f"SELECT count(*) FROM read_parquet('{parquet_sql}')"
     ).fetchone()[0]
     codigos_unicos = con.execute(
-        f"SELECT count(DISTINCT code) FROM read_parquet('{destino_parquet}')"
+        f"SELECT count(DISTINCT code) FROM read_parquet('{parquet_sql}')"
     ).fetchone()[0]
 
     try:
@@ -363,19 +611,38 @@ def filtrar_mexico(ruta_gz: Path, esquema: dict, destino_parquet: Path) -> dict:
     duracion = time.monotonic() - inicio
     tamano = destino_parquet.stat().st_size
 
-    log(f"  Filas de Mexico: {filas:,}")
+    log(f"  Mexico (solo pais):               {n_pais:,}")
+    log(
+        f"  Tras candado categorias:          {n_tras_categoria:,}  "
+        f"(excluidos {n_pais - n_tras_categoria:,})"
+    )
+    log(
+        f"  Tras candado integridad:          {n_tras_integridad:,}  "
+        f"(excluidos {n_tras_categoria - n_tras_integridad:,})"
+    )
+    log(
+        f"  Tras candado identidad:           {n_tras_identidad:,}  "
+        f"(excluidos {n_tras_integridad - n_tras_identidad:,})"
+    )
+    log(f"  Filas escritas (alimento valido): {filas:,}")
     log(f"  Codigos unicos:  {codigos_unicos:,} (duplicados: {filas - codigos_unicos:,})")
     log(f"  Filas rechazadas por malformacion: {rechazos:,}")
     log(f"  Parquet escrito: {destino_parquet.name} ({formato_bytes(tamano)}) en {duracion:.0f} s")
 
     return {
         "filas": filas,
+        "filas_mexico_pais": n_pais,
+        "filas_tras_categorias": n_tras_categoria,
+        "filas_tras_integridad": n_tras_integridad,
+        "filas_tras_identidad": n_tras_identidad,
         "codigos_unicos": codigos_unicos,
         "duplicados": filas - codigos_unicos,
         "filas_rechazadas": rechazos,
         "bytes_parquet": tamano,
         "segundos": round(duracion, 1),
-        "condicion_filtrado": condicion,
+        "condicion_filtrado": where_pais,
+        "condicion_calidad": where_calidad,
+        "candados": candados,
     }
 
 
@@ -390,7 +657,7 @@ def reconciliar(filas: int) -> dict:
     desviacion = abs(delta) / API_MEXICO_COUNT
     dentro = desviacion <= TOLERANCIA_RECONCILIACION
 
-    log(f"  Export:  {filas:,} filas")
+    log(f"  Export (Mexico, filtro de pais):  {filas:,} filas")
     log(f"  API ({API_COUNT_FECHA}): {API_MEXICO_COUNT:,} productos")
     log(f"  Diferencia: {delta:+,} ({desviacion:.1%})")
 
@@ -444,7 +711,7 @@ def main() -> int:
         procedencia = descargar_export(ruta_gz, args.skip_download)
         esquema = inspeccionar_esquema(ruta_gz)
         filtrado = filtrar_mexico(ruta_gz, esquema, ruta_parquet)
-        conciliacion = reconciliar(filtrado["filas"])
+        conciliacion = reconciliar(filtrado["filas_mexico_pais"])
     except Exception as error:  # noqa: BLE001 - el script reporta y se detiene
         log(f"ERROR: {error}")
         return 1

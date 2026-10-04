@@ -105,9 +105,25 @@ def test_plato_no_inventa_grupo() -> None:
     assert plato[NO_CLASIFICADO]["n"] == 1
     assert plato[PLATO_CEREALES]["share"] == 0.5
     assert plato[NO_CLASIFICADO]["label"] == "no clasificado"
+    assert plato[PLATO_CEREALES]["codes"] == []
+    assert plato[NO_CLASIFICADO]["codes"] == []
     cats = {b["key"]: b for b in resumen["categories"]}
     assert cats["en:sodas"]["n"] == 1
     assert "en:breads" in cats
+
+
+def test_plato_codes_no_cambia_n_ni_share() -> None:
+    resumen = resumir_carrito(
+        [
+            {"code": "0074323081411", "food_groups_tags": "en:cereals", "main_category": "en:breads"},
+            {"code": "75000002", "food_groups_tags": "en:sodas", "main_category": "en:sodas"},
+        ]
+    )
+    plato = {b["key"]: b for b in resumen["plato"]}
+    assert plato[PLATO_CEREALES]["n"] == 1
+    assert plato[PLATO_CEREALES]["share"] == 0.5
+    assert plato[PLATO_CEREALES]["codes"] == ["0074323081411"]
+    assert plato[NO_CLASIFICADO]["codes"] == ["75000002"]
 
 
 def test_categoria_vacia_es_no_clasificado() -> None:

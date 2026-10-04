@@ -46,10 +46,7 @@ RANGO_VALIDO: dict[str, tuple[float, float]] = {
 # en notebooks/02_eda_universo_mexico.ipynb, sección 5).
 TAMANO_MINIMO_CATEGORIA = 30
 
-# Salvaguarda añadida en la transformación (paso 6), NO estaba en A16: el
-# tamaño nominal de una categoría (cuántos productos la traen como etiqueta)
-# no garantiza que haya suficientes productos CON DATO VÁLIDO para un
-# nutriente concreto. Evita calcular un percentil sobre un efectivo de 2 o 3
-# productos aunque la categoría nominal tenga 30+ miembros. Pendiente de que
-# Paola lo revise y confirme o ajuste.
+# Decisión A24. El tamaño nominal de la categoría (A16) no garantiza efectivo
+# con dato saneado para un nutriente. Por debajo de este mínimo el percentil
+# de ese nutriente es NULL.
 MINIMO_PEERS_PERCENTIL = 5

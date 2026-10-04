@@ -1,5 +1,5 @@
-"""Modelos de dominio (producto, usuario, carrito) independientes de la persistencia y de la UI.
+"""Modelos de dominio: el contrato validado vive en `nutrimatch.schemas` (pydantic v2).
 
-Regla invariable: un dato faltante se representa como NULL más una bandera explícita, NUNCA como
-cero.
+No se duplica aquí una segunda representación del perfil o del ranking. Regla invariable: un
+dato faltante se representa como NULL más una bandera explícita, NUNCA como cero.
 """

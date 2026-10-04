@@ -216,9 +216,31 @@ def _cubetas(claves: list[str], n_productos: int, orden: tuple[str, ...] | None 
             "label": PLATO_LABELS.get(clave, clave),
             "n": conteo.get(clave, 0),
             "share": (conteo.get(clave, 0) / denominador) if n_productos else 0.0,
+            "codes": [],
         }
         for clave in keys
     ]
+
+
+def _code_de_fila(fila: Mapping[str, Any]) -> str | None:
+    if _es_nulo(fila.get("code")):
+        return None
+    texto = str(fila.get("code")).strip()
+    return texto or None
+
+
+def _adjuntar_codes(
+    cubetas: list[dict[str, Any]],
+    claves: list[str],
+    codes: list[str | None],
+) -> list[dict[str, Any]]:
+    por_clave: dict[str, list[str]] = {}
+    for clave, code in zip(claves, codes, strict=True):
+        if code:
+            por_clave.setdefault(clave, []).append(code)
+    for cubeta in cubetas:
+        cubeta["codes"] = list(por_clave.get(cubeta["key"], []))
+    return cubetas
 
 
 def resumir_carrito(filas: list[Mapping[str, Any]]) -> dict[str, Any]:
@@ -262,12 +284,13 @@ def resumir_carrito(filas: list[Mapping[str, Any]]) -> dict[str, Any]:
 
     categorias = [_categoria_de_fila(fila) for fila in filas]
     platos = [grupo_plato(fila) for fila in filas]
+    codes = [_code_de_fila(fila) for fila in filas]
     return {
         "n_products": n,
         "method": metodo,
         "method_note": nota,
         "status": "DERIVED",
         "nutrients": nutrientes,
-        "plato": _cubetas(platos, n, PLATO_ORDEN),
-        "categories": _cubetas(categorias, n),
+        "plato": _adjuntar_codes(_cubetas(platos, n, PLATO_ORDEN), platos, codes),
+        "categories": _adjuntar_codes(_cubetas(categorias, n), categorias, codes),
     }
