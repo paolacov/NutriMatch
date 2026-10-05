@@ -6,9 +6,8 @@
       "framework": "angular"
     },
     "api": {
-      "root": ".",
-      "framework": "fastapi",
-      "entrypoint": "api/index.py"
+      "root": "api",
+      "framework": "fastapi"
     }
   },
   "rewrites": [
