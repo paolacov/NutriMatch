@@ -24,7 +24,7 @@
       }
     },
     {
-      "source": "/products",
+      "source": "/products/:path*",
       "destination": {
         "service": "api"
       }
