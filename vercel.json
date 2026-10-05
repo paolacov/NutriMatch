@@ -12,7 +12,49 @@
   },
   "rewrites": [
     {
-      "source": "^/(meta|search|products|catalog|ranking|cart|events|ai)(/.*)?$",
+      "source": "/meta",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/search",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/products",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/catalog/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/ranking/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/cart/:path*",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/events",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/ai/:path*",
       "destination": {
         "service": "api"
       }
