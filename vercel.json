@@ -1,32 +1,27 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/frontend/browser"
-      }
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "angular"
     },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "includeFiles": "{src/nutrimatch/**,datos/procesados/dataset_referencia_20261002.parquet}"
-      }
+    "api": {
+      "root": "api",
+      "framework": "fastapi"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "^/(meta|search|products|catalog|ranking|cart|events|ai)(/.*)?$",
-      "dest": "/api/index.py"
+      "source": "^/(meta|search|products|catalog|ranking|cart|events|ai)(/.*)?$",
+      "destination": {
+        "service": "api"
+      }
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "^(.*)$",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
     }
   ]
 }
