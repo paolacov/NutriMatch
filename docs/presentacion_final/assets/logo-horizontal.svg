@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 312 56" role="img" aria-label="NutriMatch">
-  <rect width="48" height="48" x="0" y="4" rx="12" fill="#0F6B63"/>
-  <path d="M9.5 32.6c6.8-12 21.8-12 28.5 0" fill="none" stroke="#E86A2A" stroke-width="1.7" stroke-linecap="round"/>
-  <path d="M15 30.6 21.9 37.3 34.8 21.2" fill="none" stroke="#FFFDF8" stroke-width="3.9" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="15" cy="30.6" r="2.35" fill="#C41E3A"/>
-  <text x="60" y="37" font-family="Plus Jakarta Sans, Avenir Next, Segoe UI, sans-serif" font-size="28" font-weight="800" fill="#0F6B63">Nutri</text>
-  <text x="138" y="37" font-family="Plus Jakarta Sans, Avenir Next, Segoe UI, sans-serif" font-size="28" font-weight="600" fill="#10231F">Match</text>
-</svg>
