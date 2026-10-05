@@ -1,0 +1,15 @@
+.venv
+frontend/node_modules
+frontend/.angular
+**/.pytest_cache
+**/.ruff_cache
+notebooks/.ipynb_checkpoints
+datos/cache
+datos/procesados/dataset_referencia_20260926.parquet
+datos/procesados/dataset_referencia_20260927.parquet
+datos/procesados/dataset_referencia_20260929.parquet
+datos/procesados/off_mexico_20260919.parquet
+datos/procesados/off_mexico_20260929.parquet
+datos/procesados/matriz_nut_100g_20260919.parquet
+datos/procesados/matriz_nut_100g_20260929.parquet
+datos/procesados/identidad_homologada_20260919.parquet

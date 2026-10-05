@@ -1,0 +1,75 @@
+\section{Descripción de los datos}
+
+La estrategia pide una comparación que se pueda usar en la compra y que no invente lo que falta. El siguiente paso fue ver si había datos para sostenerla. Hacía falta la ficha del producto, con lo que declara y con lo que no trae, y un precio solo cuando alguien lo hubiera observado. El catálogo se armó con tres fuentes públicas. Cada una cubre una parte distinta. Ninguna, por sí sola, resuelve la comparación.
+
+\subsection{Fuentes}
+
+Open Food Facts aporta la ficha: nombre, marca, nutrientes por 100\,g o 100\,mL, categorías, ingredientes, alérgenos, trazas, etiquetas, grupo NOVA y aditivos \citep{openfoodfacts2026}. Es una base pública y colaborativa. Sin esa ficha no habría qué comparar. De ella salen la nutrición, el procesamiento y las restricciones de alergia y dieta.
+
+Open Prices aporta un precio en pesos cuando el código de barras coincide de forma exacta \citep{openprices2026}. Sirve para informar un costo que sí se observó. No se usa para inventar el precio de los productos que no aparecen ahí.
+
+Quién es Quién en los Precios, de la Procuraduría Federal del Consumidor, no publica código de barras. Un precio de esa fuente solo entra si la coincidencia por texto fue revisada, comparando marca, producto y presentación \citep{profeco2026}. Se muestra como precio de referencia de una presentación parecida, y se indica cómo se hizo la coincidencia y qué tan confiable quedó.
+
+\subsection{Integración}
+
+Cada producto se identifica por su código de barras. No se juntaron presentaciones: el mismo nombre en otro tamaño o en otro sabor puede ser otro producto. Comparar solo por nombre habría mezclado productos distintos.
+
+El archivo parte del export de Open Food Facts llamado \texttt{off\_csv\_20260929}. En el filtro de México, ese export tenía 16\,851 productos. Sobre ese punto de partida se aplicaron tres filtros. En este documento se llaman candados. Ese conteo de 16\,851 es el inicio de la construcción, no el catálogo que se evalúa aquí.
+
+\begin{table}[ht]
+  \centering
+  \caption{Candados que producen el catálogo operativo. Fuente: metadato de \archivo.}
+  \label{tab:candados}
+  \begin{tabular}{lrr}
+    \toprule
+    Paso & Productos & Salen \\
+    \midrule
+    Filtro de México en el export & 16\,851 & \\
+    Producto no alimentario & 16\,848 & 3 \\
+    Integridad de identidad y nutrición & 13\,111 & 3\,737 \\
+    Identidad del nombre & 13\,093 & 18 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+El primer filtro retira tres productos que no son alimentos. El segundo pide que la identidad y la nutrición del registro se sostengan, y es el que más reduce el archivo. El tercero retira 18 registros cuyo nombre no queda identificado. El resultado, 13\,093 productos y 273 columnas, es el catálogo operativo de este trabajo. No es todavía el conjunto que se puede ordenar: eso depende de la cobertura, y se mide en la exploración. Para comprobar que los cálculos usan este archivo y no otro, se calculó su huella SHA-256:
+
+\begin{center}
+\small\texttt{a621d471a2f47aa09ba481408d95a7a808fe84bd2fa7205c56fa050e1c66045b}
+\end{center}
+
+\noindent Hay cero códigos duplicados. El cuaderno de trabajo comprueba esa huella antes de continuar. Las dos fuentes de precio no comparten códigos. Si un código tiene varias observaciones, se conserva la real más reciente.
+
+\subsection{Estructura}
+
+Cada fila es un producto. Las columnas que vienen del export son observaciones de Open Food Facts. Lo que NutriMatch calcula o recupera después lleva un estado: real, si se observó; derivado, si se calculó a partir de datos reales; o no disponible, si se sabe que no hay dato. El estado imputado, que significaría un valor estimado para rellenar un hueco, existe como nombre en el proyecto y no se usa en este catálogo. El estado sintético tampoco se escribe en el archivo. Aparece solo en la ficha, cuando no hay precio observado, y la pantalla lo llama precio de demostración.
+
+El nombre que se muestra se busca en este orden: nombre del producto, nombre genérico y nombre abreviado. El texto \enquote{Cargando…} se trata como vacío. En este corte, 12\,712 productos tienen nombre visible y 11\,606 tienen marca. Si ninguno de esos campos tiene dato, el nombre queda vacío. No se inventa un título.
+
+\subsection{Calidad}
+
+La calidad de información resume siete piezas de disponibilidad y consistencia: nutrición, ingredientes, categoría, NOVA, aditivos, etiquetas y coherencia física. Dice qué tan documentado está el registro. No mide compatibilidad con un perfil y no entra al orden.
+
+\begin{table}[ht]
+  \centering
+  \caption{Calidad de información del catálogo operativo. Fuente: notebook maestro, corte del \corte.}
+  \label{tab:calidad}
+  \begin{tabular}{lr}
+    \toprule
+    Nivel & Productos \\
+    \midrule
+    Alta & 6\,102 \\
+    Media & 1\,511 \\
+    Baja & 1\,274 \\
+    Insuficiente & 4\,206 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+En el perfil de ejemplo, los 4\,206 registros de calidad insuficiente caen en la banda de información no verificable, no en el orden. Tener calidad alta tampoco garantiza entrar: en ese mismo perfil, 3\,360 productos de calidad alta quedan fuera por alergia o dieta. La calidad describe el registro. La banda describe la decisión.
+
+\subsection{Relevancia y límites}
+
+El catálogo sirve porque cubre el tipo de producto que la persona compara y porque conserva los huecos en lugar de disimularlos. También tiene límites medidos. Alérgenos, trazas, etiquetas y precio cubren poco. El precio real existe para 259 productos: 239 de Open Prices y 20 de PROFECO. Los otros 12\,834 no tienen precio. No hay un precio igual a cero.
+
+Open Food Facts se actualiza, así que un corte posterior puede cambiar los conteos. Por eso cada resultado de este documento queda atado a la huella del archivo. Con el catálogo ya delimitado, el análisis siguiente pregunta qué se puede afirmar con esos datos y qué decisiones se siguen de ellos.

@@ -1,0 +1,70 @@
+\section{Ingeniería de variables}
+
+Las variables de esta sección resuelven problemas que la exploración ya dejó planteados. Se calculan a partir de datos observados. No predicen un valor que la fuente no trajo. La tabla~\ref{tab:variables} resume el papel de cada una. El detalle, y la razón de cada transformación, va después.
+
+\begin{table}[ht]
+  \centering
+  \caption{Variables derivadas y papel en la decisión.}
+  \label{tab:variables}
+  \small
+  \begin{tabularx}{\textwidth}{lX}
+    \toprule
+    Variable & Papel \\
+    \midrule
+    Categoría de referencia & Define el grupo de comparación. Si no hay una etiqueta con al menos 30 productos, no hay dimensión nutricional. \\
+    Percentiles & Sitúan cada nutriente dentro de su categoría, en escala de 0 a 100. Un percentil exige al menos cinco productos con dato saneado. \\
+    Dimensión nutricional & Promedio de los percentiles con dirección: azúcar, sal y grasa saturada se invierten; fibra y proteína se usan tal cual. Se calcula al cargar el catálogo. \\
+    Dimensión de procesamiento & Banda del grupo NOVA, afinada con aditivos. Ya está en el archivo. \\
+    Dimensión de etiquetas & Porcentaje de las etiquetas valoradas que el producto presenta. Se calcula con el perfil. \\
+    Cobertura & Peso de las dimensiones con dato, dividido entre el peso del perfil. \\
+    Resultado final & Promedio ponderado de las dimensiones disponibles. Nulo si la cobertura es menor que 0{,}5. \\
+    Universo puntuable & Procesamiento presente y al menos cuatro de ocho percentiles. Es previo al perfil. \\
+    Calidad y precio & Se muestran. No entran al resultado. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Percentiles y dimensión nutricional}
+
+Azúcar y fibra no se miden en la misma escala, y dentro de una categoría sus distribuciones tampoco son iguales. Para compararlas entre productos parecidos se usó el puesto de cada uno frente a los demás de su categoría. Ese puesto es el percentil. No es una fracción entre cero y uno. En este corte, el máximo observado es 100. Para calcular el percentil de un nutriente hacen falta al menos cinco productos con dato saneado en esa categoría. Si hay menos, ese percentil queda nulo.
+
+La señal nutricional no promedia los ocho nutrientes del núcleo. Usa cinco, y solo los que tienen percentil. Si \(p\) es ese puesto, fibra y proteína aportan \(p\). Azúcar, sal y grasa saturada aportan \(100 - p\): en esos tres, un puesto alto significa más cantidad, y la señal los lee al revés. El resultado de esta parte es el promedio de los aportes que sí existen. Energía, grasa total y carbohidratos se quedan en la ficha.
+
+Al cargar el catálogo, 7\,028 productos tienen esta señal calculable (53{,}68\,\%). El archivo en disco sigue teniendo 273 columnas. La señal se agrega en memoria y no se reescribe en el archivo.
+
+\subsection{Procesamiento}
+
+Cada grupo NOVA ocupa un tramo de 25 puntos: el grupo 1 entre 75 y 100, el 2 entre 50 y 75, el 3 entre 25 y 50, y el 4 entre 0 y 25 \citep{monteiro2018nova}. El techo del grupo \(g\) es \(100 - (g - 1) \times 25\). Dentro del tramo, los aditivos restan desde ese techo hacia abajo, hasta el percentil 95 de aditivos observado en los productos del grupo 4 de este mismo corte. Si el número de aditivos falta, se restan 12{,}5 puntos, la mitad del tramo, y el producto queda en el centro. Sin grupo, la señal es nula. Que falten los aditivos no se lee como si el producto tuviera cero aditivos.
+
+\subsection{Etiquetas, cobertura y resultado}
+
+La señal de etiquetas es el porcentaje de las etiquetas valoradas por la persona que el producto presenta. Queda nula si el producto no tiene etiquetas o si la persona no declaró ninguna. Es cero solo cuando hay etiquetas y ninguna coincide.
+
+La persona ordena tres prioridades. Ese orden se convierte en pesos que suman 1: \(3/6\) (0{,}50) para la primera, \(2/6\) (0{,}33) para la segunda y \(1/6\) (0{,}17) para la tercera. No hay controles numéricos sueltos. La primera prioridad pesa la mitad. La segunda, cerca de un tercio. La tercera, el resto.
+
+Si \(A\) son las partes con dato y \(w_d\) es el peso de cada una, la cobertura es la fracción del perfil que sí se pudo calcular:
+\[
+c = \frac{\sum_{d \in A} w_d}{w_1 + w_2 + w_3}.
+\]
+El resultado usa solo esas partes. Es su promedio ponderado:
+\[
+r = \frac{\sum_{d \in A} w_d \, s_d}{\sum_{d \in A} w_d},
+\]
+siempre que \(c \ge 0{,}5\). Si \(c < 0{,}5\), \(r\) queda nulo. La parte ausente no se sustituye por cero. Por eso el denominador es el peso de lo disponible, no el peso total.
+
+Con estos pesos, cualquier par de partes suma al menos 0{,}5. Perder una sola no basta para salir del orden. El resultado queda nulo solo cuando la cobertura es menor que 0{,}5.
+
+\subsection{Universo puntuable}
+
+El universo puntuable se define antes de conocer a la persona. Pide procesamiento calculable y al menos cuatro de los ocho percentiles del núcleo. En este corte son 5\,864 productos, y la regla coincide con la bandera en todos los casos. La figura~\ref{fig:universo} muestra cómo se reduce el catálogo antes de aplicar un perfil.
+
+Un producto puede estar en ese universo y, aun así, quedar fuera del orden de una persona, por alergia, por dieta o por cobertura. También puede entrar al orden sin estar en el universo, si las partes que ese perfil sí puede calcular pesan al menos la mitad. El cuarto producto del ejemplo de la sección~\ref{sec:evaluacion} es ese caso.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.92\textwidth]{universo.png}
+  \caption{Estrechamiento del catálogo antes de aplicar un perfil. Fuente: notebook maestro, corte del \corte.}
+  \label{fig:universo}
+\end{figure}
+
+Estas variables ya responden a lo que el análisis mostró. Falta la regla que las convierte, junto con el perfil, en un orden.

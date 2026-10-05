@@ -1,0 +1,14 @@
+variable,pct_faltante,p_falta_sin_ingredientes,p_falta_con_ingredientes,razon_sin_vs_con_ingredientes,completeness_si_falta,completeness_si_tiene
+energy-kcal_100g,27.4,40.9,11.0,3.71,0.278,0.611
+fat_100g,28.6,43.3,11.0,3.93,0.277,0.617
+saturated-fat_100g,37.7,57.1,14.5,3.95,0.31,0.647
+carbohydrates_100g,28.4,42.5,11.5,3.68,0.282,0.615
+sugars_100g,37.4,57.4,13.3,4.31,0.302,0.65
+proteins_100g,28.7,43.0,11.6,3.7,0.283,0.616
+salt_100g,39.3,61.3,12.9,4.77,0.299,0.663
+fiber_100g,38.9,58.5,15.4,3.8,0.316,0.65
+categories_tags,48.2,83.0,6.4,12.95,0.268,0.755
+nova_group,59.8,99.0,12.6,7.88,0.325,0.81
+ingredients_analysis_tags (dieta),54.2,99.2,0.1,1518.19,0.293,0.789
+allergens+traces (ambos vacíos),79.3,99.4,55.1,1.8,0.433,0.852
+labels_tags (sellos),74.7,87.3,59.6,1.47,0.46,0.698

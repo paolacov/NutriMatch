@@ -1,0 +1,8 @@
+has_product_name,has_generic_name,has_abbreviated,n,pct
+True,False,False,10909,64.74
+True,True,False,4157,24.67
+False,False,False,1672,9.92
+False,True,True,66,0.39
+True,True,True,44,0.26
+False,True,False,2,0.01
+True,False,True,1,0.01

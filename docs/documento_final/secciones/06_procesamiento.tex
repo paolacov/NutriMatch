@@ -1,0 +1,21 @@
+\section{Procesamiento de datos}
+
+La exploración mostró que los faltantes son frecuentes y que siguen qué tan documentado está el registro. Esta etapa no vuelve a ese hallazgo: lo prepara para el cálculo. Un dato ausente no es un cero. Cero significa que la fuente afirmó un valor, por ejemplo que el producto no declara azúcar. Nulo significa que la fuente no trajo el dato. Las transformaciones siguientes evitan que esas dos situaciones se confundan.
+
+\subsection{Limpieza}
+
+El código de barras se guarda como texto, para no perder un cero inicial. Si se leyera como número, un código que empieza con cero podría cambiar. Un texto ausente que llega como un valor numérico vacío se trata como ausencia antes de separar etiquetas o de decidir si una parte del cálculo tiene dato. El texto \enquote{Cargando…} no se acepta como nombre.
+
+Los valores fuera de un rango físico plausible se marcan como extremos. Ese producto deja de aportar al percentil y a las estadísticas de su categoría en esa medida. El valor original sigue visible en la ficha. Ocultarlo sería reescribir el registro. En este corte hay 56 registros con sal fuera de rango. En 55, la relación entre la sal y el sodio del mismo producto es aproximadamente 2{,}5, y el valor dividido entre 1\,000 cae en un rango válido. Esos 55 se corrigen con los dos campos del propio producto, y la corrección queda marcada. El caso típico es una sal anotada mil veces más alta, como si la unidad se hubiera corrido. El registro que no cumple esa relación permanece fuera de rango, sin corrección. Hay además 57 registros en los que la suma de macronutrientes supera 100. Esa marca es informativa y no borra los nutrientes.
+
+\subsection{Valores faltantes e imputación}
+
+No se imputan precio, alérgenos, etiquetas, dieta, grupo NOVA ni los nutrientes del núcleo. Imputar sería poner un valor estimado donde la fuente no dijo nada. El catálogo no contiene valores de ese tipo. Cada ausente queda nulo, con una bandera que dice que el dato no está, para que el cálculo sepa qué parte puede usar.
+
+Tampoco se crearon productos artificiales para agrandar el catálogo. Un registro inventado no es una observación. El precio de demostración que a veces aparece en la ficha es otra cosa: un entero entre 12 y 180 pesos, siempre el mismo para el mismo código, marcado como simulado. No se escribe en el archivo y el orden no lo usa. Sirve para recorrer la pantalla, no para completar los datos.
+
+\subsection{Otras transformaciones}
+
+La categoría de referencia, los percentiles y la parte de procesamiento se calculan una vez y quedan en el archivo. No dependen de lo que la persona declare. Las etiquetas y el resultado final se calculan cuando llega el perfil. Por eso, repetir una corrida exige el mismo archivo, el mismo perfil y el mismo conjunto de productos.
+
+Con lo observado, lo corregido y lo ausente ya separados, el paso siguiente es convertirlos en las piezas que el orden combina.

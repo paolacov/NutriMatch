@@ -1,0 +1,84 @@
+code,es_control_real,nombre,marca,quantity,price_catalogo,price_status_catalogo,price_source_catalogo,op_n_obs,op_monedas,op_paises,op_clase,upc_consultado,upc_clase,upc_titulo,upc_precio_min,upc_precio_max,upc_n_ofertas,upc_merchant,retrieved_at
+0074323081411,True,Cajeta,Coronado,660 g,115.0,REAL,qqp_profeco,0,,,ya_real_catalogo,True,ya_real_catalogo,"Barcel USA Coronado  Caramel Spread, 23.3 oz",5.18,23.65,2,Wal-Mart.com,2026-09-27T05:40:17.992953+00:00
+7501077400050,True,Harina de Maíz Nixtamalizado,Maseca,200g,19.0,REAL,qqp_profeco,0,,,ya_real_catalogo,True,ya_real_catalogo,Mexican White Maseca Masa Harina Corn Flour Gluten-free 1kg Bbd: 10/16,4.99,7.35,0,,2026-09-27T05:40:17.992953+00:00
+7501300801197,True,Leche Querétaro Entera,Querétaro,1l,25.0,REAL,open_prices,1,MXN,MX,ya_real_catalogo,True,ya_real_catalogo,,,,0,,2026-09-27T05:40:17.992953+00:00
+0033357043307,False,Toasted Sesame Dressing,Kewpie,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0038000148019,False,Special K Nut Bar,Kellogg's,33 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0041512180095,False,Organic Peanut Butter Spread,Sun Harvest,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0070381241705,False,Aderezo para ensaladas estilo ranch,Johnny’s,702g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0070847035916,False,Bebida energética Monster,"Aga,Monster",473 ml,,UNAVAILABLE,,0,,,sin_hit,True,hit_gtin_precio_no_mx,2020 Mexico Monster Energy Drink Lo-carb + Original Cans 473 Ml. Empty,16.0,16.0,0,,2026-09-27T05:40:17.992953+00:00
+0076397007151,False,PURE DE TOMATE SAZONADO,LA COSTEÑA,350 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0078742137841,False,Queso Parmesano Rallado,Members Mark,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0085696608044,False,Mori-Nu Shelf Stable Silken Tofu Firm,Morinaga,"10.8 oz, 307 g",,UNAVAILABLE,,1,EUR,FR,hit_exacto_otra_moneda,True,hit_gtin_precio_no_mx,"FOR ENTREES, SALADS AND DESSERTS",0.0,149.97,10,UnbeatableSale.com,2026-09-27T05:40:17.992953+00:00
+0111004556001,False,nutri leche,,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+05003631,False,,,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0614360000107,False,F-Diaz Mango,F-Diaz,1 L,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0633148100112,False,Tajin salsa picante,Tajin,475 ml,,UNAVAILABLE,,0,,,sin_hit,True,hit_gtin_precio_no_mx,Tajin Clasico Salsa Picante Con Limon Lime 16oz /485ml 1 Bottle,13.98,13.98,0,,2026-09-27T05:40:17.992953+00:00
+0729090061509,False,Natura Jugo de Naranja,Sonrisa,1 L,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0735257002513,False,D'Gari Fresa,D'Gari,120,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0750176180421,False,Granola Quaker almendras pasas y miel,,360 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0760573080129,False,Sazón Completa,Sassón,50 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+0884394000293,False,Aloe vera kind,Okf Corporation,500 ml,,UNAVAILABLE,,0,,,sin_hit,True,hit_gtin_precio_no_mx,"OKF, ALOE VERA KING, ALOE VERA DRINK, PINEAPPLE",0.0,28.04,3,Rakuten(Buy.com),2026-09-27T05:40:17.992953+00:00
+2000000074032,False,FUDGE MINT,Great value,283 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+2000000146219,False,Barra Farnat Nutrition fruta rojo amaranto trigo y avena 6 pzas,Farnat,27 g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+2000000147373,False,Leche Great Value entera,,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+2547619152006,False,Hellman's adereso light,,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+4501037628466,False,Nescafe decaf 40g,,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+4696298000004,False,Orejas De Mantequilla Con Canela,KIRKLAND signature,,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+50202010075546,False,Kodak,Kodak,1,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+7443011629885,False,Galletas con vainilla,Sweetwell,37.32g,,UNAVAILABLE,,0,,,sin_hit,True,sin_hit,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500462260286,False,Galletas de arroz,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500462648060,False,honey rice cakes,Okko,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500464338938,False,Onoguiri dank atún,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500464761613,False,Skinny chocolate hazelnuts,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500478034154,False,Aunt Jemima Mezcla Para Hot Cakes Suaves Y Ligeros,Pearl Milling Company,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500525615541,False,,Valley Foods,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500810012284,False,Papatinas,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500810015834,False,Pastitas con Mantequilla,Tía Rosa,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7500810040515,False,Panque Bimbo Hershey,Bimbo,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501000909568,False,,Gerber,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501003306333,False,Mayonesa balance aceite de aguacate,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501005110655,False,Sazonador Mi Arroz Blanco. Ajo & cebolla,KNORR,4 sobres de 12 g c/u,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501008051177,False,Extra postres Sabor a choco avellana,Kellogg's,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501018310578,False,Caracol 3,La Moderna,200 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501020526066,False,LALA entera,LALA,1 l,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501020564068,False,media crema,nutri,245 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501022011201,False,Agua con jugo de guayaba,Epura,1 l,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501024511310,False,Chocolate con leche,Hershey’s,40 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501030452577,False,Triki Trakes Bites Marinela,Marinela,90 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501032398668,False,DNP PIÑA COKETA PROMO PACK,DANONE,220 G,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501039127285,False,Aceite de Oliva Extra Virgen,Nutrioli,250 ml,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501039400845,False,Boing Tradicional Fresa,Pascual,1 L,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501040082016,False,Queso Machego FUD,FUD,375 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501054911357,False,Tortilla de harina,Del Barrio,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501073836723,False,Aguafiel Naranja,Peñafiel,500 ml,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501094920333,False,Lala leche entera 1.5L,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501118341106,False,Sal sol grano fino 500g,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501147511358,False,Kir Lunch,Qualitia,220 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501295640061,False,Yogurt sabor Mora Azul,Santa Clara,500 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501587000405,False,aceite de pescado,bnc bomuca natural care,90,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501791600019,False,Salmon Con Piel,Marketside,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501791633017,False,ARANDANOS DESHIDRATADOS,GREAT VALUE,170 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501791644549,False,Jarabe puro de Maple,Extra Especial,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7501791670548,False,Medallones De Atún Aleta Amarilla,Marketside,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7502223700499,False,,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7502234866894,False,Chewy,Kirkland,24g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7502252484285,False,Avena y Linaza,nature's heart,946ml,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7502252950223,False,Choco amaranto Casa Adelita,Casa Adelita,70 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503005509088,False,Vainilla Molina El Papantla original,Molina,150 ml,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503007888310,False,Blueberries,Global,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503016029162,False,Salsa de chilpetin,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503017189018,False,Vegan twist pinut spreads,Pinut,270g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503018256344,False,Ranch,Fresh Label,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503022833005,False,Manzanas Sarita,AgroFrutas del Campo,600 g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503023615525,False,Salsa Macha,Salsa 12 Chiles,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503024872187,False,Hummus,Libanius,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503024877120,False,Red lentil pasta,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7503044233807,False,Modelo Dorada 0% Alcohol,Modelo,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+75038502,False,Semáforo,,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7506306312814,False,,Knorr,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7506409015537,False,Piña En Almíbar,Golden Villa,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7622202232473,False,Paleta Payaso Snow,Ricolino,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+7640161876743,False,,Holle,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+8076809531351,False,Fetuccine,Barilla,500g,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00
+9507471357837,False,Naranja & Nada,Del Valle,,,UNAVAILABLE,,0,,,sin_hit,False,no_consultado,,,,0,,2026-09-27T05:40:17.992953+00:00

@@ -1,0 +1,465 @@
+code,nombre,marca,quantity,price,currency,date,retailer,country,city,veredicto
+7501030418504,Galleta tubo príncipe,,,30.0,ADP,2025-01-21,Soriana,MX,Ciudad de México,pendiente_revision_moneda
+0636817122651,Guacamole & Habanero Hot Sauce,Zaaschila,265 g,3.49,USD,2026-08-02,Cardenas,US,East Palo Alto,hit_gtin_otro_mercado
+0636817122651,Guacamole & Habanero Hot Sauce,Zaaschila,265 g,3.79,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0636817122651,Guacamole & Habanero Hot Sauce,Zaaschila,265 g,3.79,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0025293001503,Almond,Silk,1.89 L,3.49,CAD,2024-06-25,Walmart,CA,New Westminster,hit_gtin_otro_mercado
+0025293001503,Almond,Silk,1.89 L,3.48,CAD,2020-02-01,Real Canadian Superstore,CA,Coquitlam,hit_gtin_otro_mercado
+0028000299781,Chocolate Abuelita en polvo granulado,Nestlé,360 g,6.29,USD,2025-10-18,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0028000299781,Chocolate Abuelita en polvo granulado,Nestlé,360 g,4.99,USD,2025-10-30,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0028000743079,,Nescafé,14oz,14.99,USD,2025-12-03,Costco,US,Mountain View,hit_gtin_otro_mercado
+0029700001414,Buttery Homestyle Mashed Potatoes,Idahoan,1.36 kg,2.0,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0028000299781,Chocolate Abuelita en polvo granulado,Nestlé,360 g,6.59,USD,2026-01-03,La Plaza,US,Mountain View,hit_gtin_otro_mercado
+0028000743079,,Nescafé,14oz,21.99,USD,2026-08-24,Costco,US,Mountain View,hit_gtin_otro_mercado
+0041420048555,sour brite crawlers,Trolli,,3.29,USD,2025-10-03,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0041449300139,Wild Blueberry Muffin Mix,Krusteaz,384 gr,4.79,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449471549,Cranberry orange flavor muffin mix,Krusteaz,527 g,4.79,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449111407,Cinnamon swirl crumb cake and muffin mix,Krusteaz,595 gr,4.79,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449402277,Supreme muffin mix,Krusteaz,436 gr,4.79,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449001104,Light & Fluffy Buttermilk Complete Pancake Mix,Krusteaz,907 gr,3.99,USD,2025-10-30,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449471501,Light & Fluffy Buttermilk Complete Pancake Mix,Krusteaz,714 gr,3.99,USD,2025-10-30,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449302546,Premium Brownie Mix Chocolate Supreme,Ghirardelli,531 gr,5.49,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0041449003153,Harina preparada completamente para hacer Hot Cakes,Krusteaz,4.53 kg,7.99,USD,2025-12-16,Costco,US,Mountain View,hit_gtin_otro_mercado
+0051000197597,Homestyle Alfredo,Prego,411 g,3.49,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0049733830119,CHIPOTLE HOT SAUCE,CHOLULA,150 ml,4.79,USD,2025-10-06,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0049733091015,Cholula Salsa Picante,Cholula,150ml,4.79,USD,2025-10-06,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0049733091015,Cholula Salsa Picante,Cholula,150ml,4.79,USD,2025-11-08,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0049733830119,CHIPOTLE HOT SAUCE,CHOLULA,150 ml,4.79,USD,2025-11-08,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0049733091015,Cholula Salsa Picante,Cholula,150ml,5.49,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0049733830119,CHIPOTLE HOT SAUCE,CHOLULA,150 ml,5.49,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0049733091015,Cholula Salsa Picante,Cholula,150ml,4.99,USD,2026-07-27,Walgreens,US,Millbrae,hit_gtin_otro_mercado
+0051000197597,Homestyle Alfredo,Prego,411 g,4.99,USD,2026-07-27,Walgreens,US,Millbrae,hit_gtin_otro_mercado
+0049733091015,Cholula Salsa Picante,Cholula,150ml,4.29,USD,2026-07-30,Smart & Final extra!,US,Mountain View,hit_gtin_otro_mercado
+0049733830119,CHIPOTLE HOT SAUCE,CHOLULA,150 ml,4.29,USD,2026-07-30,Smart & Final extra!,US,Mountain View,hit_gtin_otro_mercado
+0051000197597,Homestyle Alfredo,Prego,411 g,4.49,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7501071120305,Refresco Squirt sabor toronja,,,7.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+7501071120305,Refresco Squirt sabor toronja,,,9.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0096619381555,Organic Blue Agave,Kirkland Signature,36 onz,8.99,USD,2025-12-16,Costco,US,Mountain View,hit_gtin_otro_mercado
+0096619483556,organic GREEK YOGURT plain,KIRKLAND signature,1.36 kg (48oz),7.49,USD,2026-06-05,Costco,US,Sunnyvale,hit_gtin_otro_mercado
+0096619483556,organic GREEK YOGURT plain,KIRKLAND signature,1.36 kg (48oz),7.49,USD,2026-08-02,Costco,US,Fremont,hit_gtin_otro_mercado
+0073141150057,Strawberry Cream Covered Biscuit Sticks,Pocky,40 g,2.99,USD,2025-12-28,Mollie Stone's,US,Palo Alto,hit_gtin_otro_mercado
+0073141150040,Pocky Chocolate,Glico,40 g,2.99,USD,2025-12-28,Mollie Stone's,US,Palo Alto,hit_gtin_otro_mercado
+0073472001196,English Muffins EZEKIEL 4:9 Sprouted Grain,Food For Life,454 g,7.49,USD,2026-01-02,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0073472001196,English Muffins EZEKIEL 4:9 Sprouted Grain,Food For Life,454 g,6.49,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0073141110815,Pocky - Almond Crush,"Glico,Pocky",1.45 oz (41 g),2.79,USD,2026-06-07,Tokyo Central,US,Cupertino,hit_gtin_otro_mercado
+0073141150040,Pocky Chocolate,Glico,40 g,1.99,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0073141150040,Pocky Chocolate,Glico,40 g,2.19,USD,2026-07-27,Walgreens,US,Millbrae,hit_gtin_otro_mercado
+0073472001530,Flourless Sprouted Grain Bread,Food for Life,24 oz,8.99,USD,2026-09-12,Dumbo Market,US,New York,hit_gtin_otro_mercado
+0073141150040,Pocky Chocolate,Glico,40 g,2.2,USD,2026-09-15,Fairway Market,US,New York,hit_gtin_otro_mercado
+0038000845246,Original,Pringles,2.3 oz,1.79,USD,2026-02-14,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0017077102322,Kefir,Lifeway,946 ml,5.99,USD,2026-02-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0017077102322,Kefir,Lifeway,946 ml,3.84,USD,2026-06-04,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0017077102322,Kefir,Lifeway,946 ml,5.49,USD,2026-09-12,Dumbo Market,US,New York,hit_gtin_otro_mercado
+5601008101901,Cream Cracker,Vieira,180 g (6 x 30 g),1.75,EUR,2025-07-29,Intermarché Super,FR,Amplepuis,hit_gtin_otro_mercado
+0077975089156,Gluten Free Mini Pretzels,Snyder's of Hanover,226.8 g,4.79,USD,2026-02-07,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0077975089156,Gluten Free Mini Pretzels,Snyder's of Hanover,226.8 g,4.79,USD,2026-02-07,Safeway,US,Mountain View,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.29,EUR,2024-01-05,Monoprix,FR,Pont-de-Crau,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.05,EUR,2024-01-07,Intermarché,FR,Grenoble,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.01,EUR,2024-02-10,E.Leclerc,FR,Gap,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.02,EUR,2024-03-22,Intermarché,FR,Paris,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.23,EUR,2023-03-21,Square Montholon,FR,Paris,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.14,EUR,2024-06-01,Auchan Supermarché,FR,Le Havre,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.65,EUR,2024-06-04,Spar,FR,Bordeaux,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,108.0,TWD,2024-06-05,大潤發內湖二店,TW,潭美,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.7,EUR,2024-06-22,,,,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.01,EUR,2024-06-27,Carrefour Market,FR,Vitry-sur-Seine,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,13.5,MYR,2024-07-06,Tong Hing Supermarket,MY,Kota Kinabalu,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,11.3,MYR,2024-07-06,Bataras Marketplace,MY,Kota Kinabalu,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,11.49,MYR,2024-07-07,Servay Hypermarket,MY,Kota Kinabalu,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,39.9,NOK,2024-09-28,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.05,EUR,2024-10-16,Carrefour,FR,Chelles,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,2.39,EUR,2024-10-16,Carrefour,FR,Chelles,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.5,EUR,2024-12-04,U Express,FR,Lyon,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.13,EUR,2024-12-12,Intermarché Contact,FR,Monestier-de-Clermont,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.27,EUR,2025-01-07,Utile,FR,Saint-Martin-d'Hères,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,39.9,NOK,2024-12-21,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.48,EUR,2025-01-07,Carrefour City,FR,Grenoble,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,17.9,SEK,2025-01-22,Willys Landskrona Infarten,SE,Landskrona,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.05,EUR,2025-02-22,BeauSevran,FR,Sevran,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,1.7,GBP,2025-03-27,Co-op Food,GB,Cardiff,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.7,GBP,2025-03-27,Co-op Food,GB,Cardiff,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,1.7,GBP,2025-04-01,The Co-operative Food,GB,Cardiff,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,2.19,EUR,2025-04-18,Jumbo,NL,Maastricht,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.45,EUR,2025-04-23,Carrefour City,FR,Pont-à-Mousson,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.96,EUR,2025-05-10,Intermarché,FR,Domène,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,2.49,EUR,2025-05-24,Lidl,DE,Lübeck,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.99,EUR,2025-05-26,REWE,DE,Berlin,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.77,EUR,2025-06-07,REWE,DE,Berlin,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,141.0,THB,2025-06-09,Lotus's,TH,กรุงเทพมหานคร,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,135.0,THB,2025-06-04,Cj Express,TH,ชะอำ,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.77,EUR,2025-06-02,REWE,DE,Berlin,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,135.0,THB,2025-05-29,Tesco Lotus,TH,เทศบาลนครสุราษฎร์ธานี,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,135.0,THB,2025-05-29,Big C,TH,เทศบาลนครสุราษฎร์ธานี,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,135.0,THB,2025-05-31,Mini C,TH,เทศบาลนครสุราษฎร์ธานี,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,145.0,THB,2025-06-01,Saver Mart,TH,บ้านเฉวง,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.95,EUR,2025-08-02,Vival,FR,Corps,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.95,EUR,2025-08-08,Auchan,FR,Nancy,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,1.69,EUR,2025-08-18,Aldi,DE,Jessen (Elster),hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.77,EUR,2025-09-13,Spar,FR,Chamonix-Mont-Blanc,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.32,EUR,2025-09-30,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.01,EUR,2025-09-30,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,39.9,NOK,2025-11-04,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,2.49,EUR,2026-01-09,Kaufland,DE,Weingarten,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.0,EUR,2026-02-09,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.0,GBP,2026-02-27,Co-op Food,GB,Cardiff,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,0.93,EUR,2026-03-05,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8008698005231,Chocolate O's,Schär,165 g ℮ 5.8 oz,3.31,EUR,2026-03-25,Carrefour Market,FR,Paris,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,2.69,EUR,2026-04-25,REWE City,DE,Mainz,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.19,EUR,2026-05-09,Près d'ici,FR,Nancy,hit_gtin_otro_mercado
+8008698005231,Chocolate O's,Schär,165 g ℮ 5.8 oz,3.78,EUR,2026-05-16,Intermarché Super,FR,Craponne,hit_gtin_otro_mercado
+80051671,Hazelnut Spread with Cocoa,nutella,200 g,451.0,JPY,2026-06-22,マックスバリュ,JP,広島市,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.35,EUR,2026-07-01,Carrefour City,FR,Nancy,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,41.9,NOK,2026-08-08,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8076800195057,Spaghetti N°5,Barilla,500 g,1.2,EUR,2026-08-09,Super U,FR,Lyon,hit_gtin_otro_mercado
+8076809523738,Lasagne Platten,Barilla,500g,41.9,NOK,2026-08-10,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,4.99,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,4.49,USD,2025-10-03,99 Ranch Market,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,6.49,USD,2026-01-03,La Plaza,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,6.29,USD,2026-04-12,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,5.59,USD,2026-06-07,Tokyo Central,US,Cupertino,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,90.0,NOK,2026-06-16,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,5.29,USD,2026-06-18,T&T Supermarket,US,San Jose,hit_gtin_otro_mercado
+0022000302663,,,,2.99,USD,2026-06-19,7-Eleven,US,Los Gatos,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,90.0,NOK,2026-06-16,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,5.49,USD,2026-07-03,Sakura Market,US,San Jose,hit_gtin_otro_mercado
+0022000302663,,,,2.79,USD,2026-07-27,Walgreens,US,Millbrae,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,4.79,USD,2026-07-30,Smart & Final extra!,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,5.99,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,7.69,USD,2026-09-16,Morton Williams,US,New York,hit_gtin_otro_mercado
+0024463061095,Sriracha Hot Chili Sauce,"Huy Fong Foods, Inc.",482g,5.49,USD,2026-09-16,Katagiri,US,New York,hit_gtin_otro_mercado
+0076186000011,Japanese Style Noodles & Original Flavored Soup,Sapporo Ichiban,100 g,1.25,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076186000011,Japanese Style Noodles & Original Flavored Soup,Sapporo Ichiban,100 g,0.99,USD,2025-10-03,99 Ranch Market,US,Mountain View,hit_gtin_otro_mercado
+0076186000011,Japanese Style Noodles & Original Flavored Soup,Sapporo Ichiban,100 g,1.49,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076186000011,Japanese Style Noodles & Original Flavored Soup,Sapporo Ichiban,100 g,1.19,USD,2026-06-07,Tokyo Central,US,Cupertino,hit_gtin_otro_mercado
+0076186000011,Japanese Style Noodles & Original Flavored Soup,Sapporo Ichiban,100 g,1.59,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7501058618917,Café de olla,Nescafé,170 G,8.99,USD,2026-01-03,La Plaza,US,Mountain View,hit_gtin_otro_mercado
+7501058620101,Nescafé Clásico,"Nestlé,Nescafé",120 g,10.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+7501058618917,Café de olla,Nescafé,170 G,10.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0041800200580,"Light concord grape juice beverage, light concord grape","Welch's,Welch Foods Inc",1.89 L,5.49,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0042272013289,Amy's Spinach Pizza with Veggie Crust,Amy's Kitchen,339 grams,9.98,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+8410179300825,Aceite de oliva extra suave Borges,Borges,500ml,12.19,EUR,2025-08-08,Mini Rimi,EE,Tartu linn,hit_gtin_otro_mercado
+8410179900254,Grapeseed,Borges,500 ml,7.15,EUR,2025-08-08,Mini Rimi,EE,Tartu linn,hit_gtin_otro_mercado
+0884394000330,Aloe vera king drink,OKF Corporation,500 ml,24.9,NOK,2024-04-13,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0884394000019,Aloe Vera King,OKF,1.5 L,4.19,NOK,2024-04-13,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0884912126115,"great grains raisins, dates & pecans cereal",Post,453 g,6.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0884912129512,Sweetened Naturally & Artificially Flavored Rice Cereal with Real Cocoa,Cocoa Pebbles,311g,4.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0884912129512,Sweetened Naturally & Artificially Flavored Rice Cereal with Real Cocoa,Cocoa Pebbles,311g,4.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0884912126016,Post great grains cereal crunchy pecan,Post,453 g,6.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0884912126016,Post great grains cereal crunchy pecan,Post,453 g,6.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+5000159461122,Snickers,Snickers,50 g,29.0,NOK,2024-04-27,Circle K Viken,NO,Bergen,hit_gtin_otro_mercado
+5060323901649,Polpa + Herbs,Coppola Salerno,400 g,17.5,NOK,2024-04-13,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0014100079477,Mint Chocolate Milano Cookies,Pepperidge Farm,7 oz (198 g),6.69,USD,2025-10-01,Ava's Market and Deli,US,Mountain View,hit_gtin_otro_mercado
+0014100074816,Milano Raspberry Chocolate,Pepperidge Farm,7 oz (198 g),6.69,USD,2025-10-01,Ava's Market and Deli,US,Mountain View,hit_gtin_otro_mercado
+0014100074649,Pepperidge farm cookies,PEPPERIDGE FARM,191 g,6.69,USD,2025-10-01,Ava's Market and Deli,US,Mountain View,hit_gtin_otro_mercado
+0014100079521,Chessmen Butter Cookies,Pepperidge Farm,191 g,6.69,USD,2025-10-01,Ava's Market and Deli,US,Mountain View,hit_gtin_otro_mercado
+0014100074120,Milano Dark Chocolate,"Pepperidge Farm,Milano",6 oz (170 g),5.99,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100079521,Chessmen Butter Cookies,Pepperidge Farm,191 g,5.99,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100074816,Milano Raspberry Chocolate,Pepperidge Farm,7 oz (198 g),5.99,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100074649,Pepperidge farm cookies,PEPPERIDGE FARM,191 g,5.99,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100074120,Milano Dark Chocolate,"Pepperidge Farm,Milano",6 oz (170 g),4.49,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0011863118764,MERLOT BELLAVITANO CHEESE,SARTORI,150 g,7.79,USD,2025-10-30,Sprouts Farmers Market,US,Sunnyvale,hit_gtin_otro_mercado
+0013000001243,Tomato Ketchup,HEINZ,397 g,4.49,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0012957100016,Hot Sauce,"Salsa Huichol, Salsa Huichol Hot Sauce",6.5 FL OZ (190ml),2.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0013000001243,Tomato Ketchup,HEINZ,397 g,4.79,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0013000001243,Tomato Ketchup,HEINZ,397 g,3.89,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100074816,Milano Raspberry Chocolate,Pepperidge Farm,7 oz (198 g),5.99,USD,2026-02-14,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100074120,Milano Dark Chocolate,"Pepperidge Farm,Milano",6 oz (170 g),5.99,USD,2026-02-14,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100074649,Pepperidge farm cookies,PEPPERIDGE FARM,191 g,5.99,USD,2026-02-14,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100079521,Chessmen Butter Cookies,Pepperidge Farm,191 g,5.99,USD,2026-02-14,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100074649,Pepperidge farm cookies,PEPPERIDGE FARM,191 g,5.99,USD,2026-02-14,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100074816,Milano Raspberry Chocolate,Pepperidge Farm,7 oz (198 g),3.49,USD,2026-02-28,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0013000001243,Tomato Ketchup,HEINZ,397 g,4.99,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100079477,Mint Chocolate Milano Cookies,Pepperidge Farm,7 oz (198 g),3.25,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100074816,Milano Raspberry Chocolate,Pepperidge Farm,7 oz (198 g),3.25,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100079521,Chessmen Butter Cookies,Pepperidge Farm,191 g,3.25,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7501059224827,café 100% puro soluble Nescafé clásico,Nescafé,200g,17.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0021000026272,macaroni & cheese sauce mix,Kraft,,9.99,USD,2026-01-04,Costco,US,Mountain View,hit_gtin_otro_mercado
+0021000052288,Original Barbecue Sauce,Kraft,18 oz (510g),2.99,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0021000052288,Original Barbecue Sauce,Kraft,18 oz (510g),3.5,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0021000052288,Original Barbecue Sauce,Kraft,18 oz (510g),3.5,USD,2026-06-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0021000026272,macaroni & cheese sauce mix,Kraft,,7.99,USD,2026-09-13,Costco,US,New York,hit_gtin_otro_mercado
+0021000052288,Original Barbecue Sauce,Kraft,18 oz (510g),3.99,USD,2026-09-15,City Acres Market,US,New York,hit_gtin_otro_mercado
+7501003308498,Aderezo jalapeño,,,5.49,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0052603054454,Organic low sodium chicken broth,PACIFIC foods,946 ml,3.5,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0052603054454,Organic low sodium chicken broth,PACIFIC foods,946 ml,5.99,USD,2026-07-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7501055304745,Coca cola,Coca-cola,3L,9.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,4.08,EUR,2024-01-09,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,4.19,EUR,2024-01-16,Monoprix,FR,Grenoble,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,3.39,EUR,2024-01-24,Monoprix,FR,Grenoble,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,2.92,EUR,2024-11-08,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,4.13,EUR,2025-01-06,Carrefour City,FR,Seyssinet-Pariset,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,3.57,EUR,2025-01-09,Spar,FR,Grenoble,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,4.61,EUR,2025-01-09,Spar,FR,Grenoble,hit_gtin_otro_mercado
+3168930009191,Doritos nacho,Doritos,170 g,1.43,EUR,2022-12-15,Centre Commercial E.Leclerc,FR,Montélimar,hit_gtin_otro_mercado
+3168930009191,Doritos nacho,Doritos,170 g,1.24,EUR,2022-02-26,Centre Commercial E.Leclerc,FR,Montélimar,hit_gtin_otro_mercado
+3168930009191,Doritos nacho,Doritos,170 g,1.26,EUR,2021-12-04,Centre Commercial E.Leclerc,FR,Montélimar,hit_gtin_otro_mercado
+3168930009191,Doritos nacho,Doritos,170 g,1.35,EUR,2021-02-20,Centre Commercial E.Leclerc,FR,Montélimar,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,3.22,EUR,2025-03-06,U Express,FR,Échirolles,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,2.84,EUR,2025-04-23,IKEA,FR,Guipavas,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,2.84,EUR,2025-04-23,E.Leclerc,FR,Brest,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,3.12,EUR,2025-06-07,Intermarché Super Bresson,FR,Bresson,hit_gtin_otro_mercado
+3036810204014,Moutarde au miel,Maille,1pcs,4.5,EUR,2025-11-08,Alcampo,ES,l'Hospitalet de Llobregat,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,3.24,EUR,2025-11-24,Auchan,FR,Fontaine,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,3.09,EUR,2025-12-12,G20,FR,Lille,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,2.7,EUR,2025-12-12,Carrefour,FR,Lille,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,3.39,EUR,2025-12-12,Monoprix,FR,Lille,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,3.45,EUR,2025-12-12,Carrefour,FR,Lille,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,2.88,EUR,2026-01-22,Match,FR,Lille,hit_gtin_otro_mercado
+3159470000120,CORN FLAKES,Kellogg's,500 g,2.67,EUR,2026-02-07,Auchan,FR,Clichy,hit_gtin_otro_mercado
+3229820782560,"Muesli Superfruits Raisins, cassis, cranberry, myrtille",Bjorg,375g,3.06,EUR,2026-08-14,Intermarché Super,FR,Bourg-de-Thizy,hit_gtin_otro_mercado
+3036810207589,,Maille,210g,4.19,EUR,2026-08-17,Interspar,HR,Grad Rijeka,hit_gtin_otro_mercado
+3036810204014,Moutarde au miel,Maille,1pcs,4.79,EUR,2026-08-17,Interspar,HR,Grad Rijeka,hit_gtin_otro_mercado
+0070272232027,DAIRY WHIPPED TOPPING,Reddi Wip,184 g,3.5,USD,2025-11-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0070272232058,Whipped Topping,Reddi Wip,184 g,3.5,USD,2025-11-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0066022009018,Organic Hass Avocados,Eco Farms,3 count,3.93,USD,2025-11-29,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+75041670,Corona Extra,Corona,330 cc / 330 ml,1.99,EUR,2026-02-02,Diagonal,FR,Clichy,hit_gtin_otro_mercado
+75041670,Corona Extra,Corona,330 cc / 330 ml,1.99,EUR,2026-03-06,Diagonal,FR,Clichy,hit_gtin_otro_mercado
+3560070060252,MOZZARELLA,Carrefour,220 g,0.99,EUR,2024-11-11,Carrefour Market,FR,Veynes,hit_gtin_otro_mercado
+3560070060252,MOZZARELLA,Carrefour,220 g,1.05,EUR,2025-03-16,Carrefour Market,FR,Paris,hit_gtin_otro_mercado
+3560070060252,MOZZARELLA,Carrefour,220 g,0.99,EUR,2025-04-13,Carrefour Market,FR,Saint-Genis-Pouilly,hit_gtin_otro_mercado
+3415581571004,Favorite Selection,Häagen-Dazs,400 ml (4 x 100 ml),7.3,EUR,2026-01-08,Sitis Market,FR,Clichy,hit_gtin_otro_mercado
+3415581571004,Favorite Selection,Häagen-Dazs,400 ml (4 x 100 ml),7.3,EUR,2026-01-20,Sitis Market,FR,Clichy,hit_gtin_otro_mercado
+3415581571004,Favorite Selection,Häagen-Dazs,400 ml (4 x 100 ml),7.3,EUR,2026-01-27,Sitis Market,FR,Clichy,hit_gtin_otro_mercado
+3560070060252,MOZZARELLA,Carrefour,220 g,0.93,EUR,2026-02-15,Carrefour Market,ES,Madrid,hit_gtin_otro_mercado
+3560070060252,MOZZARELLA,Carrefour,220 g,0.99,EUR,2026-04-17,Carrefour Market,FR,Vannes,hit_gtin_otro_mercado
+0009800512041,Kinder Chocolate,Kinder,1.8 OZ (50g),1.99,USD,2025-10-03,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0732494000500,Caramel Flavoured Popcorn,G.H. Cretors,227 g,4.49,USD,2026-02-07,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.08,EUR,2024-01-09,Intermarché,FR,Grenoble,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.29,EUR,2024-01-26,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.14,EUR,2021-12-14,E. Leclerc,FR,Échirolles,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.44,EUR,2020-11-20,E. Leclerc,FR,Échirolles,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.99,EUR,2023-01-02,Carrefour Market,FR,Miribel,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.8,EUR,2022-09-10,Carrefour Market,FR,Miribel,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,2.14,EUR,2025-01-03,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.71,EUR,2025-01-06,Carrefour City,FR,Seyssinet-Pariset,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.59,EUR,2025-12-07,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.74,EUR,2026-01-02,Intermarché Super Bresson,FR,Bresson,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.59,EUR,2026-02-02,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.06,EUR,2026-02-05,E.Leclerc Levallois,FR,Levallois-Perret,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.54,EUR,2026-02-07,Auchan,FR,Clichy,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,2.42,EUR,2026-02-09,G20,FR,Paris,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.99,EUR,2026-02-10,Monoprix,FR,Arcueil,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.29,EUR,2026-02-13,Carrefour Market,FR,Paris,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.06,EUR,2026-02-21,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.95,EUR,2026-03-01,Franprix,FR,Clichy,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,2.01,EUR,2026-03-08,Centre Commercial E.Leclerc,FR,Gennevilliers,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.38,EUR,2026-03-16,Super U,FR,Paris,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.38,EUR,2026-03-17,Super U,FR,Paris,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,2.09,EUR,2026-03-18,Auchan,FR,Nancy,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.35,EUR,2026-04-12,Intermarché,FR,Clichy,hit_gtin_otro_mercado
+7622300744663,Original,"Mondelēz,Oreo",220 g,2.38,EUR,2026-03-15,Super U,FR,Paris,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,1.93,EUR,2026-05-09,Auchan,FR,Nancy,hit_gtin_otro_mercado
+7622300441937,Philadelphia Original,Mondelez International,150 g,2.09,EUR,2024-10-07,Carrefour Villeurbanne,FR,Villeurbanne,hit_gtin_otro_mercado
+0738545010481,Salsa Clasica,La Botanera,,4.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0738912022413,"Country Fried Beef Steak with Signature, Homestyle Mashed Potatoes & Country-Style Gravy",Boston Market,374 g,4.5,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0738545010481,Salsa Clasica,La Botanera,,1.99,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0605388187888,Fiesta Blend,Great Value,227 g,1.97,USD,2026-05-22,Walmart Supercenter,US,Lynchburg,hit_gtin_otro_mercado
+7501058624147,Decaf,Nescafé,,11.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+7501058624130,Nescafe Reserva Xiapan,Nescafé,180 g,13.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+7503016555074,La Perrona,,,3.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+75002343,Aceite Vegetal Mixto,123,1litro,2.99,USD,2026-01-03,La Plaza,US,Mountain View,hit_gtin_otro_mercado
+8412600013014,Pan de Molde Integral,Bimbo,460g | 16 REBANADAS,2.15,EUR,2024-04-08,Ahorramás,ES,Getafe,hit_gtin_otro_mercado
+8412289014197,García Baquero Queso Iberico,García Baquero,150 g,4.55,PAB,2026-03-21,Riba Smith,PA,Bella Vista,hit_gtin_otro_mercado
+8412289003740,Spanish Cheese Plate,Garcia Baquero,150 g,6.6,PAB,2026-03-23,Riba Smith,PA,Bella Vista,hit_gtin_otro_mercado
+7501017042098,SALSA ROJA PARA ENCHILADAS,LA COSTEÑA,420g,40.0,NOK,2026-06-16,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+7501017045020,,,,30.0,NOK,2026-08-10,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+0037600110877,Creamy roasted honey nut peanut butter,Skippy,462 gramos,3.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),3.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),3.13,USD,2025-10-17,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0037600105002,Reduced Fat Creamy Peanut Butter,Skippy,462 g,3.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600104999,Peanut Butter Spread,Skippy,462 gramos,3.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),3.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600110877,Creamy roasted honey nut peanut butter,Skippy,462 gramos,3.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),3.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600110877,Creamy roasted honey nut peanut butter,Skippy,462 gramos,4.49,USD,2026-04-26,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),4.49,USD,2026-04-26,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0037600110877,Creamy roasted honey nut peanut butter,Skippy,462 gramos,4.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0037600110877,Creamy roasted honey nut peanut butter,Skippy,462 gramos,4.49,USD,2026-09-15,Fairway Market,US,New York,hit_gtin_otro_mercado
+0037600105064,Peanut Butter Spread,Skippy Natural Creamy,15 oz (425g),4.49,USD,2026-09-15,Fairway Market,US,New York,hit_gtin_otro_mercado
+0037600105002,Reduced Fat Creamy Peanut Butter,Skippy,462 g,4.49,USD,2026-09-15,Fairway Market,US,New York,hit_gtin_otro_mercado
+0072250037129,100% Whole Wheat,Nature's Own,20 oz (567 g),5.29,USD,2025-10-11,Whole Foods Market,US,Los Altos,hit_gtin_otro_mercado
+0072250020749,Thick Sliced White Bread,Nature's Own,"22 oz., 1lb 6oz, 624 g",3.99,USD,2025-10-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0072250037068,Honey Wheat,Nature's Own,20 oz,5.49,USD,2025-10-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0072180634733,Classic Crust Pepperoni Pizza,Red Baron,583 g,4.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0072180634719,SUPREME PIZZA,RED BARON,664 g,4.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0072180634290,Classic Crust Four Cheese Pizza,Red Baron,597 g,4.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0072180634290,Classic Crust Four Cheese Pizza,Red Baron,597 g,6.99,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0072180634733,Classic Crust Pepperoni Pizza,Red Baron,583 g,6.99,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0072180634719,SUPREME PIZZA,RED BARON,664 g,6.99,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0072250020756,Perfectly Crafted Thick Sliced Multigrain Bread,Nature's Own,22 oz,4.79,USD,2026-09-15,Food Bazaar,US,New York,hit_gtin_otro_mercado
+0633148100624,Tajin Classic Seasoning Reduced Sodium,Tajin,142 g,6.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),4.99,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0633148100624,Tajin Classic Seasoning Reduced Sodium,Tajin,142 g,2.99,USD,2026-07-30,Smart & Final extra!,US,Mountain View,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),54.9,NOK,2026-08-10,Rema 1000 Danmarksplass,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),54.9,NOK,2026-08-10,Rema 1000 Danmarksplass,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),3.49,USD,2026-07-27,Walgreens,US,Millbrae,hit_gtin_otro_mercado
+0633148100617,Fruity chamoy hot sauce with lime,Tajín,15.38 fl. oz. (455 mL),50.0,NOK,2026-08-10,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),54.9,NOK,2026-08-10,Rema 1000 Danmarksplass,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),54.9,NOK,2026-08-10,Rema 1000 Danmarksplass,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),65.0,NOK,2026-08-20,Oliven eksotisk mat,NO,Bergen,hit_gtin_otro_mercado
+0633148100624,Tajin Classic Seasoning Reduced Sodium,Tajin,142 g,3.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0633148100624,Tajin Classic Seasoning Reduced Sodium,Tajin,142 g,3.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0633148100556,Chili Seasoning,Tajín,400 g (14 oz),6.99,USD,2026-08-28,Apna Bazar,US,Sunnyvale,hit_gtin_otro_mercado
+0633148100556,Chili Seasoning,Tajín,400 g (14 oz),89.9,NOK,2026-09-03,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),49.9,NOK,2026-09-03,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0633148100556,Chili Seasoning,Tajín,400 g (14 oz),89.9,NOK,2026-09-03,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0633148100013,,Tajín,(142 g),54.9,NOK,2026-09-18,Rema 1000 Danmarksplass,NO,Bergen,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,6.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100149,New York Super Fudge Chunk,Ben & Jerry's,473 ml,6.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100354,Chunky Monkey,Ben & Jerry's,473 ml,6.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,6.99,USD,2025-09-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100149,New York Super Fudge Chunk,Ben & Jerry's,473 ml,8.99,USD,2025-09-28,Draeger's,US,Los Altos,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,4.68,USD,2024-08-02,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,4.68,USD,2024-12-05,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,4.68,USD,2025-05-22,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0076840100156,Cherry Garcia Cherry Ice Cream with Cherries & Fudge Flakes,Ben & Jerry's,1 pt,6.39,USD,2025-10-05,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,6.39,USD,2025-10-18,Whole Foods Market,US,Los Altos,hit_gtin_otro_mercado
+0077901006516,Feta Chunk,President,8 oz (226 g),6.79,USD,2025-10-30,Sprouts Farmers Market,US,Sunnyvale,hit_gtin_otro_mercado
+0076840529872,Brownie Batter,Ben & Jerry's Core,1 pint,7.79,USD,2025-11-03,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100354,Chunky Monkey,Ben & Jerry's,473 ml,5.12,USD,2025-12-06,Walmart Supercenter,US,Mountain View,hit_gtin_otro_mercado
+0076840100156,Cherry Garcia Cherry Ice Cream with Cherries & Fudge Flakes,Ben & Jerry's,1 pt,6.49,USD,2025-12-24,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,6.49,USD,2025-12-24,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0076840100354,Chunky Monkey,Ben & Jerry's,473 ml,6.49,USD,2025-12-24,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0076840100354,Chunky Monkey,Ben & Jerry's,473 ml,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100156,Cherry Garcia Cherry Ice Cream with Cherries & Fudge Flakes,Ben & Jerry's,1 pt,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840485116,The Tonight Dough,Ben & Jerry's,473 ml,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100149,New York Super Fudge Chunk,Ben & Jerry's,473 ml,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840529872,Brownie Batter,Ben & Jerry's Core,1 pint,6.99,USD,2026-01-23,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,5.19,USD,2026-04-09,Target,US,Town of Smithtown,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,4.44,USD,2026-05-01,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,4.44,USD,2026-05-01,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0076840100583,Chocolate Chip Cookie Dough,Ben & Jerry's,473 ml,4.44,USD,2026-05-01,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0077901006516,Feta Chunk,President,8 oz (226 g),4.99,USD,2026-09-13,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+5449000000996,Coke Original Taste,Coca-Cola,33 cl,0.99,EUR,2024-11-15,Franprix,FR,Paris,hit_gtin_otro_mercado
+5449000000996,Coke Original Taste,Coca-Cola,33 cl,1.1,EUR,2026-04-06,HiperDino Express Alegría Barranco,ES,Los Cristianos,hit_gtin_otro_mercado
+8410344151306,Aceitunas Rellenas de Anchoas,Serpis,300g  (130 g escurrido),1.99,EUR,2024-03-26,Bonpreu,ES,Sant Feliu de Llobregat,hit_gtin_otro_mercado
+8410376010701,Galleta María,Gullón,400 g,2.39,EUR,2025-11-08,Supeco,ES,Barcelona,hit_gtin_otro_mercado
+9002490200220,Red Bull Sugarfree,Red Bull,250ml,4.49,PLN,2024-08-31,Biedronka,PL,Wrocław,hit_gtin_otro_mercado
+9002490200220,Red Bull Sugarfree,Red Bull,250ml,7.6,PLN,2026-01-14,Żabka,PL,Poznań,hit_gtin_otro_mercado
+8850389100684,Mogu lychee,Sappe Public Company Limited,320 ml,1.95,EUR,2026-02-19,Franprix,FR,Clichy,hit_gtin_otro_mercado
+8850389100684,Mogu lychee,Sappe Public Company Limited,320 ml,1.95,EUR,2026-02-23,Franprix,FR,Clichy,hit_gtin_otro_mercado
+8850389100684,Mogu lychee,Sappe Public Company Limited,320 ml,1.95,EUR,2026-03-16,Franprix,FR,Clichy,hit_gtin_otro_mercado
+8000320010088,Passata di Pomodoro,Cirio,680g,2.05,EUR,2023-09-02,Auchan,FR,Ennetières-en-Weppes,hit_gtin_otro_mercado
+8000500126936,Ferrero Rocher,Ferrero rocher,50 g,75.0,TWD,2024-05-26,7-Eleven,TW,東區商圈,hit_gtin_otro_mercado
+7898024397915,Nutella B-ready,Nutella,22g,117.0,JPY,2025-04-24,まいづる本店ショッピングプラザ,JP,唐津市,hit_gtin_otro_mercado
+8000320010088,Passata di Pomodoro,Cirio,680g,2.16,EUR,2026-02-10,Super U,FR,Grenoble,hit_gtin_otro_mercado
+8001250009999,Gnocchi di Patate,De Cecco,500g,2.9,EUR,2026-02-17,Diagonal,FR,Clichy,hit_gtin_otro_mercado
+8001585008032,Mini rolls chocolate,"Balconi, Balconista",180 g,1.01,EUR,2026-02-20,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8001250009999,Gnocchi di Patate,De Cecco,500g,2.56,EUR,2026-03-05,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8001250009999,Gnocchi di Patate,De Cecco,500g,2.56,EUR,2026-03-26,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8000320010088,Passata di Pomodoro,Cirio,680g,2.27,EUR,2026-08-20,U Express Lyon Université,FR,Lyon,hit_gtin_otro_mercado
+8001585008032,Mini rolls chocolate,"Balconi, Balconista",180 g,0.97,EUR,2026-09-02,E. Leclerc,FR,Vandœuvre-lès-Nancy,hit_gtin_otro_mercado
+0078895700015,HOISIN SAUCE,LEE KUM KEE,8.5 oz,3.29,USD,2025-09-28,Draeger's,US,Los Altos,hit_gtin_otro_mercado
+0078895700015,HOISIN SAUCE,LEE KUM KEE,8.5 oz,4.99,USD,2026-01-04,Lucky,US,Sunnyvale,hit_gtin_otro_mercado
+0078895700015,HOISIN SAUCE,LEE KUM KEE,8.5 oz,3.49,USD,2026-05-30,H Mart,US,Dublin,hit_gtin_otro_mercado
+0078895700015,HOISIN SAUCE,LEE KUM KEE,8.5 oz,4.49,USD,2026-06-25,Windmill Market,US,San Juan Bautista,hit_gtin_otro_mercado
+0014100085478,CHEDDAR 100% REAL CHEESE,Goldfish,6.6 oz (187 g),2.99,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0014100085539,Goldfish Baked Snack Crackers Xtra Cheesy Pizza,Pepperidge Farm,187 G,1.97,USD,2025-10-05,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0016000189102,Fruit Roll-Ups,General Mills,"5 oz, 10x 0.5 oz rolls",3.99,USD,2025-10-31,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0014100085478,CHEDDAR 100% REAL CHEESE,Goldfish,6.6 oz (187 g),2.0,USD,2026-01-07,,,,hit_gtin_otro_mercado
+0014100085478,CHEDDAR 100% REAL CHEESE,Goldfish,6.6 oz (187 g),2.0,USD,2026-03-28,ShopRite,US,Huntington Station,hit_gtin_otro_mercado
+0016000194304,"Variety Pack Fruit by the Foot 6 Count Strawberry, Berry and Rainbow Punch","Fruit by the Foot,General Mills Sales Inc","128 g, 6x 0.75 oz rolls",3.99,USD,2025-10-31,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0724836004031,"Mexico Lindo, Green Habanero Hot Sauce, Extra Hot",Especias Castillo  S.A. De C.V,5 FL OZ (150 mL),1.67,USD,2026-08-02,Cardenas,US,East Palo Alto,hit_gtin_otro_mercado
+0724836004024,Salsa de chile Habanero Rojo,México Lindo,,1.67,USD,2026-08-02,Cardenas,US,East Palo Alto,hit_gtin_otro_mercado
+6111021013307,Orange Jam,"Aïcha,Extra",430g,2.32,EUR,2026-02-27,Auchan Supermarché,FR,Bagneux,hit_gtin_otro_mercado
+0085696608044,Mori-Nu Shelf Stable Silken Tofu Firm,Morinaga,"10.8 oz, 307 g",3.5,EUR,2025-01-03,Viet-Hung,FR,Grenoble,hit_gtin_otro_mercado
+5050083739811,Céréales Special K Kellogg's Nature,Kellogg's,750 g,4.16,EUR,2024-02-26,Intermarché Super,FR,Bezons,hit_gtin_otro_mercado
+5050083739811,Céréales Special K Kellogg's Nature,Kellogg's,750 g,4.88,EUR,2024-08-20,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+5050083739811,Céréales Special K Kellogg's Nature,Kellogg's,750 g,4.88,EUR,2024-11-08,Auchan Supermarché,FR,Grenoble,hit_gtin_otro_mercado
+5050083739811,Céréales Special K Kellogg's Nature,Kellogg's,750 g,6.19,EUR,2025-01-09,Spar,FR,Grenoble,hit_gtin_otro_mercado
+5050083739811,Céréales Special K Kellogg's Nature,Kellogg's,750 g,4.75,EUR,2025-12-12,Carrefour,FR,Lille,hit_gtin_otro_mercado
+0036200219317,Tomato & Basil Sauce,Bertolli,680 g,3.99,USD,2025-09-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0034000140589,HR-KISSES MK CHOCO 306G,Hershey’s,306g,7.29,USD,2025-10-03,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0034000140589,HR-KISSES MK CHOCO 306G,Hershey’s,306g,5.99,USD,2025-09-28,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0036200219317,Tomato & Basil Sauce,Bertolli,680 g,4.49,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7501017005062,Nachos de jalapeno imp,La Costeña,220 g,2.35,EUR,2025-11-10,Alcampo,ES,Barcelona,hit_gtin_otro_mercado
+7501017005062,Nachos de jalapeno imp,La Costeña,220 g,1.95,EUR,2026-04-05,Carrefour,FR,Gennevilliers,hit_gtin_otro_mercado
+7501017005925,Salsa verde la Costeña,"La Costena, EDEKA La Costena",250g,3.15,EUR,2026-04-05,Carrefour,FR,Gennevilliers,hit_gtin_otro_mercado
+7501017005925,Salsa verde la Costeña,"La Costena, EDEKA La Costena",250g,2.88,EUR,2026-07-31,Auchan,FR,Nancy,hit_gtin_otro_mercado
+0815074022915,100% Pure Avocado Oil Spray,Chosen Foods,13.5oz,13.99,CAD,2025-07-31,Costco,US,Tucson,hit_gtin_otro_mercado
+0815074022809,Classic Mayo,Chosen Foods,946 ml,8.99,USD,2025-12-16,Costco,US,Mountain View,hit_gtin_otro_mercado
+0815074020096,Classic Mayo,Chosen Foods,24 fl oz,18.99,USD,2025-10-19,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0818290017734,Chobani 20G Protein Zero Added Sugar Mixed Berry Vanilla,Chobani,10 fl oz (296ml),3.0,USD,2025-12-24,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0818290017734,Chobani 20G Protein Zero Added Sugar Mixed Berry Vanilla,Chobani,10 fl oz (296ml),2.99,USD,2026-02-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0815074022915,100% Pure Avocado Oil Spray,Chosen Foods,13.5oz,11.47,USD,2026-03-09,WinCo Foods,US,Edmonds,hit_gtin_otro_mercado
+0815074022809,Classic Mayo,Chosen Foods,946 ml,6.69,USD,2026-03-28,Costco,US,Mountain View,hit_gtin_otro_mercado
+0815074022809,Classic Mayo,Chosen Foods,946 ml,9.69,USD,2026-04-17,Costco,US,Sunnyvale,hit_gtin_otro_mercado
+0814563010457,Organic Seedless Grapes,Molina,3lbs,8.49,USD,2026-05-21,Costco,US,Mountain View,hit_gtin_otro_mercado
+0814563010457,Organic Seedless Grapes,Molina,3lbs,8.49,USD,2026-06-12,Costco,US,Mountain View,hit_gtin_otro_mercado
+0815074022809,Classic Mayo,Chosen Foods,946 ml,9.69,USD,2026-07-16,Costco,US,Mountain View,hit_gtin_otro_mercado
+0818290017734,Chobani 20G Protein Zero Added Sugar Mixed Berry Vanilla,Chobani,10 fl oz (296ml),3.99,USD,2026-01-25,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0894700010014,Greek Yogurt Nonfat Plain,Chobani,5.3 oz,1.24,USD,2025-10-25,Grocery Outlet,US,Milpitas,hit_gtin_otro_mercado
+0894700010434,Greek Yogurt Whole Milk Plain,Chobani,907g (32 OZ),5.59,USD,2025-10-25,Grocery Outlet,US,Milpitas,hit_gtin_otro_mercado
+0894700010137,Greek Yogurt Nonfat Plain,Chobani,32 OZ,7.99,USD,2026-02-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0894700010014,Greek Yogurt Nonfat Plain,Chobani,5.3 oz,1.0,USD,2026-02-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0894700010052,Greek Yogurt Blueberry on the Bottom,Chobani,5.3 oz,1.0,USD,2026-02-12,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0085696608037,Silken Tofu Soft imp,"Morinaga, Pacific Nutritional Foods  Inc., Mori Nu",12unknown,3.25,EUR,2025-01-03,Viet-Hung,FR,Grenoble,hit_gtin_otro_mercado
+0085696608044,Mori-Nu Shelf Stable Silken Tofu Firm,Morinaga,"10.8 oz, 307 g",3.5,EUR,2025-01-03,Viet-Hung,FR,Grenoble,hit_gtin_otro_mercado
+0085696608051,TOFU,MORI-NU SILKEN,12.3 oz,2.5,USD,2025-10-30,Sprouts Farmers Market,US,Sunnyvale,hit_gtin_otro_mercado
+7501071307799,Refried Black Beans,Isadora,430 g,13.99,PLN,2026-08-01,TK Maxx,PL,Warszawa,hit_gtin_otro_mercado
+00000154,Mct Oil Powder,Opportuniteas,6 oz,1.99,EUR,2021-04-02,Centre Commercial E. Leclerc,FR,Saint-Magne-de-Castillon,hit_gtin_otro_mercado
+00000154,Mct Oil Powder,Opportuniteas,6 oz,1.99,EUR,2021-03-19,Centre Commercial E. Leclerc,FR,Saint-Magne-de-Castillon,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.25,EUR,2024-01-16,Monoprix,FR,Grenoble,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.91,EUR,2024-09-22,Casino,FR,Paris,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,52.5,NOK,2024-05-25,Bunnpris Damsgård,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.95,EUR,2025-03-12,Franprix,FR,Paris,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.15,CHF,2025-08-28,Migros,CH,Neuchâtel,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.15,CHF,2025-09-02,Coop,CH,Genève,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.79,EUR,2025-12-30,Billa,AT,Wien,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.45,EUR,2026-02-09,E.Leclerc Drive,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.76,EUR,2026-02-11,Match,FR,Vandœuvre-lès-Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.99,EUR,2026-02-13,Carrefour City,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.55,EUR,2026-02-28,E. Leclerc,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.55,EUR,2026-03-04,E. Leclerc,FR,Vandœuvre-lès-Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.75,EUR,2026-03-14,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.99,EUR,2026-03-16,Carrefour City,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,59.9,NOK,2026-06-02,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,51.9,NOK,2026-06-02,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,51.9,NOK,2026-06-02,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,51.9,NOK,2026-06-05,Rema 1000 Marken,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,51.9,NOK,2026-06-05,Rema 1000 Marken,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,64.9,NOK,2026-06-21,Coop Prix Fenderen,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.35,EUR,2026-07-28,Monoprix,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,3.96,EUR,2026-07-31,Auchan,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,45.43,NOK,2026-08-03,Coop Prix Fenderen,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,51.4,NOK,2026-08-15,Kiwi Bøhmergaten,NO,Bergen,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.05,EUR,2026-08-23,Auchan Supermarché,FR,Lyon,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.36,EUR,2026-08-25,U Express,FR,Lyon,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,31.13,SEK,2026-07-31,Willys Landskrona Infarten,SE,Landskrona,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.16,EUR,2026-08-27,Carrefour City,FR,Grenoble,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.99,EUR,2026-08-28,Super U,FR,Lyon,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.09,EUR,2026-08-29,Carrefour City,FR,Nancy,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.68,EUR,2026-09-01,Carrefour Express,FR,Lyon,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,4.1,EUR,2026-09-05,Intermarché Contact,FR,Ginasservis,hit_gtin_otro_mercado
+8715035110106,Soy Sauce,Kikkoman,150ml,5.6,EUR,2026-07-30,Carrefour Express,FR,Nancy,hit_gtin_otro_mercado
+0057836022614,Honey Bombs Sweet Honey-Crunch Flavor Golden Sweet Tomatoes On The Vine,Sunset,8x12oz (341g),5.99,USD,2025-09-17,Whole Foods Market,US,Los Altos,hit_gtin_otro_mercado
+0057836022782,Lolli Bombs Tomatoes On The Vine,Sunset,8x12oz(341g),5.99,USD,2025-09-17,Whole Foods Market,US,Los Altos,hit_gtin_otro_mercado
+0840370900506,Queso Parmesano,Kraft,16 oz,9.99,USD,2025-10-18,Nob Hill Foods,US,Mountain View,hit_gtin_otro_mercado
+0829515302207,Garden veggie chips,Sensible Portions,198 g,3.49,USD,2026-02-07,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0840370900506,Queso Parmesano,Kraft,16 oz,10.99,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+8002590055417,Cantuccini dark chocolate,Sapori,175g,2.89,EUR,2026-02-04,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+8002590055417,Cantuccini dark chocolate,Sapori,175g,3.35,EUR,2026-02-14,E. Leclerc,FR,Saint-Martin-d'Hères,hit_gtin_otro_mercado
+8002590055417,Cantuccini dark chocolate,Sapori,175g,3.35,EUR,2026-02-14,E. Leclerc,FR,Saint-Martin-d'Hères,hit_gtin_otro_mercado
+8001720021018,,Bauli,500 g,6.55,EUR,2026-05-09,E. Leclerc,FR,Saint-Martin-d'Hères,hit_gtin_otro_mercado
+4008258442012,Morceaux de Gingembre confit,Seeberger,200g,4.38,EUR,2024-01-22,Super U,FR,Grenoble,hit_gtin_otro_mercado
+4008258442012,Morceaux de Gingembre confit,Seeberger,200g,4.18,EUR,2024-03-06,G20,FR,Bezons,hit_gtin_otro_mercado
+4008258442012,Morceaux de Gingembre confit,Seeberger,200g,4.57,EUR,2024-09-24,U Express Lyon Université,FR,Lyon,hit_gtin_otro_mercado
+4008258442012,Morceaux de Gingembre confit,Seeberger,200g,4.39,EUR,2026-04-06,Carrefour,FR,Gennevilliers,hit_gtin_otro_mercado
+40052397,"KITKAT 4 Fingers Barre au Chocolat au Lait 41,5g, unitaire",Nestlé,41.5 g,2.0,EUR,2026-07-26,Bon app !,FR,Nancy,hit_gtin_otro_mercado
+4008258442012,Morceaux de Gingembre confit,Seeberger,200g,4.84,EUR,2026-08-09,Super U,FR,Lyon,hit_gtin_otro_mercado
+7501052472195,Salsa de tomate catsup,clemente jaques,220g,15.0,USD,2026-01-09,"Abarrotes ""Dunosusa""",MX,Leona Vicario,pendiente_revision_moneda
+5060323903490,Polpa Fine - Finely chopped tomatoes,Coppola Salerno,400 g,15.52,NOK,2024-04-13,Gigaboks Åsane,NO,Bergen,hit_gtin_otro_mercado
+0040600345002,Original I can't Believe it's not Butter!,I can't Believe it's not Butter!,500 G,4.99,USD,2025-10-22,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0097339000061,Salsa Picante,Valentina,12.5 fl oz (370mL),2.69,USD,2026-01-10,J.L. Produce,US,Mountain View,hit_gtin_otro_mercado
+0097339000061,Salsa Picante,Valentina,12.5 fl oz (370mL),79.0,NOK,2026-07-09,Petra Delikatesse,NO,Asker,hit_gtin_otro_mercado
+0097339000030,Salsa Picante,Valentina,1 litro,5.99,USD,2026-08-11,Safeway,US,Mountain View,hit_gtin_otro_mercado
+7613032396350,Capsules NESCAFE DOLCE GUSTO Espresso Macchiato Cortado 16 Capsules,Nescafe Dolce Gusto,100.8 g,5.08,EUR,2026-02-04,Centre Commercial E.Leclerc,FR,Clichy,hit_gtin_otro_mercado
+7613032396350,Capsules NESCAFE DOLCE GUSTO Espresso Macchiato Cortado 16 Capsules,Nescafe Dolce Gusto,100.8 g,4.88,EUR,2026-03-01,Centre Commercial E.Leclerc,FR,Gennevilliers,hit_gtin_otro_mercado
+7613032396350,Capsules NESCAFE DOLCE GUSTO Espresso Macchiato Cortado 16 Capsules,Nescafe Dolce Gusto,100.8 g,4.88,EUR,2026-03-01,Centre Commercial E.Leclerc,FR,Gennevilliers,hit_gtin_otro_mercado
+0016000275263,Cheerios,General Mills,8.9 oz,5.89,USD,2025-10-06,Whole Foods Market,US,Sunnyvale,hit_gtin_otro_mercado
+0016000467576,Marshmallow flavored bars,General Mills,192 g,5.49,USD,2025-10-31,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0016000275263,Cheerios,General Mills,8.9 oz,4.29,USD,2026-04-03,Fred Meyer,US,Lynnwood,hit_gtin_otro_mercado
+0016000275263,Cheerios,General Mills,8.9 oz,1.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0602652434051,Banana Peanut Butter Clusters with Dark Chocolate Chunks,KIND,11 oz,5.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado
+0602652434051,Banana Peanut Butter Clusters with Dark Chocolate Chunks,KIND,11 oz,5.99,USD,2026-07-24,Safeway,US,Mountain View,hit_gtin_otro_mercado

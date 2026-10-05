@@ -1,0 +1,10 @@
+grupo,metrica,valor,esperado,ok
+G1,n_total,16851,16851,True
+G1,n_d1_calculable,7040,7040,True
+G1,n_d2_calculable,6781,6781,True
+G1,n_universo_puntuable,5864,5864,True
+A5,n_price_real,263,263,True
+A31,n_insuficiente_Ana,9517,9517,True
+A31,causa_dominante_Ana,D1+D2+D3,D1+D2+D3,True
+A31,n_insuficiente_Caro,10974,10974,True
+A31,causa_dominante_Caro,D1+D2+D3,D1+D2+D3,True

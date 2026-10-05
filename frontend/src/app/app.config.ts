@@ -1,5 +1,5 @@
 import { registerLocaleData } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import localeEsMx from '@angular/common/locales/es-MX';
 import {
   ApplicationConfig,
@@ -10,6 +10,7 @@ import {
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
+import { apiBaseInterceptor } from './core/api-base.interceptor';
 
 registerLocaleData(localeEsMx);
 
@@ -18,7 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([apiBaseInterceptor])),
     { provide: LOCALE_ID, useValue: 'es-MX' },
   ],
 };

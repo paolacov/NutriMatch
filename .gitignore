@@ -26,6 +26,12 @@ Thumbs.db
 
 # Secretos locales: solo se versiona .env.example
 .env
+.env.*
+!.env.example
+
+# Credenciales sueltas
+*.pem
+credentials.json
 
 # Base SQLite de estado mutable (incluye los ficheros -wal y -shm del modo WAL).
 # Es regenerable, no es fuente de verdad.
@@ -82,3 +88,12 @@ docs/NutriMatch_Documentacion_Tecnica_Completa.pdf
 
 # Se conservan los marcadores de carpeta para que el árbol exista al clonar.
 !**/.gitkeep
+
+# Empaquetado generado para Colab y copias de entrega.
+# El código que ejecuta la aplicación ya está en el repositorio.
+# Estos archivos no hacen falta para instalar, probar ni desplegar.
+/nutrimatch-colab.zip
+/entregables/
+
+# Enlace local de la CLI de Vercel. No es código del proyecto.
+.vercel/

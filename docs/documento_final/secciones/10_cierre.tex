@@ -1,0 +1,50 @@
+\section{Arquitectura e implementación}
+
+La decisión de implementación es que el cálculo no viva dentro de la pantalla. El catálogo está en un archivo de tabla. El motor lee ese archivo y produce el orden. La pantalla solo muestra lo que el motor ya calculó. Por eso el notebook maestro y la aplicación usan las mismas funciones: una corrida y una ficha no pueden divergir.
+
+En la práctica, un servicio hecho con FastAPI entrega el catálogo, la ficha, el orden, las alternativas, el carrito y las alertas. La pantalla, hecha con Angular, los presenta. Una base local guarda solo lo que se puede volver a generar, como el perfil y el historial de uso. En el despliegue, la misma aplicación sirve la pantalla y el servicio.
+
+\subsection{Capa de lenguaje}
+
+Hay una capa opcional que redacta una explicación a partir de hechos ya calculados. No calcula resultados, no decide el orden, no inventa atributos ni precios y no sustituye al motor. Si una frase no está respaldada por un hecho, no pasa. Sin una clave de modelo de lenguaje, la respuesta sale de textos fijos. La decisión de compra no depende de ese texto.
+
+\section{Discusión y limitaciones}
+
+Lo que sigue no es una disculpa. Es el borde de lo que este corte permite afirmar. El sistema se diseñó para no decir más de lo que los datos sostienen.
+
+\subsection{Lo que el proyecto demuestra}
+
+Con el archivo del \corte, se puede sostener lo siguiente. La comparación se repite: el mismo archivo, el mismo perfil y el mismo conjunto de productos devuelven el mismo orden. Los faltantes se respetan: un ausente no entra como cero, y si la cobertura queda por debajo de 0{,}5 el resultado es nulo. El orden se adapta al perfil. En el ejemplo, la banda de ranking pasa de 113 a 114 productos cuando cambia la prioridad. La parte nutricional va en la dirección del contraste con Nutri-Score, como se midió en la evaluación. El recorrido de compra está implementado: búsqueda, ficha, alternativas, carrito y alertas.
+
+Doce de trece casos revisados coinciden con lo esperado. El treceavo difiere en el nombre, no en el puntaje.
+
+\subsection{Lo que no se puede concluir}
+
+Hay afirmaciones que los datos no alcanzan a sostener.
+
+\begin{itemize}
+  \item No se observó qué compra la persona. Sin compras, clics, favoritos o conversiones no hay una respuesta correcta con la cual entrenar ni evaluar un modelo de recomendación. Por eso no hay aprendizaje supervisado, y no hay un porcentaje de aciertos de compra.
+  \item No hay validez clínica. No se interpretan síntomas ni se prescribe una dieta.
+  \item Un resultado alto es compatibilidad con el perfil y con la información disponible. No es una recomendación para toda la población.
+  \item No hubo una prueba formal de usabilidad. Se puede describir el recorrido. No se puede decir que fue validado con personas.
+\end{itemize}
+
+La cobertura incompleta es una propiedad del catálogo, no un detalle menor. El procesamiento está disponible en 6\,780 productos. Etiquetas, alérgenos y precio cubren menos. Esa es la razón para no imputar: rellenar el hueco inventaría una afirmación que la fuente no hizo. La banda no verificable es grande porque el registro no alcanza, no porque se haya demostrado un riesgo. Mostrarla aparte evita una falsa seguridad. También deja muchos productos fuera de una respuesta afirmativa.
+
+El precio real es escaso: 259 productos, frente a 12\,834 sin precio. El entero de demostración ayuda a recorrer la ficha y no es un precio observado. El orden no lo usa.
+
+El notebook maestro sostiene la repetición local: comprueba la huella del archivo, reutiliza el motor y deja las cifras de este documento. El procedimiento para Google Colab está escrito ahí. La ejecución que respalda estas páginas se hizo en el entorno local del proyecto, no dentro de Colab.
+
+\section{Conclusiones}
+
+La pregunta era cómo convertir un catálogo heterogéneo de alimentos empacados en una comparación útil y repetible, sin inventar información que los datos no contienen.
+
+Lo que se construyó es una regla fija. Toma el catálogo operativo del \corte, 13\,093 productos, y lo que la persona declara. Devuelve un orden que se puede explicar. De esos productos, 5\,864 cumplen las condiciones mínimas para armar la comparación antes de conocer a la persona. Esa cifra no es el tamaño de una recomendación. El orden de un perfil es otro conjunto: en el ejemplo, 113 productos, o 114 si cambia la prioridad. La cuenta experimental de 665 y 640 no es esa lista.
+
+La ciencia de datos del proyecto está en las decisiones que salieron de mirar los datos. Los faltantes siguen la documentación del registro, así que no se rellenan. Los nutrientes no comparten escala, así que se comparan por su puesto dentro de productos parecidos, y solo cuando la dirección es clara. NOVA, concentrado en el grupo 4, no separa solo: se ajusta con aditivos y queda nulo si el grupo no está. Las etiquetas esperan al perfil. El precio se muestra cuando es real y no ordena.
+
+Con ese resultado, la persona puede conservar un producto, descartarlo, explorar alternativas, sustituirlo, revisar una restricción y cerrar la compra en el carrito. La aplicación es la forma en que el análisis llega a esa decisión.
+
+Lo que no se puede afirmar es que la persona comprará el producto que quedó primero, que el resultado valga para toda la población, o que la facilidad de uso haya sido medida con personas. No hay una compra observada que sirva de respuesta correcta. La cobertura del catálogo sigue incompleta, y por eso el sistema se niega a inventar lo que falta.
+
+NutriMatch no decide por la persona qué alimento es saludable. Organiza información dispersa, la convierte en una comparación comprensible y deja la decisión de compra en quien la usa.

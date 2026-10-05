@@ -1,0 +1,36 @@
+\section{Modelación y motor de decisión}
+
+\subsection{De las variables a un orden}
+
+Las variables ya dicen con quién se compara un producto, cómo se lee cada nutriente y qué hacer cuando falta un dato. Faltaba una forma repetible de pasar de esas variables, y de las prioridades de la persona, a un orden. Esa forma es una regla fija de compatibilidad. Aquí se llama motor. Las mismas entradas producen el mismo resultado y el mismo orden. No hay azar ni un ajuste entrenado con ejemplos.
+
+La entrada es el catálogo y un perfil: el orden de tres prioridades, la dieta vegana o vegetariana si se declaró, los alérgenos a evitar y las etiquetas valoradas. Los pesos son los de la sección anterior: \(3/6\) (0{,}50), \(2/6\) (0{,}33) y \(1/6\) (0{,}17). La nutrición y el procesamiento llegan ya calculados. Las etiquetas y el resultado se arman cuando llega el perfil.
+
+\subsection{Por qué no hay aprendizaje supervisado}
+
+NutriMatch no utiliza aprendizaje supervisado en el MVP porque el catálogo no contiene un target observado que permita entrenar y evaluar de manera científicamente válida un modelo de recomendación. Un modelo supervisado aprende de ejemplos que ya traen la respuesta correcta. Aquí esa respuesta no existe: no hay historial de compra, no hay clics, no hay favoritos y no hay conversiones. El resultado, las tres señales y las bandas los calcula el propio sistema. Entrenar un modelo para predecirlos sería circular. La respuesta saldría de la misma regla que se quiere evaluar, y la prueba no diría nada nuevo.
+
+Por eso el motor no es un modelo de aprendizaje automático. Es una regla de compatibilidad y de orden, a partir de lo que la persona declaró y de lo que el producto tiene observado. La falta de una respuesta de compra no se toma como una debilidad del sistema. Es la condición del problema: lo que se apoya es una comparación, no la predicción de una compra.
+
+Tampoco se construyó un agrupamiento no supervisado. Ese tipo de análisis junta productos parecidos sin una respuesta previa. Podría describir el catálogo, pero no es lo que hoy ordena la compra. Hacerlo solo para nombrar una técnica no respondería la pregunta del proyecto. El orden sale de la regla que sigue.
+
+\subsection{Alergias, dieta y bandas}
+
+Alergias y dieta tienen tres estados: apto, no apto y no verificable. La alergia usa lo que el registro declara y las trazas, el aviso de que el producto puede contener el alérgeno. La dieta usa el análisis de ingredientes. Si los ingredientes no alcanzan para afirmar la dieta, el estado es no verificable. Decir que sí cumple, sin evidencia, inventaría un hecho.
+
+El resultado combina las señales disponibles y las promedia según el peso de lo que sí tiene dato. Cada producto cae en una sola banda, en este orden:
+
+\begin{enumerate}
+  \item excluido, si la alergia no es apta o la dieta es incompatible; se cuenta y no se lista;
+  \item no verificable, si la alergia o la dieta no se pueden afirmar;
+  \item información insuficiente, si la cobertura es menor que 0{,}5;
+  \item ranking, el resto, de mayor a menor resultado.
+\end{enumerate}
+
+El orden de las bandas importa. Un producto excluido no pasa a la banda de no verificable, y uno no verificable no se mezcla con los aptos. La búsqueda por nombre o por código ocurre antes de puntuar, sobre todo el catálogo.
+
+\subsection{Salida}
+
+La salida es un orden con el resultado, las tres señales, la banda, la cobertura y el estado de los datos. Las alternativas de un producto se buscan en su misma categoría, el grupo con el que ya se comparó la nutrición. El precio y Nutri-Score pueden acompañar la ficha. No cambian el orden de la lista.
+
+Evaluar esta regla no es preguntar si predice una compra. Es preguntar si, con los mismos datos y el mismo perfil, hace lo que se diseñó para hacer. Eso corresponde a la sección siguiente.

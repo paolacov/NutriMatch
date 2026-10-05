@@ -1,0 +1,21 @@
+\section{Planteamiento del problema}
+
+\subsection{El problema}
+
+La decisión es concreta. Hay dos o más alimentos empacados parecidos, y hay que elegir. La dificultad es que la ficha de cada uno está incompleta de una manera distinta.
+
+La información útil existe, pero está repartida. Llega como nutrientes por 100\,g o 100\,mL, como un grupo de procesamiento, como etiquetas, como alérgenos y trazas, como una lista de ingredientes y, en pocos casos, como un precio observado. Las trazas indican que el producto puede contener un alérgeno, aunque no sea un ingrediente principal. Cada dato responde una pregunta distinta. Ninguno, por sí solo, alcanza para ordenar la compra.
+
+A eso se suma lo que no está. Un registro puede traer el nutriente y no la categoría que permitiría compararlo con productos parecidos. Puede traer el nombre y no decir nada sobre alérgenos. Puede no traer precio. Ese hueco no es un valor del alimento. Es la falta de una afirmación de la fuente.
+
+Si ese silencio se lee como un hecho, la comparación se deforma. Leer \enquote{no hay dato de cacahuate} como \enquote{no contiene cacahuate} haría parecer apta a la mayor parte del catálogo, por falta de documentación y no por evidencia. Leer un precio ausente como cero haría parecer gratuitos a los productos sin precio. Contar un nutriente ausente como el valor más alto o el más bajo de la escala premiaría o castigaría el hueco.
+
+De ahí sale un principio del proyecto. Un dato ausente no es un cero. Cero significa que la fuente afirmó un valor, por ejemplo que el producto no declara azúcar. Nulo significa que la fuente no trajo el dato. Si esa diferencia no se respeta, el orden parece completo y no lo es.
+
+\subsection{Relevancia y alcance}
+
+La compra ocurre con lo que está publicado, no con el dato que convendría tener. Por eso el problema importa: una comparación útil tiene que trabajar con fichas reales, incompletas y distintas entre sí. El proyecto se limita a alimentos empacados del corte mexicano usado por NutriMatch. No observa el anaquel del día, no registra compras y no describe a un grupo de personas.
+
+La pregunta del trabajo es esta: ¿cómo convertir un catálogo heterogéneo de alimentos empacados en una comparación útil y reproducible para apoyar una decisión de compra, sin inventar información que los datos no contienen? Heterogéneo quiere decir que los datos son de tipos distintos y no llegan completos en todos los productos.
+
+Esa pregunta, para quien compra, no es una fórmula. Es una decisión frente a varias opciones parecidas. La estrategia siguiente dice quién es esa persona, qué necesita y qué puede hacer con el resultado.
